@@ -37,6 +37,11 @@ public class SOrder implements Serializable {
     private Long userId;
 
     /**
+     * 任务ID
+     */
+    private Long taskId;
+
+    /**
      * 支付方式
      */
     private Integer paymentType;

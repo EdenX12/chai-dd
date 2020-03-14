@@ -7,6 +7,7 @@
                 <result column="id" property="id" />
                     <result column="order_sn" property="orderSn" />
                     <result column="user_id" property="userId" />
+                    <result column="task_id" property="taskId" />
                     <result column="payment_type" property="paymentType" />
                     <result column="payment_state" property="paymentState" />
                     <result column="shipping_express_code" property="shippingExpressCode" />
@@ -33,7 +34,7 @@
         <!-- 通用查询结果列 -->
         <sql id="Base_Column_List">
                 id,
-            order_sn, user_id, payment_type, payment_state, shipping_express_code, shipping_express_id, shipping_code, shipping_fee,
+            order_sn, user_id, task_id, payment_type, payment_state, shipping_express_code, shipping_express_id, shipping_code, shipping_fee,
             deliver_explain, address_id, order_amount, pay_amount, order_message, order_status, address_name, address_phone, address_detail,
             product_id, product_number, shipping_time, payment_time, create_time
         </sql>
@@ -45,6 +46,7 @@
         o.id id,
         o.order_sn orderSn,
         o.user_id userId,
+        o.task_id taskId,
         o.payment_type paymentType,
         o.payment_state paymentState,
         o.shipping_express_code shippingExpressCode,
