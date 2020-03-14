@@ -71,7 +71,7 @@ public class SUserTaskController extends BaseController {
 
             // 最大购买份数判断
             SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
-
+            //上限不仅是这次的领取份数要加上之前的领取份数----代码需要完善
             if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
                 response.put("code", 1);
                 response.message("超过领取任务上限" + userLevel.getBuyNumber() + "份！");
