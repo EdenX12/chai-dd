@@ -60,16 +60,20 @@ public class SOrderController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
             order.setUserId(user.getId());
 
+            SProduct product = productService.getById(order.getProductId());
+
             order.setOrderStatus(0);
             order.setCreateTime(new Date());
+            order.setPaymentType(1);
+            order.setPaymentState(0);
+            order.setOrderAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
+            order.setPayAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
 
             int orderId = this.orderService.addOrder(order);
 
-            SProduct product = productService.getById(order.getProductId());
-
             // 调起微信支付
             JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(orderId),
-                    product.getTaskPrice().multiply(BigDecimal.valueOf(order.getProductNumber().longValue())).toString(),
+                    product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber().longValue())).toString(),
                     user.getOpenId(),
                     request.getRemoteAddr(),
                     "2",
