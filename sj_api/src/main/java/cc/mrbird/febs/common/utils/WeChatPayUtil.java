@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class WeChatPayUtil {
 
         mm1.put("out_trade_no", orderSn);
 
-        mm1.put("total_fee", String.valueOf(Integer.parseInt(total)));
+        mm1.put("total_fee", String.valueOf(new BigDecimal(total).multiply(new BigDecimal(100)).intValue()));
 
         mm1.put("spbill_create_ip", ip);
 
