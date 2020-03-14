@@ -34,7 +34,7 @@ public class SUserMsgServiceImpl extends ServiceImpl<SUserMsgMapper, SUserMsg> i
         }
 
         Page<SUserMsg> page = new Page<>();
-        SortUtil.handlePageSort(request, page, "msgTime", FebsConstant.ORDER_DESC, false);
+        SortUtil.handlePageSort(request, page, "msg_time", FebsConstant.ORDER_DESC, false);
 
         return baseMapper.selectPage(page, queryWrapper);
     }
