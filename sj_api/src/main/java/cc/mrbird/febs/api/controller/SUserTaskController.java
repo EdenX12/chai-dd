@@ -154,8 +154,8 @@ public class SUserTaskController extends BaseController {
         returnMap.put("productId", product.getId());
         returnMap.put("productType", product.getProductType());
         returnMap.put("productName", product.getProductName());
-        returnMap.put("productDes()", product.getProductDes());
-        returnMap.put("productDetail()", product.getProductDetail());
+        returnMap.put("productDes", product.getProductDes());
+        returnMap.put("productDetail", product.getProductDetail());
         returnMap.put("productImg", product.getProductImg());
         returnMap.put("productPrice", product.getProductPrice());
         returnMap.put("priceUnit", product.getPriceUnit());
