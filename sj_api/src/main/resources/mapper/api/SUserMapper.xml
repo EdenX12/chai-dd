@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.api.mapper.SUserMapper">
+
+        <!-- 通用查询映射结果 -->
+        <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUser">
+                <result column="id" property="id" />
+                    <result column="user_name" property="userName" />
+                    <result column="user_password" property="userPassword" />
+                    <result column="create_time" property="createTime" />
+                    <result column="open_id" property="openId" />
+                    <result column="user_phone" property="userPhone" />
+                    <result column="total_amount" property="totalAmount" />
+                    <result column="lock_amount" property="lockAmount" />
+                    <result column="reward_bean" property="rewardBean" />
+                    <result column="user_status" property="userStatus" />
+                    <result column="user_level_id" property="userLevelId" />
+                    <result column="canuse_bean" property="canuseBean" />
+                    <result column="parent_id" property="parentId" />
+        </resultMap>
+
+        <!-- 通用查询结果列 -->
+        <sql id="Base_Column_List">
+                id,
+            user_name, user_password, create_time, open_id, user_phone, total_amount, lock_amount, reward_bean, user_status, user_level, canuse_bean, parent_id
+        </sql>
+
+    
+</mapper>
