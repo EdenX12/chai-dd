@@ -19,6 +19,47 @@ import java.util.Date;
 public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUserFollow> implements ISUserFollowService {
 
     @Override
+    public SUserFollow findUserFollowDetail(SUserFollow userFollow) {
+
+        LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper();
+
+        // 用户ID
+        queryWrapper.eq(SUserFollow::getUserId, userFollow.getUserId());
+
+        // 转让任务ID不为空的情况下
+        if (userFollow.getTaskOrderId() != null) {
+            queryWrapper.eq(SUserFollow::getTaskOrderId, userFollow.getTaskOrderId());
+            queryWrapper.eq(SUserFollow::getFollowType, 1);
+        } else {
+            queryWrapper.eq(SUserFollow::getProductId, userFollow.getProductId());
+            queryWrapper.eq(SUserFollow::getFollowType, 0);
+        }
+
+        return baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public int findUserFollowCount(SUserFollow userFollow) {
+
+        LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper();
+
+        // 转让任务ID不为空的情况下
+        if (userFollow.getTaskOrderId() != null) {
+            queryWrapper.eq(SUserFollow::getTaskOrderId, userFollow.getTaskOrderId());
+            queryWrapper.eq(SUserFollow::getFollowType, 1);
+        } else {
+            queryWrapper.eq(SUserFollow::getProductId, userFollow.getProductId());
+            queryWrapper.eq(SUserFollow::getFollowType, 0);
+        }
+
+        // 已关注
+        queryWrapper.eq(SUserFollow::getStatus, 1);
+
+        return baseMapper.selectCount(queryWrapper);
+    }
+
+
+    @Override
     @Transactional
     public void createUserFollow(SUserFollow userFollow) {
 

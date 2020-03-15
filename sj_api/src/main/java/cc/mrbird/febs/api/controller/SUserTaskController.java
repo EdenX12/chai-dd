@@ -1,13 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
-import cc.mrbird.febs.api.entity.SProduct;
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.entity.SUserLevel;
-import cc.mrbird.febs.api.entity.SUserTask;
-import cc.mrbird.febs.api.service.ISProductService;
-import cc.mrbird.febs.api.service.ISUserLevelService;
-import cc.mrbird.febs.api.service.ISUserService;
-import cc.mrbird.febs.api.service.ISUserTaskService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -51,6 +45,9 @@ public class SUserTaskController extends BaseController {
 
     @Autowired
     private ISUserService userService;
+
+    @Autowired
+    private ISUserFollowService userFollowService;
 
     @Autowired
     private WeChatPayUtil weChatPayUtil;
@@ -147,6 +144,19 @@ public class SUserTaskController extends BaseController {
         // 商品信息
         SProduct product = productService.getById(userTask.getProductId());
 
+        // 商品关注数量
+        SUserFollow userFollowCount = new SUserFollow();
+        userFollowCount.setProductId(userTask.getProductId());
+        userFollowCount.setFollowType(0);
+        int followCount = userFollowService.findUserFollowCount(userFollowCount);
+
+        // 用户是否已关注
+        SUserFollow userFollowDetail = new SUserFollow();
+        userFollowDetail.setProductId(userTask.getProductId());
+        userFollowDetail.setFollowType(0);
+        userFollowDetail.setUserId(user.getId());
+        userFollowDetail = userFollowService.findUserFollowDetail(userFollowDetail);
+
         Map<String, Object> returnMap = new HashMap<>();
 
         returnMap.put("userName", taskUser.getUserName());
@@ -164,9 +174,10 @@ public class SUserTaskController extends BaseController {
         returnMap.put("everyReward", product.getEveryReward());
         returnMap.put("taskNumber", product.getTaskNumber());
         returnMap.put("taskPrice", product.getTaskPrice());
-        returnMap.put("productId", product.getId());
-        // 辛苦费 见习猎人分0.5%; 初级猎手分1% 中级猎人分2% 高级猎人分3%
+        returnMap.put("followCount", followCount);
+        returnMap.put("followStatus", userFollowDetail.getStatus());
 
+        // 辛苦费 见习猎人分0.5%; 初级猎手分1% 中级猎人分2% 高级猎人分3%
         SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
         returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
