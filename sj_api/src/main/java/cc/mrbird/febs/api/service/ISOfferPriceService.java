@@ -43,7 +43,7 @@ public interface ISOfferPriceService extends IService<SOfferPrice> {
     List<SOfferPrice> findOfferPriceList(SOfferPrice offerPrice);
 
     /**
-     * 查询用户对转让任务的最后一次报价信息
+     * 查询用户对转让任务的最高报价信息
      * @param offerPrice SOfferPrice
      * @return SOfferPrice
      */

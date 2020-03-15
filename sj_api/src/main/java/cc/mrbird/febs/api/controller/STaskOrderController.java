@@ -77,6 +77,8 @@ public class STaskOrderController extends BaseController {
             taskOrder.setCreateTime(new Date());
             this.taskOrderService.createTaskOrder(taskOrder);
 
+            // 每参与一次任务转出 猎豆追加 10颗  * 猎人等级倍数
+
         } catch (Exception e) {
             message = "新增任务转让失败";
             log.error(message, e);

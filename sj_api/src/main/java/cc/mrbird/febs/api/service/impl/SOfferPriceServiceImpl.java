@@ -77,7 +77,9 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
         LambdaQueryWrapper<SOfferPrice> queryWrapper = new LambdaQueryWrapper();
 
         // 用户ID
-        queryWrapper.eq(SOfferPrice::getUserId, offerPrice.getUserId());
+        if (offerPrice.getUserId() != null) {
+            queryWrapper.eq(SOfferPrice::getUserId, offerPrice.getUserId());
+        }
 
         // 转让任务ID不为空的情况下
         if (offerPrice.getTaskOrderId() != null) {
@@ -87,8 +89,8 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
         // 已支付
         queryWrapper.eq(SOfferPrice::getPayStatus, 1);
 
-        // 按照时间降序
-        queryWrapper.orderByDesc(SOfferPrice::getCreateTime);
+        // 按照报价金额降序（求最高报价）
+        queryWrapper.orderByDesc(SOfferPrice::getAmount);
 
         return baseMapper.selectOne(queryWrapper);
     }

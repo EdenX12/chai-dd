@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +57,8 @@ public class SOfferPriceController extends BaseController {
         response.put("code", 0);
 
         try {
-            // 输入金额必须要大于所有报价中最大报价金额
-            // 待完成
+
+            // 输入金额必须要大于所有报价中最大报价金额（不需要 删除）
 
             // 先更新出局
             this.offerPriceService.updateOfferPriceOut(offerPrice);
@@ -104,15 +105,24 @@ public class SOfferPriceController extends BaseController {
 
         try {
 
-            // 修改成交状态
+            // 修改成交状态 （竞标中 - > 已成交）
             this.offerPriceService.updateOfferPriceOn(offerPrice);
 
-            // 转让任务状态更新
+            // 转让任务状态更新 （转让中 - > 已成交）
             STaskOrder taskOrder = this.taskOrderService.getById(offerPrice.getTaskOrderId());
             taskOrder.setStatus(1);
             this.taskOrderService.updateById(taskOrder);
 
-            // 支付金额退还
+            // 用户任务表状态更新（转让中 -> 转让成功）
+
+
+            // 增加新用户的任务（已接任务）
+
+
+            // 出局者支付金额退还（冻结 -> 余额）
+
+
+            // 转让任务的人 成交金额到余额
 
 
         } catch (Exception e) {

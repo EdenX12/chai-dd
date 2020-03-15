@@ -36,6 +36,9 @@ public class SUserFollowController extends BaseController {
     public void addFollow(@Valid SUserFollow userFollow) throws FebsException {
 
         try {
+
+            // 每关注一个任务（任务广场，转让中心），（10颗） * 猎人等级倍数
+
             this.userFollowService.createUserFollow(userFollow);
         } catch (Exception e) {
             message = "新增用户关注失败";
@@ -53,6 +56,9 @@ public class SUserFollowController extends BaseController {
     public void cancelFollow(@Valid SUserFollow userFollow) throws FebsException {
 
         try {
+
+            // 每取消一个任务（任务广场，转让中心），（-10颗） * 猎人等级倍数
+
             this.userFollowService.updateUserFollow(userFollow);
         } catch (Exception e) {
             message = "取消用户关注失败";

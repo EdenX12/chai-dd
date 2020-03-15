@@ -108,6 +108,7 @@ public class SUserTaskController extends BaseController {
                 userTask.setCreateTime(new Date());
                 userTask.setUpdateTime(new Date());
                 intTaskId = this.userTaskService.createUserTask(userTask);
+
             } else {
                 userTask.setUpdateTime(new Date());
                 intTaskId = this.userTaskService.updateUserTask(userTask);
@@ -132,6 +133,24 @@ public class SUserTaskController extends BaseController {
 
         return response;
     }
+
+    /**
+     * 任务分享成功之后调用
+     * @return List<Map>
+     */
+    @PostMapping("/getShareTaskSuccess")
+    @Limit(key = "getShareTaskSuccess", period = 60, count = 20, name = "根据任务ID检索商品详情接口", prefix = "limit")
+    public FebsResponse getShareTaskSuccess(Long userTaskId) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        // 猎豆追加 10颗  * 猎人等级倍数
+
+
+        return response;
+    }
+
 
     /**
      * 根据任务ID获取个人信息及商品详情（被分享转发页面读取）
@@ -192,8 +211,6 @@ public class SUserTaskController extends BaseController {
         SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
         returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
-
-
         // 第一次打开的话，生成新任务（未支付  未分享）
         SUserTask searchUserTask = new SUserTask();
         searchUserTask.setUserId(user.getId());
@@ -211,6 +228,11 @@ public class SUserTaskController extends BaseController {
             newTaskId = userTaskService.createUserTask(searchUserTask);
             // 新生成的任务ID
             returnMap.put("taskId", newTaskId);
+
+
+            // 有人查看或转发“我”分享的任务时，“我”获10颗
+            // 猎豆追加 本人（10颗） * 猎人等级倍数
+
         }
 
         response.data(returnMap);

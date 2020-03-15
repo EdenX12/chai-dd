@@ -148,6 +148,12 @@ public class SUserPayController extends BaseController {
                 userTask.setUpdateTime(new Date());
                 userTaskService.updateUserTask(userTask);
 
+                // 用户冻结金额追加
+
+
+                // 每领取一次任务，获20颗
+                // 猎豆追加  领取任务的人（20颗）  * 猎人等级倍数
+
             } else if ("O".equals(strPayType)) {
 
                 // 支付购买订单成功
@@ -163,6 +169,16 @@ public class SUserPayController extends BaseController {
                 order.setPaymentTime(new Date());
                 orderService.updateOrder(order);
 
+                // 产品下的所有 转让中的任务终止动作：
+                // 1.任务报价表 全部修改已出局状态  所有出局者支付金额退还
+
+                // 2.转让任务表状态更新 （转让中 - > 未成交流标）
+
+                // 3.用户任务表状态更新（已接任务、转让中 -> 任务完结）
+
+
+
+
             } else if ("P".equals(strPayType)) {
 
                 // 转让任务报价成功
@@ -176,6 +192,12 @@ public class SUserPayController extends BaseController {
                 offerPrice.setPayStatus(1);
                 offerPrice.setUpdateTime(new Date());
                 offerPriceService.updateById(offerPrice);
+
+                // 用户冻结金额追加
+
+
+               // 每参与一次任务报价 （10颗） * 猎人等级倍数
+
             }
 
         }

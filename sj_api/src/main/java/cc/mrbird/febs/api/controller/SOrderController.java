@@ -134,15 +134,27 @@ public class SOrderController extends BaseController {
     }
 
     /**
-     * 更新用户购买订单状态
+     * 确认收货
      * 用户ID 订单ID 状态
      */
-    @Log("更新用户购买订单状态")
-    @PostMapping("/updateOrder")
-    public void updateOrder(@Valid SOrder order) throws FebsException {
+    @Log("用户确认收货")
+    @PostMapping("/confirmOrder")
+    public void confirmOrder(@Valid SOrder order) throws FebsException {
 
         try {
+
+            order.setOrderStatus(3);
             this.orderService.updateOrder(order);
+
+            // 所有任务金退还（冻结 - > 余额）
+
+            // 独赢收益计算
+
+            // 躺赢收益计算
+
+            // 下级贡献收益计算
+
+
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";
             log.error(message, e);
