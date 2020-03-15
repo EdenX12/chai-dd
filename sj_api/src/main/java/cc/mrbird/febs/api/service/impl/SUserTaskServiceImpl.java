@@ -41,6 +41,11 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
             queryWrapper.eq(SUserTask::getProductId, userTask.getProductId());
         }
 
+        // 上级任务ID
+        if (userTask.getParentId() != null) {
+            queryWrapper.eq(SUserTask::getParentId, userTask.getParentId());
+        }
+
         return this.baseMapper.selectOne(queryWrapper);
     }
 

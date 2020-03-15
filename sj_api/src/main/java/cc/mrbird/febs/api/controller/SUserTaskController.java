@@ -68,10 +68,21 @@ public class SUserTaskController extends BaseController {
 
             // 最大购买份数判断
             SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
+
+            // 已购买任务
+            SUserTask oldUserTask = new SUserTask();
+            oldUserTask.setUserId(user.getId());
+            oldUserTask.setProductId(userTask.getProductId());
+            oldUserTask = userTaskService.findUserTask(oldUserTask);
+            int oldTaskNumber = 0;
+            if (oldUserTask != null) {
+                oldTaskNumber = oldUserTask.getTaskNumber();
+            }
+
             //上限不仅是这次的领取份数要加上之前的领取份数----代码需要完善
-            if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
+            if (oldTaskNumber + userTask.getTaskNumber() > userLevel.getBuyNumber()) {
                 response.put("code", 1);
-                response.message("超过领取任务上限" + userLevel.getBuyNumber() + "份！");
+                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
                 return response;
             }
 
@@ -92,8 +103,8 @@ public class SUserTaskController extends BaseController {
             userTask.setStatus(0);
 
             int intTaskId = 0;
-            SUserTask userTaskOne = userTaskService.findUserTask(userTask);
-            if (userTaskOne == null) {
+
+            if (userTask.getId() == null) {
                 userTask.setCreateTime(new Date());
                 userTask.setUpdateTime(new Date());
                 intTaskId = this.userTaskService.createUserTask(userTask);
@@ -181,23 +192,28 @@ public class SUserTaskController extends BaseController {
         SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
         returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
-        response.data(returnMap);
+
 
         // 第一次打开的话，生成新任务（未支付  未分享）
         SUserTask searchUserTask = new SUserTask();
         searchUserTask.setUserId(user.getId());
         searchUserTask.setProductId(userTask.getProductId());
+        searchUserTask.setParentId(userTaskId);
         SUserTask userTaskOne = userTaskService.findUserTask(searchUserTask);
+        int newTaskId;
         if (userTaskOne == null) {
-            searchUserTask.setParentId(userTaskId);
             searchUserTask.setPayStatus(2);
             searchUserTask.setTaskNumber(1);
             searchUserTask.setStatus(0);
             searchUserTask.setShareFlag(0);
             searchUserTask.setCreateTime(new Date());
             searchUserTask.setUpdateTime(new Date());
-            userTaskService.createUserTask(searchUserTask);
+            newTaskId = userTaskService.createUserTask(searchUserTask);
+            // 新生成的任务ID
+            returnMap.put("taskId", newTaskId);
         }
+
+        response.data(returnMap);
 
         return response;
     }
