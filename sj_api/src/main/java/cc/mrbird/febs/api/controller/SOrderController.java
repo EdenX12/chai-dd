@@ -69,7 +69,7 @@ public class SOrderController extends BaseController {
             order.setOrderAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
             order.setPayAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
 
-            int orderId = this.orderService.addOrder(order);
+            Long orderId = this.orderService.addOrder(order);
 
             // 调起微信支付
             JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(orderId),

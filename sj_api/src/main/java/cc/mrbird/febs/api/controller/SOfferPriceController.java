@@ -70,7 +70,7 @@ public class SOfferPriceController extends BaseController {
             offerPrice.setPayStatus(0);
             offerPrice.setStatus(1);
 
-            int offerPriceId = this.offerPriceService.createOfferPrice(offerPrice);
+            Long offerPriceId = this.offerPriceService.createOfferPrice(offerPrice);
 
             // 调起微信支付
             JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(offerPriceId),

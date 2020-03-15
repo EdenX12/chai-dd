@@ -25,9 +25,11 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
 
     @Override
     @Transactional
-    public int addOrder(SOrder order) {
+    public Long addOrder(SOrder order) {
 
-        return this.baseMapper.insert(order);
+        this.baseMapper.insert(order);
+
+        return order.getId();
     }
 
     @Override

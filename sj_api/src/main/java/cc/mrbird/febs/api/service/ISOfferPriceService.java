@@ -19,7 +19,7 @@ public interface ISOfferPriceService extends IService<SOfferPrice> {
      *
      * @param offerPrice SOfferPrice
      */
-    int createOfferPrice(SOfferPrice offerPrice);
+    Long createOfferPrice(SOfferPrice offerPrice);
 
     /**
      * 更新任务报价出局

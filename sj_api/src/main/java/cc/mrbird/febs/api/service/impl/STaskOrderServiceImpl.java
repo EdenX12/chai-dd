@@ -25,9 +25,11 @@ public class STaskOrderServiceImpl extends ServiceImpl<STaskOrderMapper, STaskOr
 
     @Override
     @Transactional
-    public int createTaskOrder(STaskOrder taskOrder) {
+    public Long createTaskOrder(STaskOrder taskOrder) {
 
-        return this.baseMapper.insert(taskOrder);
+        this.baseMapper.insert(taskOrder);
+
+        return taskOrder.getId();
     }
 
     @Override

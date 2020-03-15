@@ -102,7 +102,7 @@ public class SUserTaskController extends BaseController {
             // 已接任务
             userTask.setStatus(0);
 
-            int intTaskId = 0;
+            Long intTaskId;
 
             if (userTask.getId() == null) {
                 userTask.setCreateTime(new Date());
@@ -200,7 +200,7 @@ public class SUserTaskController extends BaseController {
         searchUserTask.setProductId(userTask.getProductId());
         searchUserTask.setParentId(userTaskId);
         SUserTask userTaskOne = userTaskService.findUserTask(searchUserTask);
-        int newTaskId;
+        Long newTaskId;
         if (userTaskOne == null) {
             searchUserTask.setPayStatus(2);
             searchUserTask.setTaskNumber(1);

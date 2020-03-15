@@ -24,9 +24,11 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
 
     @Override
     @Transactional
-    public int createOfferPrice(SOfferPrice offerPrice) {
+    public Long createOfferPrice(SOfferPrice offerPrice) {
 
-        return baseMapper.insert(offerPrice);
+        this.baseMapper.insert(offerPrice);
+
+        return offerPrice.getId();
     }
 
     @Override

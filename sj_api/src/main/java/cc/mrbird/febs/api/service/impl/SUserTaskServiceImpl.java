@@ -51,14 +51,16 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
 
     @Override
     @Transactional
-    public int createUserTask(SUserTask userTask) {
+    public Long createUserTask(SUserTask userTask) {
 
-        return this.baseMapper.insert(userTask);
+        this.baseMapper.insert(userTask);
+
+        return userTask.getId();
     }
 
     @Override
     @Transactional
-    public int updateUserTask(SUserTask userTask) {
+    public Long updateUserTask(SUserTask userTask) {
 
         LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
 
@@ -72,7 +74,8 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
             queryWrapper.eq(SUserTask::getUserId, userTask.getUserId());
         }
 
-        return this.baseMapper.update(userTask, queryWrapper);
+        this.baseMapper.update(userTask, queryWrapper);
+        return userTask.getId();
     }
 
     @Override

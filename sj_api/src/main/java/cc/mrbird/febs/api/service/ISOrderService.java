@@ -16,7 +16,7 @@ public interface ISOrderService extends IService<SOrder> {
      *
      * @param order SOrder
      */
-    int addOrder(SOrder order);
+    Long addOrder(SOrder order);
 
     /**
      * 查询用户购买订单列表

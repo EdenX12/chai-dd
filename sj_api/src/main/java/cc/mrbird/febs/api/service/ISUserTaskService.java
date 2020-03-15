@@ -18,14 +18,14 @@ public interface ISUserTaskService extends IService<SUserTask> {
      *
      * @param userTask SUserTask
      */
-    int createUserTask(SUserTask userTask);
+    Long createUserTask(SUserTask userTask);
 
     /**
      * 更新用户任务
      *
      * @param userTask SUserTask
      */
-    int updateUserTask(SUserTask userTask);
+    Long updateUserTask(SUserTask userTask);
 
     /**
      * 检索用户任务
