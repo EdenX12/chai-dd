@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,4 +43,11 @@ public interface ISUserTaskService extends IService<SUserTask> {
      */
     IPage<Map> findUserTaskList(SUserTask userTask, QueryRequest queryRequest);
 
+    /**
+     * 查询我的预备队
+     *
+     * @param userId Long
+     * @return List
+     */
+    List<Long> findUserIdsByParent(Long userId);
 }

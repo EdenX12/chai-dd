@@ -38,4 +38,18 @@ public class SUserMsgServiceImpl extends ServiceImpl<SUserMsgMapper, SUserMsg> i
 
         return baseMapper.selectPage(page, queryWrapper);
     }
+
+    @Override
+    public int findUserMsgNotReadCount(SUserMsg userMsg) {
+
+        LambdaQueryWrapper<SUserMsg> queryWrapper = new LambdaQueryWrapper();
+
+        // 用户ID不为空的情况下
+        queryWrapper.eq(SUserMsg::getUserId, userMsg.getUserId());
+
+        queryWrapper.eq(SUserMsg::getStatus, 0);
+
+        return baseMapper.selectCount(queryWrapper);
+    }
+
 }

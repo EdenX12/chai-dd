@@ -18,4 +18,11 @@ public interface ISUserMsgService extends IService<SUserMsg> {
      */
     IPage<SUserMsg> findUserMsgList(SUserMsg userMsg, QueryRequest request);
 
+    /**
+     * 查询用户未读消息数量
+     * @param userMsg SUserMsg
+     * @return int
+     */
+    public int findUserMsgNotReadCount(SUserMsg userMsg);
+
 }

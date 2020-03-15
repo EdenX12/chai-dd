@@ -3,6 +3,8 @@ package cc.mrbird.febs.api.service;
 import cc.mrbird.febs.api.entity.SUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author MrBird
  */
@@ -23,4 +25,10 @@ public interface ISUserService extends IService<SUser> {
 	 */
 	void createUser(SUser user) throws Exception;
 
+	/**
+	 * 根据上级ID查询下级所有用户
+	 *
+	 * @param parentIds List
+	 */
+	List<SUser> findByParentId(List parentIds);
 }

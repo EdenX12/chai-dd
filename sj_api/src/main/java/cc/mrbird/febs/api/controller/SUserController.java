@@ -1,11 +1,18 @@
 package cc.mrbird.febs.api.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cc.mrbird.febs.api.entity.SUserLevel;
+import cc.mrbird.febs.api.entity.SUserMsg;
+import cc.mrbird.febs.api.service.ISUserLevelService;
+import cc.mrbird.febs.api.service.ISUserMsgService;
+import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.controller.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +57,19 @@ public class SUserController extends BaseController {
 	@Autowired
 	private ISUserService userService;
 
+    @Autowired
+    private ISUserLevelService userLevelService;
+
+    @Autowired
+    private ISUserMsgService userMsgService;
+
+    @Autowired
+    private ISUserTaskService userTaskService;
+
+    /**
+     * 用户登录
+     * @return SUser
+     */
 	@PostMapping("/login")
     @Limit(key = "login", period = 60, count = 20, name = "登录接口", prefix = "limit")
     public FebsResponse login(HttpServletRequest request, String openId) throws Exception {
@@ -79,15 +99,87 @@ public class SUserController extends BaseController {
         return new FebsResponse().message("认证成功").data(userInfo);
     }
 
-	@PostMapping("/test")
-    @Limit(key = "test", period = 60, count = 20, name = "测试接口", prefix = "limit")
-    public FebsResponse test( HttpServletRequest request) throws Exception {
+    /**
+     * 取得我的个人信息
+     * @return SUser
+     */
+    @PostMapping("/getUser")
+    @Limit(key = "getUser", period = 60, count = 20, name = "检索个人信息接口", prefix = "limit")
+    public FebsResponse getUser() throws Exception {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        Map<String, Object> returnMap = new HashMap<>();
 
         SUser user = FebsUtil.getCurrentUser();
 
-        return new FebsResponse().message("获取信息成功").data(user);
+        // 用户名称
+        returnMap.put("userName", user.getUserName());
+        // 用户电话
+        returnMap.put("userPhone", user.getUserPhone());
+        // 用户头像
+        returnMap.put("userImg", user.getUserImg());
+        // 猎豆数量
+        returnMap.put("rewardBean", user.getRewardBean());
+        // 可用余额
+        returnMap.put("totalAmount", user.getTotalAmount());
+        // 冻结金额
+        returnMap.put("lockAmount", user.getLockAmount());
+        // 等级名称
+        SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
+        returnMap.put("levelName", userLevel.getLevelName());
+        // 未读消息数
+        SUserMsg userMsg = new SUserMsg();
+        userMsg.setUserId(user.getId());
+        int notReadMsgCount = userMsgService.findUserMsgNotReadCount(userMsg);
+        returnMap.put("notReadMsgCount", notReadMsgCount);
+
+        // 一级组织人数
+        List parentIds1 = new ArrayList();
+        parentIds1.add(user.getId());
+        List<SUser> userList1 = userService.findByParentId(parentIds1);
+        returnMap.put("levelCount1", userList1.size());
+
+        // 二级组织人数
+        List parentIds2 = new ArrayList();
+        for (SUser user1 : userList1) {
+            parentIds2.add(user1.getId());
+        }
+        List<SUser> userList2 = userService.findByParentId(parentIds2);
+        returnMap.put("levelCount2", userList2.size());
+
+        // 三级组织人数
+        List parentIds3 = new ArrayList();
+        for (SUser user2 : userList2) {
+            parentIds3.add(user2.getId());
+        }
+        List<SUser> userList3 = userService.findByParentId(parentIds3);
+        returnMap.put("levelCount3", userList3.size());
+
+        // 四级组织人数
+        List parentIds4 = new ArrayList();
+        for (SUser user3 : userList3) {
+            parentIds4.add(user3.getId());
+        }
+        List<SUser> userList4 = userService.findByParentId(parentIds4);
+        returnMap.put("levelCount4", userList4.size());
+
+        // 预备队人数
+        List<Long> userIds = userTaskService.findUserIdsByParent(user.getId());
+        returnMap.put("reserveCount", userIds.size());
+
+        response.data(returnMap);
+
+        return response;
     }
 
+    /**
+     * 缓存存储信息
+     * @param token token
+     * @param user  用户信息
+     * @return String
+     */
     private String saveTokenToRedis(SUser user, JWTToken token, HttpServletRequest request) throws Exception {
         String ip = IPUtil.getIpAddr(request);
 

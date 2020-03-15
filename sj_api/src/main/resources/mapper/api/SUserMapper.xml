@@ -9,6 +9,7 @@
                     <result column="user_password" property="userPassword" />
                     <result column="create_time" property="createTime" />
                     <result column="open_id" property="openId" />
+            <result column="user_img" property="userImg" />
                     <result column="user_phone" property="userPhone" />
                     <result column="total_amount" property="totalAmount" />
                     <result column="lock_amount" property="lockAmount" />
@@ -22,7 +23,7 @@
         <!-- 通用查询结果列 -->
         <sql id="Base_Column_List">
                 id,
-            user_name, user_password, create_time, open_id, user_phone, total_amount, lock_amount, reward_bean, user_status, user_level, canuse_bean, parent_id
+            user_name, user_password, create_time, open_id, user_img, user_phone, total_amount, lock_amount, reward_bean, user_status, user_level, canuse_bean, parent_id
         </sql>
 
     

@@ -47,6 +47,11 @@ public class SUser implements Serializable {
     private String openId;
 
     /**
+     * 用户头像
+     */
+    private String userImg;
+
+    /**
      * 用户手机号码
      */
     private String userPhone;

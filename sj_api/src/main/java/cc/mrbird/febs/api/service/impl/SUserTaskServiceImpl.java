@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author MrBird
@@ -81,4 +81,36 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
             return null;
         }
     }
+
+    @Override
+    public List<Long> findUserIdsByParent(Long userId) {
+
+        LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
+
+        queryWrapper.eq(SUserTask::getUserId, userId);
+
+        List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
+
+        List<Long> userIds = new ArrayList();
+
+        for (SUserTask userTask : userTaskList) {
+
+            LambdaQueryWrapper<SUserTask> queryWrapper1 = new LambdaQueryWrapper<SUserTask>();
+            queryWrapper.eq(SUserTask::getParentId, userTask.getId());
+
+            List<SUserTask> userTaskList2 = this.baseMapper.selectList(queryWrapper);
+            for (SUserTask userTask2 : userTaskList2) {
+                userIds.add(userTask2.getUserId());
+            }
+        }
+
+        // 去重
+        Set set = new HashSet();
+        set.addAll(userIds);
+        userIds.clear();
+        userIds.addAll(set);
+
+        return userIds;
+    }
+
 }
