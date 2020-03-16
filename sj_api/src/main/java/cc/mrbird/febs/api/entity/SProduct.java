@@ -102,7 +102,7 @@ public class SProduct implements Serializable {
     private String priceUnit;
 
     /**
-     * 躺赢奖励（页面展示，真正分钱另有规则）
+     * 独赢奖励（页面展示，真正分钱另有规则）
      */
     private String successReward;
 

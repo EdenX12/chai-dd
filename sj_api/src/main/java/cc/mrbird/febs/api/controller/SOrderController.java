@@ -1,10 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
-import cc.mrbird.febs.api.entity.SOrder;
-import cc.mrbird.febs.api.entity.SProduct;
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.service.ISOrderService;
-import cc.mrbird.febs.api.service.ISProductService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -23,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +40,15 @@ public class SOrderController extends BaseController {
 
     @Autowired
     private ISProductService productService;
+
+    @Autowired
+    private ISUserTaskService userTaskService;
+
+    @Autowired
+    private ISUserService userService;
+
+    @Autowired
+    private ISUserLevelService userLevelService;
 
     @Autowired
     private WeChatPayUtil weChatPayUtil;
@@ -143,17 +151,106 @@ public class SOrderController extends BaseController {
 
         try {
 
+            SUser user = FebsUtil.getCurrentUser();
+            order.setUserId(user.getId());
+
             order.setOrderStatus(3);
             this.orderService.updateOrder(order);
 
-            // 所有任务金退还（冻结 - > 余额）
+            SProduct product = productService.getById(order.getProductId());
 
-            // 独赢收益计算
+            // 产品下所有已完结 任务金退还（冻结 - > 余额）  并且修改状态为佣金已入账
+            SUserTask userTask = new SUserTask();
+            userTask.setProductId(order.getProductId());
+            userTask.setPayStatus(1);
+            userTask.setStatus(3);
+            List<SUserTask> userTaskList = userTaskService.findUserTaskList(userTask);
 
-            // 躺赢收益计算
+            // 判断此用户是否领取过任务
+            boolean taskGotUser = false;
 
-            // 下级贡献收益计算
+            // 其他人总的领取份数
+            int totalTaskNumberOther = 0;
 
+            for (SUserTask userTasked : userTaskList) {
+                if (order.getUserId().equals(userTasked.getUserId())) {
+                    taskGotUser = true;
+                } else {
+                    totalTaskNumberOther = totalTaskNumberOther + userTasked.getTaskNumber();
+                }
+            }
+
+            // 独赢收益计算 (如领取过任务 40%  50%由其他领取该任务者均分 未领取过任务 5%  80%被其他领取该任务者均分)
+            BigDecimal everyReward = new BigDecimal(0);
+            if (taskGotUser) {
+                SUser user1 = this.userService.getById(userTask.getUserId());
+                user1.setTotalAmount(user1.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.4))));
+                this.userService.updateById(user1);
+
+                // 每份任务的躺赢收益
+                everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.5)).divide(BigDecimal.valueOf(totalTaskNumberOther));
+            } else {
+                SUser user1 = this.userService.getById(userTask.getUserId());
+                user1.setTotalAmount(user1.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.05))));
+                this.userService.updateById(user1);
+
+                // 每份任务的躺赢收益
+                everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.valueOf(totalTaskNumberOther));
+            }
+
+            for (SUserTask userTasked : userTaskList) {
+
+                // 躺赢收益计算
+                if (!order.getUserId().equals(userTasked.getUserId())) {
+
+                    SUser user1 = this.userService.getById(userTasked.getUserId());
+                    user1.setTotalAmount(user1.getTotalAmount().add(everyReward.multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
+                    this.userService.updateById(user1);
+                }
+
+                // 佣金已入账 状态更新
+                userTasked.setUpdateTime(new Date());
+                userTasked.setStatus(4);
+                userTaskService.updateById(userTasked);
+            }
+
+            // 下级贡献收益计算 往上推四级，（如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
+            List<SUser> userList = new ArrayList();
+            if (user.getParentId() != null) {
+                // 第一级
+                SUser user1 = userService.getById(user.getParentId());
+                userList.add(user1);
+                if (user1.getParentId() != null) {
+                    // 第二级
+                    SUser user2 = userService.getById(user1.getParentId());
+                    userList.add(user2);
+                    if (user2.getParentId() != null) {
+                        // 第三级
+                        SUser user3 = userService.getById(user2.getParentId());
+                        userList.add(user3);
+                        if (user3.getParentId() != null) {
+                            // 第四级
+                            SUser user4 = userService.getById(user3.getParentId());
+                            userList.add(user4);
+                        }
+                    }
+                }
+            }
+
+            for (SUser user0 : userList) {
+                SUserLevel userLevel = userLevelService.getById(user0.getUserLevelId());
+                if (userLevel.getLevelType() == 1) {
+                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.005))));
+                } else if (userLevel.getLevelType() == 2) {
+                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.01))));
+                } else if (userLevel.getLevelType() == 3) {
+                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.02))));
+                } else if (userLevel.getLevelType() == 4) {
+                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.03))));
+                }
+
+                this.userService.updateById(user0);
+            }
 
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";
