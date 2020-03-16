@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,17 +70,18 @@ public class SUserTaskController extends BaseController {
             // 最大购买份数判断
             SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
 
-            // 已购买任务
+            // 已购买任务  （现在 转让成功 的 也算在内  后续可能需要调整）
             SUserTask oldUserTask = new SUserTask();
             oldUserTask.setUserId(user.getId());
+            oldUserTask.setPayStatus(1);
             oldUserTask.setProductId(userTask.getProductId());
-            oldUserTask = userTaskService.findUserTask(oldUserTask);
+            List<SUserTask> oldUserTaskList = userTaskService.findUserTaskList(oldUserTask);
             int oldTaskNumber = 0;
-            if (oldUserTask != null) {
-                oldTaskNumber = oldUserTask.getTaskNumber();
+            for (SUserTask userTask1 : oldUserTaskList) {
+                oldTaskNumber = oldTaskNumber + userTask1.getTaskNumber();
             }
 
-            //上限不仅是这次的领取份数要加上之前的领取份数----代码需要完善
+            // 上限不仅是这次的领取份数要加上之前的领取份数
             if (oldTaskNumber + userTask.getTaskNumber() > userLevel.getBuyNumber()) {
                 response.put("code", 1);
                 response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
@@ -145,7 +147,7 @@ public class SUserTaskController extends BaseController {
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
-        // 猎豆追加 10颗  * 猎人等级倍数
+        // 猎豆追加 10颗  * 猎人等级倍数  分享只计算一次
 
 
         return response;
@@ -216,7 +218,7 @@ public class SUserTaskController extends BaseController {
         searchUserTask.setUserId(user.getId());
         searchUserTask.setProductId(userTask.getProductId());
         searchUserTask.setParentId(userTaskId);
-        SUserTask userTaskOne = userTaskService.findUserTask(searchUserTask);
+        List<SUserTask> userTaskOne = userTaskService.findUserTaskList(searchUserTask);
         Long newTaskId;
         if (userTaskOne == null) {
             searchUserTask.setPayStatus(2);

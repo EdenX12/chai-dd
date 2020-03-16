@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -57,11 +58,13 @@ public class STaskOrderController extends BaseController {
 
                 // 更新原任务的任务数量
                 userTask.setTaskNumber(taskOrder.getTaskNumber());
+                userTask.setPayAmount(userTask.getPayAmount().multiply( BigDecimal.valueOf(taskOrder.getTaskNumber() / userTask.getTaskNumber())));
                 userTask.setStatus(1);
                 userTaskService.updateUserTask(userTask);
 
                 // 追加新的用户任务
                 userTask.setTaskNumber(userTask.getTaskNumber() - taskOrder.getTaskNumber());
+                userTask.setPayAmount(userTask.getPayAmount().multiply( BigDecimal.valueOf((userTask.getTaskNumber() - taskOrder.getTaskNumber()) / userTask.getTaskNumber())));
                 userTask.setStatus(0);
                 userTaskService.createUserTask(userTask);
 

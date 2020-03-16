@@ -32,7 +32,7 @@ public interface ISUserTaskService extends IService<SUserTask> {
      *
      * @param userTask SUserTask
      */
-    SUserTask findUserTask(SUserTask userTask);
+    List<SUserTask> findUserTaskList(SUserTask userTask);
 
     /**
      * 查询我的任务列表

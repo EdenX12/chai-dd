@@ -22,7 +22,7 @@ import java.util.*;
 public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask> implements ISUserTaskService {
 
     @Override
-    public SUserTask findUserTask(SUserTask userTask) {
+    public List<SUserTask> findUserTaskList(SUserTask userTask) {
 
         LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
 
@@ -41,12 +41,22 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
             queryWrapper.eq(SUserTask::getProductId, userTask.getProductId());
         }
 
+        // 支付状态
+        if (userTask.getPayStatus() != null) {
+            queryWrapper.eq(SUserTask::getPayStatus, userTask.getPayStatus());
+        }
+
+        // 状态
+        if (userTask.getStatus() != null) {
+            queryWrapper.eq(SUserTask::getStatus, userTask.getStatus());
+        }
+
         // 上级任务ID
         if (userTask.getParentId() != null) {
             queryWrapper.eq(SUserTask::getParentId, userTask.getParentId());
         }
 
-        return this.baseMapper.selectOne(queryWrapper);
+        return this.baseMapper.selectList(queryWrapper);
     }
 
     @Override

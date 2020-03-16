@@ -3,8 +3,11 @@ package cc.mrbird.febs.api.controller;
 import cc.mrbird.febs.api.entity.SOfferPrice;
 import cc.mrbird.febs.api.entity.STaskOrder;
 import cc.mrbird.febs.api.entity.SUser;
+import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.api.service.ISOfferPriceService;
 import cc.mrbird.febs.api.service.ISTaskOrderService;
+import cc.mrbird.febs.api.service.ISUserService;
+import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -44,7 +47,13 @@ public class SOfferPriceController extends BaseController {
     private ISTaskOrderService taskOrderService;
 
     @Autowired
+    private ISUserTaskService userTaskService;
+
+    @Autowired
     private WeChatPayUtil weChatPayUtil;
+
+    @Autowired
+    private ISUserService userService;
 
     /**
      * 新增任务报价
@@ -74,7 +83,7 @@ public class SOfferPriceController extends BaseController {
             Long offerPriceId = this.offerPriceService.createOfferPrice(offerPrice);
 
             // 调起微信支付
-            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(offerPriceId),
+            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(offerPriceId),
                     offerPrice.getAmount().toString(),
                     user.getOpenId(),
                     request.getRemoteAddr(),
@@ -114,16 +123,44 @@ public class SOfferPriceController extends BaseController {
             this.taskOrderService.updateById(taskOrder);
 
             // 用户任务表状态更新（转让中 -> 转让成功）
-
+            SUserTask userTaskOld = this.userTaskService.getById(taskOrder.getTaskId());
+            userTaskOld.setStatus(2);
+            userTaskOld.setUpdateTime(new Date());
+            this.userTaskService.updateById(userTaskOld);
 
             // 增加新用户的任务（已接任务）
-
+            SUserTask userTaskNew = new SUserTask();
+            userTaskNew.setUserId(offerPrice.getUserId());
+            userTaskNew.setProductId(userTaskOld.getProductId());
+            userTaskNew.setParentId(userTaskOld.getParentId());
+            userTaskNew.setPayStatus(userTaskOld.getPayStatus());
+            userTaskNew.setTaskNumber(userTaskOld.getTaskNumber());
+            userTaskNew.setStatus(0);
+            userTaskNew.setShareFlag(0);
+            userTaskNew.setCreateTime(new Date());
+            userTaskNew.setUpdateTime(new Date());
+            this.userTaskService.createUserTask(userTaskNew);
 
             // 出局者支付金额退还（冻结 -> 余额）
+            List<SOfferPrice> offerPriceOutList = this.offerPriceService.findOfferPriceOutList(offerPrice);
+            for (SOfferPrice offerPriceOut : offerPriceOutList) {
 
+                SUser user = this.userService.getById(offerPriceOut.getUserId());
+                // 冻结金额-
+                user.setLockAmount(user.getLockAmount().subtract(offerPriceOut.getAmount()));
+                // 余额+
+                user.setTotalAmount(user.getTotalAmount().add(offerPriceOut.getAmount()));
 
-            // 转让任务的人 成交金额到余额
+                this.userService.updateById(user);
+            }
 
+            // 转让任务的人 领取任务或者报价任务成交的金额解冻   成交金额到余额
+            SUser user = this.userService.getById(userTaskOld.getUserId());
+            // 冻结金额-原来支付金额
+            user.setLockAmount(user.getLockAmount().subtract(userTaskOld.getPayAmount()));
+            // 余额+
+            user.setTotalAmount(user.getTotalAmount().add(offerPrice.getAmount()));
+            this.userService.updateById(user);
 
         } catch (Exception e) {
             message = "任务报价成交失败";
@@ -145,7 +182,7 @@ public class SOfferPriceController extends BaseController {
 
         FebsResponse response = new FebsResponse();
 
-        List<SOfferPrice> offerPriceList = offerPriceService.findOfferPriceList(offerPrice);
+        List<SOfferPrice> offerPriceList = this.offerPriceService.findOfferPriceList(offerPrice);
 
         response.put("code", 0);
         response.data(offerPriceList);
@@ -166,7 +203,7 @@ public class SOfferPriceController extends BaseController {
         SUser user = FebsUtil.getCurrentUser();
         offerPrice.setUserId(user.getId());
 
-        SOfferPrice offerPriceDetail = offerPriceService.findOfferPriceDetail(offerPrice);
+        SOfferPrice offerPriceDetail = this.offerPriceService.findOfferPriceDetail(offerPrice);
 
         response.put("code", 0);
         response.data(offerPriceDetail);
@@ -184,7 +221,7 @@ public class SOfferPriceController extends BaseController {
 
         FebsResponse response = new FebsResponse();
 
-        Map<String, Object> offerPricePageList = getDataTable(offerPriceService.findOfferPriceList(offerPrice, queryRequest));
+        Map<String, Object> offerPricePageList = getDataTable(this.offerPriceService.findOfferPriceList(offerPrice, queryRequest));
 
         response.put("code", 0);
         response.data(offerPricePageList);

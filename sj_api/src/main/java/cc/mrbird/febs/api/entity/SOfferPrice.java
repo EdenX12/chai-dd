@@ -39,7 +39,7 @@ public class SOfferPrice implements Serializable {
     /**
      * 任务转让主键
      */
-    private Integer taskOrderId;
+    private Long taskOrderId;
 
     /**
      * 竞标人

@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +19,14 @@ public interface ISTaskOrderService extends IService<STaskOrder> {
      * @param taskOrder STaskOrder
      */
     Long createTaskOrder(STaskOrder taskOrder);
+
+    /**
+     * 查询转让任务列表
+     *
+     * @param taskOrder STaskOrder
+     * @return List
+     */
+    List<STaskOrder> findTaskOrderList(STaskOrder taskOrder);
 
     /**
      * 查询任务详情列表，包括关注数量

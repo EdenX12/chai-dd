@@ -1,6 +1,7 @@
 package cc.mrbird.febs.api.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -44,6 +45,11 @@ public class SUserTask implements Serializable {
      * 状态 1 已支付 2 不支付
      */
     private Integer payStatus;
+
+    /**
+     * 支付金额
+     */
+    private BigDecimal payAmount;
 
     /**
      * 任务份数

@@ -36,6 +36,13 @@ public interface ISOfferPriceService extends IService<SOfferPrice> {
     void updateOfferPriceOn(SOfferPrice offerPrice);
 
     /**
+     * 查询出局者的报价信息
+     * @param offerPrice SOfferPrice
+     * @return List<SOfferPrice>
+     */
+    List<SOfferPrice> findOfferPriceOutList(SOfferPrice offerPrice);
+
+    /**
      * 查询转让任务的报价信息
      * @param offerPrice SOfferPrice
      * @return List<SOfferPrice>

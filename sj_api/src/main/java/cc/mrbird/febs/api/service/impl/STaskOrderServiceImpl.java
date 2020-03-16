@@ -8,6 +8,7 @@ import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.SortUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +33,25 @@ public class STaskOrderServiceImpl extends ServiceImpl<STaskOrderMapper, STaskOr
 
         return taskOrder.getId();
     }
+
+    @Override
+    public List<STaskOrder> findTaskOrderList(STaskOrder taskOrder) {
+
+        LambdaQueryWrapper<STaskOrder> queryWrapper = new LambdaQueryWrapper();
+
+        // 转让任务ID不为空的情况下
+        if (taskOrder.getTaskId() != null) {
+            queryWrapper.eq(STaskOrder::getTaskId, taskOrder.getTaskId());
+        }
+
+        // 状态 0：转让中 1：已成交 2：未成交流标
+        if (taskOrder.getStatus() != null) {
+            queryWrapper.eq(STaskOrder::getStatus, taskOrder.getStatus());
+        }
+
+        return this.baseMapper.selectList(queryWrapper);
+    }
+
 
     @Override
     public IPage<Map> findTaskOrderList(STaskOrder taskOrder, QueryRequest request) {

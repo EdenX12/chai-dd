@@ -1,10 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.*;
-import cc.mrbird.febs.api.service.ISOfferPriceService;
-import cc.mrbird.febs.api.service.ISOrderService;
-import cc.mrbird.febs.api.service.ISUserPayService;
-import cc.mrbird.febs.api.service.ISUserTaskService;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.exception.FebsException;
@@ -23,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +37,9 @@ public class SUserPayController extends BaseController {
     private ISUserPayService userPayService;
 
     @Autowired
+    private ISTaskOrderService taskOrderService;
+
+    @Autowired
     private ISUserTaskService userTaskService;
 
     @Autowired
@@ -46,6 +47,9 @@ public class SUserPayController extends BaseController {
 
     @Autowired
     private ISOfferPriceService offerPriceService;
+
+    @Autowired
+    private ISUserService userService;
 
     /**
      * 新增用户支付
@@ -137,19 +141,22 @@ public class SUserPayController extends BaseController {
             if ("T".equals(strPayType)) {
 
                 // 领取任务支付成功
-                SUserTask userTask = userTaskService.getById(relationId);
+                SUserTask userTask = this.userTaskService.getById(relationId);
 
                 userPay.setUserId(userTask.getUserId());
 
-                userPayService.save(userPay);
+                this.userPayService.save(userPay);
 
                 // 变更用户任务的支付状态
                 userTask.setPayStatus(1);
+                userTask.setPayAmount(total);
                 userTask.setUpdateTime(new Date());
-                userTaskService.updateUserTask(userTask);
+                this.userTaskService.updateUserTask(userTask);
 
                 // 用户冻结金额追加
-
+                SUser user = this.userService.getById(userTask.getUserId());
+                user.setLockAmount(user.getLockAmount().add(total));
+                this.userService.updateById(user);
 
                 // 每领取一次任务，获20颗
                 // 猎豆追加  领取任务的人（20颗）  * 猎人等级倍数
@@ -157,44 +164,90 @@ public class SUserPayController extends BaseController {
             } else if ("O".equals(strPayType)) {
 
                 // 支付购买订单成功
-                SOrder order = orderService.getById(relationId);
+                SOrder order = this.orderService.getById(relationId);
 
                 userPay.setUserId(order.getUserId());
 
-                userPayService.save(userPay);
+                this.userPayService.save(userPay);
 
                 // 变更订单状态 已付款
                 order.setPaymentState(1);
                 order.setOrderStatus(1);
                 order.setPaymentTime(new Date());
-                orderService.updateOrder(order);
+                this.orderService.updateOrder(order);
 
                 // 产品下的所有 转让中的任务终止动作：
-                // 1.任务报价表 全部修改已出局状态  所有出局者支付金额退还
+                SUserTask userTask = new SUserTask();
+                userTask.setProductId(order.getProductId());
+                userTask.setPayStatus(1);
+                userTask.setStatus(1);
+                List<SUserTask> userTaskList = userTaskService.findUserTaskList(userTask);
 
-                // 2.转让任务表状态更新 （转让中 - > 未成交流标）
+                for (SUserTask userTasking : userTaskList) {
 
-                // 3.用户任务表状态更新（已接任务、转让中 -> 任务完结）
+                    // 2.转让任务表状态更新 （转让中 - > 未成交流标）
+                    STaskOrder taskOrder = new STaskOrder();
+                    taskOrder.setTaskId(userTasking.getId());
+                    taskOrder.setStatus(0);
+                    List<STaskOrder> taskOrderList = taskOrderService.findTaskOrderList(taskOrder);
 
+                    for (STaskOrder taskOrdering : taskOrderList) {
 
+                        // 1.任务报价表 全部竞标中修改已出局状态  所有出局者支付金额退还
+                        SOfferPrice offerPrice = new SOfferPrice();
+                        offerPrice.setTaskOrderId(taskOrdering.getId());
+                        this.offerPriceService.updateOfferPriceOut(offerPrice);
 
+                        // 所有出局者
+                        List<SOfferPrice> offerPriceOutList = this.offerPriceService.findOfferPriceOutList(offerPrice);
+
+                        for (SOfferPrice offerPriceOut : offerPriceOutList) {
+                            SUser user = this.userService.getById(offerPriceOut.getUserId());
+                            // 冻结金额-
+                            user.setLockAmount(user.getLockAmount().subtract(offerPriceOut.getAmount()));
+                            // 余额+
+                            user.setTotalAmount(user.getTotalAmount().add(offerPriceOut.getAmount()));
+
+                            this.userService.updateById(user);
+                        }
+
+                        taskOrdering.setStatus(2);
+                        taskOrderService.updateById(taskOrdering);
+                    }
+
+                    // 3.用户任务表状态更新（转让中 -> 任务完结）
+                    userTasking.setStatus(3);
+                    userTaskService.updateById(userTasking);
+                }
+
+                // 4.用户任务表状态更新（已接任务 -> 任务完结）
+                userTask.setProductId(order.getProductId());
+                userTask.setPayStatus(1);
+                userTask.setStatus(0);
+                userTaskList = userTaskService.findUserTaskList(userTask);
+                for (SUserTask userTask0 : userTaskList) {
+                    userTask0.setStatus(3);
+                    userTaskService.updateById(userTask0);
+                }
 
             } else if ("P".equals(strPayType)) {
 
                 // 转让任务报价成功
-                SOfferPrice offerPrice = offerPriceService.getById(relationId);
+                SOfferPrice offerPrice = this.offerPriceService.getById(relationId);
 
                 userPay.setUserId(offerPrice.getUserId());
 
-                userPayService.save(userPay);
+                this.userPayService.save(userPay);
 
                 // 变更订单状态 已付款
                 offerPrice.setPayStatus(1);
                 offerPrice.setUpdateTime(new Date());
-                offerPriceService.updateById(offerPrice);
+                this.offerPriceService.updateById(offerPrice);
 
                 // 用户冻结金额追加
-
+                SUser user = this.userService.getById(offerPrice.getUserId());
+                user.setLockAmount(user.getLockAmount().add(total));
+                this.userService.updateById(user);
 
                // 每参与一次任务报价 （10颗） * 猎人等级倍数
 

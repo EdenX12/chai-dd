@@ -65,6 +65,26 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
         this.baseMapper.update(offerPrice, queryWrapper);
     }
 
+
+    @Override
+    public List<SOfferPrice> findOfferPriceOutList(SOfferPrice offerPrice) {
+
+        LambdaQueryWrapper<SOfferPrice> queryWrapper = new LambdaQueryWrapper();
+
+        // 转让任务ID不为空的情况下
+        if (offerPrice.getTaskOrderId() != null) {
+            queryWrapper.eq(SOfferPrice::getTaskOrderId, offerPrice.getTaskOrderId());
+        }
+
+        // 已支付
+        queryWrapper.eq(SOfferPrice::getPayStatus, 1);
+
+        // 已出局
+        queryWrapper.eq(SOfferPrice::getStatus, 2);
+
+        return this.baseMapper.selectList(queryWrapper);
+    }
+
     @Override
     public List<SOfferPrice> findOfferPriceList(SOfferPrice offerPrice) {
 
