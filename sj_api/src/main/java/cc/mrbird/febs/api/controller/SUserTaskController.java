@@ -68,14 +68,14 @@ public class SUserTaskController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
 
             // 最大购买份数判断
-            SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
+            SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
 
             // 已购买任务  （现在 转让成功 的 也算在内  后续可能需要调整）
             SUserTask oldUserTask = new SUserTask();
             oldUserTask.setUserId(user.getId());
             oldUserTask.setPayStatus(1);
             oldUserTask.setProductId(userTask.getProductId());
-            List<SUserTask> oldUserTaskList = userTaskService.findUserTaskList(oldUserTask);
+            List<SUserTask> oldUserTaskList = this.userTaskService.findUserTaskList(oldUserTask);
             int oldTaskNumber = 0;
             for (SUserTask userTask1 : oldUserTaskList) {
                 oldTaskNumber = oldTaskNumber + userTask1.getTaskNumber();
@@ -89,7 +89,7 @@ public class SUserTaskController extends BaseController {
             }
 
             // 老手不能购买新手标
-            SProduct product = productService.getById(userTask.getProductId());
+            SProduct product = this.productService.getById(userTask.getProductId());
 
             if (userLevel.getLevelType() > 1 && product.getProductType() == 1) {
 
@@ -101,23 +101,22 @@ public class SUserTaskController extends BaseController {
             // 用户ID
             userTask.setUserId(user.getId());
 
-            // 已接任务
-            userTask.setStatus(0);
-
-            Long intTaskId;
-
             if (userTask.getId() == null) {
+                userTask.setPayStatus(2);
+                userTask.setStatus(0);
+                userTask.setShareFlag(0);
                 userTask.setCreateTime(new Date());
                 userTask.setUpdateTime(new Date());
-                intTaskId = this.userTaskService.createUserTask(userTask);
 
+                this.userTaskService.createUserTask(userTask);
             } else {
                 userTask.setUpdateTime(new Date());
-                intTaskId = this.userTaskService.updateUserTask(userTask);
+
+                this.userTaskService.updateUserTask(userTask);
             }
 
             // 调起微信支付
-            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(intTaskId),
+            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
                     product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
                     user.getOpenId(),
                     request.getRemoteAddr(),
@@ -147,12 +146,30 @@ public class SUserTaskController extends BaseController {
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
-        // 猎豆追加 10颗  * 猎人等级倍数  分享只计算一次
+        SUser user = FebsUtil.getCurrentUser();
 
+        // 猎豆追加 10颗  * 猎人等级倍数  分享只计算一次
+        SUserTask userTask = new SUserTask();
+
+        userTask.setId(userTaskId);
+        userTask.setUserId(user.getId());
+
+        List<SUserTask> userTaskList = this.userTaskService.findUserTaskList(userTask);
+
+        // 未分享过的任务
+        if (userTaskList != null && userTaskList.size() > 0) {
+            userTask = userTaskList.get(0);
+
+            if (userTask.getShareFlag() == 0) {
+
+                SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+                user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+                this.userService.updateById(user);
+            }
+        }
 
         return response;
     }
-
 
     /**
      * 根据任务ID获取个人信息及商品详情（被分享转发页面读取）
@@ -168,26 +185,26 @@ public class SUserTaskController extends BaseController {
         SUser user = FebsUtil.getCurrentUser();
 
         // 任务信息
-        SUserTask userTask = userTaskService.getById(userTaskId);
+        SUserTask userTask = this.userTaskService.getById(userTaskId);
 
         // 转发任务的用户信息
-        SUser taskUser = userService.getById(userTask.getUserId());
+        SUser taskUser = this.userService.getById(userTask.getUserId());
 
         // 商品信息
-        SProduct product = productService.getById(userTask.getProductId());
+        SProduct product = this.productService.getById(userTask.getProductId());
 
         // 商品关注数量
         SUserFollow userFollowCount = new SUserFollow();
         userFollowCount.setProductId(userTask.getProductId());
         userFollowCount.setFollowType(0);
-        int followCount = userFollowService.findUserFollowCount(userFollowCount);
+        int followCount = this.userFollowService.findUserFollowCount(userFollowCount);
 
         // 用户是否已关注
         SUserFollow userFollowDetail = new SUserFollow();
         userFollowDetail.setProductId(userTask.getProductId());
         userFollowDetail.setFollowType(0);
         userFollowDetail.setUserId(user.getId());
-        userFollowDetail = userFollowService.findUserFollowDetail(userFollowDetail);
+        userFollowDetail = this.userFollowService.findUserFollowDetail(userFollowDetail);
 
         Map<String, Object> returnMap = new HashMap<>();
 
@@ -210,7 +227,7 @@ public class SUserTaskController extends BaseController {
         returnMap.put("followStatus", userFollowDetail.getStatus());
 
         // 辛苦费 见习猎人分0.5%; 初级猎手分1% 中级猎人分2% 高级猎人分3%
-        SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
+        SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
         returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
         // 第一次打开的话，生成新任务（未支付  未分享）
@@ -218,7 +235,7 @@ public class SUserTaskController extends BaseController {
         searchUserTask.setUserId(user.getId());
         searchUserTask.setProductId(userTask.getProductId());
         searchUserTask.setParentId(userTaskId);
-        List<SUserTask> userTaskOne = userTaskService.findUserTaskList(searchUserTask);
+        List<SUserTask> userTaskOne = this.userTaskService.findUserTaskList(searchUserTask);
         Long newTaskId;
         if (userTaskOne == null) {
             searchUserTask.setPayStatus(2);
@@ -227,14 +244,16 @@ public class SUserTaskController extends BaseController {
             searchUserTask.setShareFlag(0);
             searchUserTask.setCreateTime(new Date());
             searchUserTask.setUpdateTime(new Date());
-            newTaskId = userTaskService.createUserTask(searchUserTask);
+            newTaskId = this.userTaskService.createUserTask(searchUserTask);
             // 新生成的任务ID
             returnMap.put("taskId", newTaskId);
 
-
             // 有人查看或转发“我”分享的任务时，“我”获10颗
             // 猎豆追加 本人（10颗） * 猎人等级倍数
-
+            SUser user2 = this.userService.getById(userTask.getUserId());
+            SUserLevel userLevel2 = this.userLevelService.getById(user2.getUserLevelId());
+            user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+            this.userService.updateById(user2);
         }
 
         response.data(returnMap);
@@ -252,7 +271,7 @@ public class SUserTaskController extends BaseController {
 
         FebsResponse response = new FebsResponse();
 
-        Map<String, Object> userTaskPageList = getDataTable(userTaskService.findUserTaskList(userTask, queryRequest));
+        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskList(userTask, queryRequest));
 
         response.put("code", 0);
         response.data(userTaskPageList);

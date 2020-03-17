@@ -2,8 +2,11 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.STaskOrder;
 import cc.mrbird.febs.api.entity.SUser;
+import cc.mrbird.febs.api.entity.SUserLevel;
 import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.api.service.ISTaskOrderService;
+import cc.mrbird.febs.api.service.ISUserLevelService;
+import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
@@ -39,6 +42,12 @@ public class STaskOrderController extends BaseController {
 
     @Autowired
     private ISUserTaskService userTaskService;
+
+    @Autowired
+    private ISUserService userService;
+
+    @Autowired
+    private ISUserLevelService userLevelService;
 
     /**
      * 新增任务转让
@@ -81,6 +90,9 @@ public class STaskOrderController extends BaseController {
             this.taskOrderService.createTaskOrder(taskOrder);
 
             // 每参与一次任务转出 猎豆追加 10颗  * 猎人等级倍数
+            SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+            user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+            this.userService.updateById(user);
 
         } catch (Exception e) {
             message = "新增任务转让失败";

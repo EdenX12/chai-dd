@@ -51,6 +51,9 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISUserService userService;
 
+    @Autowired
+    private ISUserLevelService userLevelService;
+
     /**
      * 新增用户支付
      */
@@ -153,13 +156,12 @@ public class SUserPayController extends BaseController {
                 userTask.setUpdateTime(new Date());
                 this.userTaskService.updateUserTask(userTask);
 
-                // 用户冻结金额追加
+                // 用户冻结金额追加  猎豆追加  领取任务的人（20颗）  * 猎人等级倍数
                 SUser user = this.userService.getById(userTask.getUserId());
+                SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
                 user.setLockAmount(user.getLockAmount().add(total));
+                user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
                 this.userService.updateById(user);
-
-                // 每领取一次任务，获20颗
-                // 猎豆追加  领取任务的人（20颗）  * 猎人等级倍数
 
             } else if ("O".equals(strPayType)) {
 
@@ -181,7 +183,7 @@ public class SUserPayController extends BaseController {
                 userTask.setProductId(order.getProductId());
                 userTask.setPayStatus(1);
                 userTask.setStatus(1);
-                List<SUserTask> userTaskList = userTaskService.findUserTaskList(userTask);
+                List<SUserTask> userTaskList = this.userTaskService.findUserTaskList(userTask);
 
                 for (SUserTask userTasking : userTaskList) {
 
@@ -212,22 +214,22 @@ public class SUserPayController extends BaseController {
                         }
 
                         taskOrdering.setStatus(2);
-                        taskOrderService.updateById(taskOrdering);
+                        this.taskOrderService.updateById(taskOrdering);
                     }
 
                     // 3.用户任务表状态更新（转让中 -> 任务完结）
                     userTasking.setStatus(3);
-                    userTaskService.updateById(userTasking);
+                    this.userTaskService.updateById(userTasking);
                 }
 
                 // 4.用户任务表状态更新（已接任务 -> 任务完结）
                 userTask.setProductId(order.getProductId());
                 userTask.setPayStatus(1);
                 userTask.setStatus(0);
-                userTaskList = userTaskService.findUserTaskList(userTask);
+                userTaskList = this.userTaskService.findUserTaskList(userTask);
                 for (SUserTask userTask0 : userTaskList) {
                     userTask0.setStatus(3);
-                    userTaskService.updateById(userTask0);
+                    this.userTaskService.updateById(userTask0);
                 }
 
             } else if ("P".equals(strPayType)) {
@@ -244,13 +246,12 @@ public class SUserPayController extends BaseController {
                 offerPrice.setUpdateTime(new Date());
                 this.offerPriceService.updateById(offerPrice);
 
-                // 用户冻结金额追加
+                // 用户冻结金额追加   每参与一次任务报价 （10颗） * 猎人等级倍数
                 SUser user = this.userService.getById(offerPrice.getUserId());
+                SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
                 user.setLockAmount(user.getLockAmount().add(total));
+                user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
                 this.userService.updateById(user);
-
-               // 每参与一次任务报价 （10颗） * 猎人等级倍数
-
             }
 
         }

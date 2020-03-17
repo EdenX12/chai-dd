@@ -63,9 +63,6 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
     @Transactional
     public void createUserFollow(SUserFollow userFollow) {
 
-        SUser user = FebsUtil.getCurrentUser();
-        userFollow.setUserId(user.getId());
-
         LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper<SUserFollow>();
 
         // 用户ID
@@ -103,9 +100,6 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
     @Override
     @Transactional
     public void updateUserFollow(SUserFollow userFollow) {
-
-        SUser user = FebsUtil.getCurrentUser();
-        userFollow.setUserId(user.getId());
 
         LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper<SUserFollow>();
 

@@ -214,7 +214,7 @@ public class SOrderController extends BaseController {
                 userTaskService.updateById(userTasked);
             }
 
-            // 下级贡献收益计算 往上推四级，（如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
+            // 下级贡献收益计算 往上推四级
             List<SUser> userList = new ArrayList();
             if (user.getParentId() != null) {
                 // 第一级
@@ -237,18 +237,11 @@ public class SOrderController extends BaseController {
                 }
             }
 
+            // （如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
             for (SUser user0 : userList) {
                 SUserLevel userLevel = userLevelService.getById(user0.getUserLevelId());
-                if (userLevel.getLevelType() == 1) {
-                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.005))));
-                } else if (userLevel.getLevelType() == 2) {
-                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.01))));
-                } else if (userLevel.getLevelType() == 3) {
-                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.02))));
-                } else if (userLevel.getLevelType() == 4) {
-                    user0.setTotalAmount(user0.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.03))));
-                }
-
+                user0.setTotalAmount(user0.getTotalAmount().add(
+                        product.getTotalReward().multiply(userLevel.getIncomeRate())));
                 this.userService.updateById(user0);
             }
 
