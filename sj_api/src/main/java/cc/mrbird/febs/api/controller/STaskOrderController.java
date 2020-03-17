@@ -1,13 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
-import cc.mrbird.febs.api.entity.STaskOrder;
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.entity.SUserLevel;
-import cc.mrbird.febs.api.entity.SUserTask;
-import cc.mrbird.febs.api.service.ISTaskOrderService;
-import cc.mrbird.febs.api.service.ISUserLevelService;
-import cc.mrbird.febs.api.service.ISUserService;
-import cc.mrbird.febs.api.service.ISUserTaskService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -48,6 +42,9 @@ public class STaskOrderController extends BaseController {
 
     @Autowired
     private ISUserLevelService userLevelService;
+
+    @Autowired
+    private ISUserBeanLogService userBeanLogService;
 
     /**
      * 新增任务转让
@@ -93,6 +90,17 @@ public class STaskOrderController extends BaseController {
             SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
             user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
+
+            // 猎豆流水插入
+            SUserBeanLog userBeanLog = new SUserBeanLog();
+            userBeanLog.setUserId(user.getId());
+            userBeanLog.setChangeType(5);
+            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+            userBeanLog.setChangeTime(new Date());
+            userBeanLog.setRelationId(taskOrder.getId());
+            userBeanLog.setRemark("关联任务转出ID");
+            userBeanLog.setOldAmount(user.getCanuseBean());
+            this.userBeanLogService.save(userBeanLog);
 
         } catch (Exception e) {
             message = "新增任务转让失败";

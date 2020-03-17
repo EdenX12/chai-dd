@@ -54,6 +54,12 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISUserLevelService userLevelService;
 
+    @Autowired
+    private ISUserAmountLogService userAmountLogService;
+
+    @Autowired
+    private ISUserBeanLogService userBeanLogService;
+
     /**
      * 新增用户支付
      */
@@ -163,6 +169,17 @@ public class SUserPayController extends BaseController {
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
                 this.userService.updateById(user);
 
+                // 猎豆流水插入
+                SUserBeanLog userBeanLog = new SUserBeanLog();
+                userBeanLog.setUserId(user.getId());
+                userBeanLog.setChangeType(1);
+                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
+                userBeanLog.setChangeTime(new Date());
+                userBeanLog.setRelationId(userTask.getId());
+                userBeanLog.setRemark("领取任务ID");
+                userBeanLog.setOldAmount(user.getCanuseBean());
+                this.userBeanLogService.save(userBeanLog);
+
             } else if ("O".equals(strPayType)) {
 
                 // 支付购买订单成功
@@ -205,6 +222,18 @@ public class SUserPayController extends BaseController {
 
                         for (SOfferPrice offerPriceOut : offerPriceOutList) {
                             SUser user = this.userService.getById(offerPriceOut.getUserId());
+
+                            // 金额流水插入
+                            SUserAmountLog userAmountLog = new SUserAmountLog();
+                            userAmountLog.setUserId(user.getId());
+                            userAmountLog.setChangeType(8);
+                            userAmountLog.setChangeAmount(offerPriceOut.getAmount());
+                            userAmountLog.setChangeTime(new Date());
+                            userAmountLog.setRelationId(offerPriceOut.getId());
+                            userAmountLog.setRemark("关联任务报价ID");
+                            userAmountLog.setOldAmount(user.getTotalAmount());
+                            this.userAmountLogService.save(userAmountLog);
+
                             // 冻结金额-
                             user.setLockAmount(user.getLockAmount().subtract(offerPriceOut.getAmount()));
                             // 余额+
@@ -252,6 +281,17 @@ public class SUserPayController extends BaseController {
                 user.setLockAmount(user.getLockAmount().add(total));
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
                 this.userService.updateById(user);
+
+                // 猎豆流水插入
+                SUserBeanLog userBeanLog = new SUserBeanLog();
+                userBeanLog.setUserId(user.getId());
+                userBeanLog.setChangeType(6);
+                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+                userBeanLog.setChangeTime(new Date());
+                userBeanLog.setRelationId(offerPrice.getId());
+                userBeanLog.setRemark("转让任务报价ID");
+                userBeanLog.setOldAmount(user.getCanuseBean());
+                this.userBeanLogService.save(userBeanLog);
             }
 
         }

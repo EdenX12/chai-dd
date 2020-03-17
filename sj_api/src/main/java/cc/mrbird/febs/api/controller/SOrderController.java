@@ -53,6 +53,9 @@ public class SOrderController extends BaseController {
     @Autowired
     private WeChatPayUtil weChatPayUtil;
 
+    @Autowired
+    private ISUserAmountLogService userAmountLogService;
+
     /**
      * 新增用户购买订单
      */
@@ -184,6 +187,18 @@ public class SOrderController extends BaseController {
             BigDecimal everyReward = new BigDecimal(0);
             if (taskGotUser) {
                 SUser user1 = this.userService.getById(userTask.getUserId());
+
+                // 金额流水插入
+                SUserAmountLog userAmountLog = new SUserAmountLog();
+                userAmountLog.setUserId(user1.getId());
+                userAmountLog.setChangeType(3);
+                userAmountLog.setChangeAmount(product.getTotalReward().multiply(BigDecimal.valueOf(0.4)));
+                userAmountLog.setChangeTime(new Date());
+                userAmountLog.setRelationId(userTask.getId());
+                userAmountLog.setRemark("关联任务ID");
+                userAmountLog.setOldAmount(user.getTotalAmount());
+                this.userAmountLogService.save(userAmountLog);
+
                 user1.setTotalAmount(user1.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.4))));
                 this.userService.updateById(user1);
 
@@ -191,6 +206,18 @@ public class SOrderController extends BaseController {
                 everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.5)).divide(BigDecimal.valueOf(totalTaskNumberOther));
             } else {
                 SUser user1 = this.userService.getById(userTask.getUserId());
+
+                // 金额流水插入
+                SUserAmountLog userAmountLog = new SUserAmountLog();
+                userAmountLog.setUserId(user1.getId());
+                userAmountLog.setChangeType(3);
+                userAmountLog.setChangeAmount(product.getTotalReward().multiply(BigDecimal.valueOf(0.05)));
+                userAmountLog.setChangeTime(new Date());
+                userAmountLog.setRelationId(userTask.getId());
+                userAmountLog.setRemark("关联任务ID");
+                userAmountLog.setOldAmount(user.getTotalAmount());
+                this.userAmountLogService.save(userAmountLog);
+
                 user1.setTotalAmount(user1.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.05))));
                 this.userService.updateById(user1);
 
@@ -200,13 +227,40 @@ public class SOrderController extends BaseController {
 
             for (SUserTask userTasked : userTaskList) {
 
-                // 躺赢收益计算
-                if (!order.getUserId().equals(userTasked.getUserId())) {
+                // 躺赢收益计算  任务金退还（冻结 - > 余额）
+                SUser user1 = this.userService.getById(userTasked.getUserId());
 
-                    SUser user1 = this.userService.getById(userTasked.getUserId());
-                    user1.setTotalAmount(user1.getTotalAmount().add(everyReward.multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
-                    this.userService.updateById(user1);
-                }
+                // 任务金退还（冻结 - > 余额）
+                // 冻结金额-
+                user1.setLockAmount(user1.getLockAmount().subtract(product.getTaskPrice().multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
+                // 余额+
+                user1.setTotalAmount(user1.getTotalAmount().add(product.getTaskPrice().multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
+
+                // 任务解冻金额流水插入
+                SUserAmountLog userAmountLog = new SUserAmountLog();
+                userAmountLog.setUserId(user1.getId());
+                userAmountLog.setChangeType(9);
+                userAmountLog.setChangeAmount(product.getTaskPrice().multiply(BigDecimal.valueOf(userTasked.getTaskNumber())));
+                userAmountLog.setChangeTime(new Date());
+                userAmountLog.setRelationId(userTasked.getId());
+                userAmountLog.setRemark("关联任务ID");
+                userAmountLog.setOldAmount(user.getTotalAmount());
+                this.userAmountLogService.save(userAmountLog);
+
+                // 躺赢收益计算
+                user1.setTotalAmount(user1.getTotalAmount().add(everyReward.multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
+                this.userService.updateById(user1);
+
+                // 躺赢金额流水插入
+                userAmountLog = new SUserAmountLog();
+                userAmountLog.setUserId(user1.getId());
+                userAmountLog.setChangeType(4);
+                userAmountLog.setChangeAmount(everyReward.multiply(BigDecimal.valueOf(userTasked.getTaskNumber())));
+                userAmountLog.setChangeTime(new Date());
+                userAmountLog.setRelationId(userTasked.getId());
+                userAmountLog.setRemark("关联任务ID");
+                userAmountLog.setOldAmount(user.getTotalAmount());
+                this.userAmountLogService.save(userAmountLog);
 
                 // 佣金已入账 状态更新
                 userTasked.setUpdateTime(new Date());
@@ -240,6 +294,18 @@ public class SOrderController extends BaseController {
             // （如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
             for (SUser user0 : userList) {
                 SUserLevel userLevel = userLevelService.getById(user0.getUserLevelId());
+
+                // 金额流水插入
+                SUserAmountLog userAmountLog = new SUserAmountLog();
+                userAmountLog.setUserId(user0.getId());
+                userAmountLog.setChangeType(5);
+                userAmountLog.setChangeAmount(product.getTotalReward().multiply(userLevel.getIncomeRate()));
+                userAmountLog.setChangeTime(new Date());
+                userAmountLog.setRelationId(order.getId());
+                userAmountLog.setRemark("关联订单ID");
+                userAmountLog.setOldAmount(user.getTotalAmount());
+                this.userAmountLogService.save(userAmountLog);
+
                 user0.setTotalAmount(user0.getTotalAmount().add(
                         product.getTotalReward().multiply(userLevel.getIncomeRate())));
                 this.userService.updateById(user0);

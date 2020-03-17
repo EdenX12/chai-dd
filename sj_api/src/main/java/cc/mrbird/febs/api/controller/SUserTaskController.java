@@ -51,6 +51,9 @@ public class SUserTaskController extends BaseController {
     private ISUserFollowService userFollowService;
 
     @Autowired
+    private ISUserBeanLogService userBeanLogService;
+
+    @Autowired
     private WeChatPayUtil weChatPayUtil;
 
     /**
@@ -165,6 +168,17 @@ public class SUserTaskController extends BaseController {
                 SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
                 this.userService.updateById(user);
+
+                // 猎豆流水插入
+                SUserBeanLog userBeanLog = new SUserBeanLog();
+                userBeanLog.setUserId(user.getId());
+                userBeanLog.setChangeType(2);
+                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+                userBeanLog.setChangeTime(new Date());
+                userBeanLog.setRelationId(userTask.getId());
+                userBeanLog.setRemark("关联任务ID");
+                userBeanLog.setOldAmount(user.getCanuseBean());
+                this.userBeanLogService.save(userBeanLog);
             }
         }
 
@@ -254,6 +268,17 @@ public class SUserTaskController extends BaseController {
             SUserLevel userLevel2 = this.userLevelService.getById(user2.getUserLevelId());
             user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user2);
+
+            // 猎豆流水插入
+            SUserBeanLog userBeanLog = new SUserBeanLog();
+            userBeanLog.setUserId(user2.getId());
+            userBeanLog.setChangeType(7);
+            userBeanLog.setChangeAmount(userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+            userBeanLog.setChangeTime(new Date());
+            userBeanLog.setRelationId(userTask.getId());
+            userBeanLog.setRemark("关联任务ID");
+            userBeanLog.setOldAmount(user.getCanuseBean());
+            this.userBeanLogService.save(userBeanLog);
         }
 
         response.data(returnMap);

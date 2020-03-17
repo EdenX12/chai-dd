@@ -1,13 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
-import cc.mrbird.febs.api.entity.SOfferPrice;
-import cc.mrbird.febs.api.entity.STaskOrder;
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.entity.SUserTask;
-import cc.mrbird.febs.api.service.ISOfferPriceService;
-import cc.mrbird.febs.api.service.ISTaskOrderService;
-import cc.mrbird.febs.api.service.ISUserService;
-import cc.mrbird.febs.api.service.ISUserTaskService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -53,6 +47,9 @@ public class SOfferPriceController extends BaseController {
 
     @Autowired
     private ISUserService userService;
+
+    @Autowired
+    private ISUserAmountLogService userAmountLogService;
 
     /**
      * 新增任务报价
@@ -145,6 +142,18 @@ public class SOfferPriceController extends BaseController {
             for (SOfferPrice offerPriceOut : offerPriceOutList) {
 
                 SUser user = this.userService.getById(offerPriceOut.getUserId());
+
+                // 金额流水插入
+                SUserAmountLog userAmountLog = new SUserAmountLog();
+                userAmountLog.setUserId(user.getId());
+                userAmountLog.setChangeType(8);
+                userAmountLog.setChangeAmount(offerPriceOut.getAmount());
+                userAmountLog.setChangeTime(new Date());
+                userAmountLog.setRelationId(offerPriceOut.getId());
+                userAmountLog.setRemark("关联报价ID");
+                userAmountLog.setOldAmount(user.getTotalAmount());
+                this.userAmountLogService.save(userAmountLog);
+
                 // 冻结金额-
                 user.setLockAmount(user.getLockAmount().subtract(offerPriceOut.getAmount()));
                 // 余额+
@@ -155,6 +164,18 @@ public class SOfferPriceController extends BaseController {
 
             // 转让任务的人 领取任务或者报价任务成交的金额解冻   成交金额到余额
             SUser user = this.userService.getById(userTaskOld.getUserId());
+
+            // 金额流水插入
+            SUserAmountLog userAmountLog = new SUserAmountLog();
+            userAmountLog.setUserId(user.getId());
+            userAmountLog.setChangeType(7);
+            userAmountLog.setChangeAmount(offerPrice.getAmount());
+            userAmountLog.setChangeTime(new Date());
+            userAmountLog.setRelationId(userTaskOld.getId());
+            userAmountLog.setRemark("关联任务ID");
+            userAmountLog.setOldAmount(user.getTotalAmount());
+            this.userAmountLogService.save(userAmountLog);
+
             // 冻结金额-原来支付金额
             user.setLockAmount(user.getLockAmount().subtract(userTaskOld.getPayAmount()));
             // 余额+

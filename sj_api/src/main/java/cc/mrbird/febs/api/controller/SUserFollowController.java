@@ -1,8 +1,10 @@
 package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.SUser;
+import cc.mrbird.febs.api.entity.SUserBeanLog;
 import cc.mrbird.febs.api.entity.SUserFollow;
 import cc.mrbird.febs.api.entity.SUserLevel;
+import cc.mrbird.febs.api.service.ISUserBeanLogService;
 import cc.mrbird.febs.api.service.ISUserFollowService;
 import cc.mrbird.febs.api.service.ISUserLevelService;
 import cc.mrbird.febs.api.service.ISUserService;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author MrBird
@@ -39,6 +42,9 @@ public class SUserFollowController extends BaseController {
     @Autowired
     private ISUserService userService;
 
+    @Autowired
+    private ISUserBeanLogService userBeanLogService;
+
     /**
      * 新增关注 （任务可不传）
      * 用户ID 任务ID 产品ID
@@ -58,6 +64,17 @@ public class SUserFollowController extends BaseController {
             SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
             user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
+
+            // 猎豆流水插入
+            SUserBeanLog userBeanLog = new SUserBeanLog();
+            userBeanLog.setUserId(user.getId());
+            userBeanLog.setChangeType(3);
+            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+            userBeanLog.setChangeTime(new Date());
+            userBeanLog.setRelationId(userFollow.getId());
+            userBeanLog.setRemark("关联用户关注ID");
+            userBeanLog.setOldAmount(user.getCanuseBean());
+            this.userBeanLogService.save(userBeanLog);
 
         } catch (Exception e) {
             message = "新增用户关注失败";
@@ -85,6 +102,17 @@ public class SUserFollowController extends BaseController {
             SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
             user.setCanuseBean(user.getCanuseBean() - userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
+
+            // 猎豆流水插入
+            SUserBeanLog userBeanLog = new SUserBeanLog();
+            userBeanLog.setUserId(user.getId());
+            userBeanLog.setChangeType(3);
+            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue() * (-1));
+            userBeanLog.setChangeTime(new Date());
+            userBeanLog.setRelationId(userFollow.getId());
+            userBeanLog.setRemark("关联用户关注ID");
+            userBeanLog.setOldAmount(user.getCanuseBean());
+            this.userBeanLogService.save(userBeanLog);
 
         } catch (Exception e) {
             message = "取消用户关注失败";
