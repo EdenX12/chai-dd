@@ -77,6 +77,11 @@ public class SUser implements Serializable {
     private Integer userStatus;
 
     /**
+     * 领取任务次数
+     */
+    private Integer taskCount;
+
+    /**
      * 用户等级 用户等级表主键  1 初级猎人 2。。。
      */
     private Long userLevelId;

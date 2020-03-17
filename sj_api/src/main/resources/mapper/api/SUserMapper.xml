@@ -13,6 +13,7 @@
                     <result column="user_phone" property="userPhone" />
                     <result column="total_amount" property="totalAmount" />
                     <result column="lock_amount" property="lockAmount" />
+            <result column="task_count" property="taskCount" />
                     <result column="reward_bean" property="rewardBean" />
                     <result column="user_status" property="userStatus" />
                     <result column="user_level_id" property="userLevelId" />
@@ -23,7 +24,7 @@
         <!-- 通用查询结果列 -->
         <sql id="Base_Column_List">
                 id,
-            user_name, user_password, create_time, open_id, user_img, user_phone, total_amount, lock_amount, reward_bean, user_status, user_level, canuse_bean, parent_id
+            user_name, user_password, create_time, open_id, user_img, user_phone, total_amount, lock_amount, task_count, reward_bean, user_status, user_level, canuse_bean, parent_id
         </sql>
 
     

@@ -167,6 +167,18 @@ public class SUserPayController extends BaseController {
                 SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
                 user.setLockAmount(user.getLockAmount().add(total));
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
+                // 领取任务次数 + 1
+                int taskCount = user.getTaskCount() + 1;
+                user.setTaskCount(taskCount);
+                // 变更个人等级
+                List<SUserLevel> userLevelList = userLevelService.list();
+                Long userLevelId = null;
+                for (SUserLevel userLevelAll : userLevelList) {
+                    if (taskCount>= userLevelAll.getMinNumber() && taskCount <= userLevelAll.getMaxNumber()) {
+                        userLevelId = userLevelAll.getId();
+                    }
+                }
+                user.setUserLevelId(userLevelId);
                 this.userService.updateById(user);
 
                 // 猎豆流水插入
