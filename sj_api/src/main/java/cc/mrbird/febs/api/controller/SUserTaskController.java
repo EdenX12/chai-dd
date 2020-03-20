@@ -266,7 +266,7 @@ public class SUserTaskController extends BaseController {
         searchUserTask.setParentId(userTaskId);
         List<SUserTask> userTaskOne = this.userTaskService.findUserTaskList(searchUserTask);
         Long newTaskId;
-        if (userTaskOne == null) {
+        if (userTaskOne == null||userTaskOne.size()==0) {
             searchUserTask.setPayStatus(2);
             searchUserTask.setTaskNumber(1);
             searchUserTask.setStatus(0);
