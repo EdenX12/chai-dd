@@ -90,9 +90,9 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
         queryWrapper.eq(SUserAddress::getUserId, userAddress.getUserId());
 
         // 用户地址ID
-        if(userAddress.getId()!=null) {
-        queryWrapper.eq(SUserAddress::getId, userAddress.getId());
-        }else {
+        if (userAddress.getId()!=null) {
+            queryWrapper.eq(SUserAddress::getId, userAddress.getId());
+        } else {
         	//如果是空 说明是查默认地址
         	queryWrapper.eq(SUserAddress::getIsDefault, 1);
         }

@@ -52,6 +52,11 @@ public class SUserTask implements Serializable {
     private BigDecimal payAmount;
 
     /**
+     * 支付时间
+     */
+    private Date payTime;
+
+    /**
      * 任务份数
      */
     private Integer taskNumber;

@@ -10,6 +10,7 @@
             <result column="parent_id" property="parentId" />
             <result column="pay_status" property="payStatus" />
             <result column="pay_amount" property="payAmount" />
+            <result column="pay_time" property="payTime" />
             <result column="task_number" property="taskNumber" />
             <result column="status" property="status" />
             <result column="share_flag" property="shareFlag" />
@@ -20,7 +21,7 @@
         <!-- 通用查询结果列 -->
         <sql id="Base_Column_List">
                 id,
-            user_id, product_id, parent_id, pay_status, task_number, status, share_flag, create_time, updateTime
+            user_id, product_id, parent_id, pay_status, pay_amount, pay_time, task_number, status, share_flag, create_time, updateTime
         </sql>
 
 
@@ -33,7 +34,8 @@
                 t.task_number taskNumber,
                 t.status status,
                 t.create_time createTime,
-
+                t.pay_time payTime,
+                datediff(now(), t.pay_time) taskDays,
                 p.product_name productName,
                 p.product_img productImg,
                 p.product_des productDes,

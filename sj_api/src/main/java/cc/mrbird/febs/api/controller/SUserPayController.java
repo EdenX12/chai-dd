@@ -8,6 +8,7 @@ import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -64,6 +65,7 @@ public class SUserPayController extends BaseController {
      * 新增用户支付
      */
     @Log("新增用户支付")
+    @Transactional
     @PostMapping("/addUserPay")
     public void addUserPay(@Valid SUserPay userPay) throws FebsException {
 
@@ -87,6 +89,7 @@ public class SUserPayController extends BaseController {
      * 微信支付成功回调
      */
     @Log("微信支付成功回调")
+    @Transactional
     @PostMapping("/paySuccess")
     public void paySuccess(HttpServletRequest request, HttpServletResponse response) throws FebsException {
 
@@ -160,6 +163,7 @@ public class SUserPayController extends BaseController {
                 userTask.setPayStatus(1);
                 userTask.setPayAmount(total);
                 userTask.setUpdateTime(new Date());
+                userTask.setPayTime(new Date());
                 this.userTaskService.updateUserTask(userTask);
 
                 // 用户冻结金额追加  猎豆追加  领取任务的人（20颗）  * 猎人等级倍数

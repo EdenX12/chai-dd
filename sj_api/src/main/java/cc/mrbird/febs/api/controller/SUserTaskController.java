@@ -12,6 +12,7 @@ import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -60,6 +61,7 @@ public class SUserTaskController extends BaseController {
      * 新增用户任务
      */
     @Log("新增用户任务")
+    @Transactional
     @PostMapping("/addUserTask")
     public FebsResponse addUserTask(HttpServletRequest request, @Valid SUserTask userTask) {
 
@@ -142,6 +144,7 @@ public class SUserTaskController extends BaseController {
      * 任务分享成功之后调用
      * @return List<Map>
      */
+    @Transactional
     @PostMapping("/getShareTaskSuccess")
     @Limit(key = "getShareTaskSuccess", period = 60, count = 20, name = "根据任务ID检索商品详情接口", prefix = "limit")
     public FebsResponse getShareTaskSuccess(Long userTaskId) {
@@ -189,6 +192,7 @@ public class SUserTaskController extends BaseController {
      * 根据任务ID获取个人信息及商品详情（被分享转发页面读取）
      * @return List<Map>
      */
+    @Transactional
     @PostMapping("/getProductByTaskId")
     @Limit(key = "getProductByTaskId", period = 60, count = 20, name = "根据任务ID检索商品详情接口", prefix = "limit")
     public FebsResponse getProductByTaskId(Long userTaskId) {
@@ -222,9 +226,15 @@ public class SUserTaskController extends BaseController {
 
         Map<String, Object> returnMap = new HashMap<>();
 
+        // 用户名称
         returnMap.put("userName", taskUser.getUserName());
+        // 用户电话
         returnMap.put("userPhone", taskUser.getUserPhone());
+        // 用户已领取任务
+        returnMap.put("userTaskNumber", userTask.getTaskNumber());
+        // 商品ID
         returnMap.put("productId", product.getId());
+        // 产品类型（新手标 正常标）
         returnMap.put("productType", product.getProductType());
         returnMap.put("productName", product.getProductName());
         returnMap.put("productDes", product.getProductDes());
@@ -235,6 +245,7 @@ public class SUserTaskController extends BaseController {
         returnMap.put("totalReward", product.getTotalReward());
         returnMap.put("successReward", product.getSuccessReward());
         returnMap.put("everyReward", product.getEveryReward());
+        // 总任务数
         returnMap.put("taskNumber", product.getTaskNumber());
         returnMap.put("taskPrice", product.getTaskPrice());
         returnMap.put("followCount", followCount);
@@ -279,6 +290,8 @@ public class SUserTaskController extends BaseController {
             userBeanLog.setRemark("关联任务ID");
             userBeanLog.setOldAmount(user.getCanuseBean());
             this.userBeanLogService.save(userBeanLog);
+        } else {
+            returnMap.put("taskId", userTaskOne.get(0).getId());
         }
 
         response.data(returnMap);

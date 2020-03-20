@@ -1,21 +1,17 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.STaskOrder;
-import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.mapper.STaskOrderMapper;
 import cc.mrbird.febs.api.service.ISTaskOrderService;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
-import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +22,6 @@ import java.util.Map;
 public class STaskOrderServiceImpl extends ServiceImpl<STaskOrderMapper, STaskOrder> implements ISTaskOrderService {
 
     @Override
-    @Transactional
     public Long createTaskOrder(STaskOrder taskOrder) {
 
         this.baseMapper.insert(taskOrder);

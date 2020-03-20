@@ -41,14 +41,29 @@ public class SUserAddress implements Serializable {
     private Long provinceId;
 
     /**
+     * 省级名称
+     */
+    private String provinceName;
+
+    /**
      * 市级ID
      */
     private Long cityId;
 
     /**
+     * 市级名称
+     */
+    private String cityName;
+
+    /**
      * 地区ID
      */
     private Long areaId;
+
+    /**
+     * 地区名称
+     */
+    private String areaName;
 
     /**
      * 地区内容

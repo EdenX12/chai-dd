@@ -13,9 +13,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
 
 /**
  * @author MrBird
@@ -24,7 +21,6 @@ import java.util.Date;
 public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> implements ISOrderService {
 
     @Override
-    @Transactional
     public Long addOrder(SOrder order) {
 
         this.baseMapper.insert(order);
@@ -55,7 +51,6 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     }
 
     @Override
-    @Transactional
     public void updateOrder(SOrder order) {
 
         SUser user = FebsUtil.getCurrentUser();

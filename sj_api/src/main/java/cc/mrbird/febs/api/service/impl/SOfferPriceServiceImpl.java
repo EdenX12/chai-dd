@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,6 @@ import java.util.Map;
 public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOfferPrice> implements ISOfferPriceService {
 
     @Override
-    @Transactional
     public Long createOfferPrice(SOfferPrice offerPrice) {
 
         this.baseMapper.insert(offerPrice);
@@ -32,7 +30,6 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
     }
 
     @Override
-    @Transactional
     public void updateOfferPriceOn(SOfferPrice offerPrice) {
 
         LambdaQueryWrapper<SOfferPrice> queryWrapper = new LambdaQueryWrapper<SOfferPrice>();
@@ -50,7 +47,6 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
     }
 
     @Override
-    @Transactional
     public void updateOfferPriceOut(SOfferPrice offerPrice) {
 
         LambdaQueryWrapper<SOfferPrice> queryWrapper = new LambdaQueryWrapper<SOfferPrice>();
@@ -64,7 +60,6 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
 
         this.baseMapper.update(offerPrice, queryWrapper);
     }
-
 
     @Override
     public List<SOfferPrice> findOfferPriceOutList(SOfferPrice offerPrice) {

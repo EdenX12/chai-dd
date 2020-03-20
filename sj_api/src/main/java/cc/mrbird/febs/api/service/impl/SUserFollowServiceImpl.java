@@ -1,14 +1,11 @@
 package cc.mrbird.febs.api.service.impl;
 
-import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.entity.SUserFollow;
 import cc.mrbird.febs.api.mapper.SUserFollowMapper;
 import cc.mrbird.febs.api.service.ISUserFollowService;
-import cc.mrbird.febs.common.utils.FebsUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -58,9 +55,7 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
         return baseMapper.selectCount(queryWrapper);
     }
 
-
     @Override
-    @Transactional
     public void createUserFollow(SUserFollow userFollow) {
 
         LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper<SUserFollow>();
@@ -98,7 +93,6 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
     }
 
     @Override
-    @Transactional
     public void updateUserFollow(SUserFollow userFollow) {
 
         LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper<SUserFollow>();

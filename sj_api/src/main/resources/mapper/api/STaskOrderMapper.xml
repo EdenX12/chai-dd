@@ -51,7 +51,7 @@
             LEFT JOIN s_user_follow f ON f.user_id = #{sTaskOrder.userId} AND f.task_order_id = o.id AND f.follow_type = 1
 
             WHERE o.status = 0
-            AND o.end_time &lt; now()
+            AND o.end_time > now()
 
         </select>
 

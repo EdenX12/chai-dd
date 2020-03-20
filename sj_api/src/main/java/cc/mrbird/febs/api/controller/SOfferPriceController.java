@@ -12,6 +12,7 @@ import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -55,6 +56,7 @@ public class SOfferPriceController extends BaseController {
      * 新增任务报价
      */
     @Log("新增任务报价")
+    @Transactional
     @PostMapping("/addOfferPrice")
     public FebsResponse addOfferPrice(HttpServletRequest request, @Valid SOfferPrice offerPrice) {
 
@@ -102,6 +104,7 @@ public class SOfferPriceController extends BaseController {
      * 任务报价成交
      */
     @Log("任务报价成交")
+    @Transactional
     @PostMapping("/updateOfferPrice")
     public FebsResponse updateOfferPrice(@Valid SOfferPrice offerPrice) {
 

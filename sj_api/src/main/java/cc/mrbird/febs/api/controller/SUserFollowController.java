@@ -14,6 +14,7 @@ import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -50,6 +51,7 @@ public class SUserFollowController extends BaseController {
      * 用户ID 任务ID 产品ID
      */
     @Log("新增用户关注")
+    @Transactional
     @PostMapping("/addFollow")
     public void addFollow(@Valid SUserFollow userFollow) throws FebsException {
 
@@ -88,6 +90,7 @@ public class SUserFollowController extends BaseController {
      * 用户ID 任务ID 产品ID
      */
     @Log("取消用户关注")
+    @Transactional
     @PostMapping("/cancelFollow")
     public void cancelFollow(@Valid SUserFollow userFollow) throws FebsException {
 

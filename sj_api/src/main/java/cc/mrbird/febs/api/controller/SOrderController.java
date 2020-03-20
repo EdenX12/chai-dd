@@ -13,6 +13,7 @@ import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,6 +61,7 @@ public class SOrderController extends BaseController {
      * 新增用户购买订单
      */
     @Log("新增用户购买订单")
+    @Transactional
     @PostMapping("/addOrder")
     public FebsResponse addOrder(HttpServletRequest request, @Valid SOrder order) {
 
@@ -149,6 +151,7 @@ public class SOrderController extends BaseController {
      * 用户ID 订单ID 状态
      */
     @Log("用户确认收货")
+    @Transactional
     @PostMapping("/confirmOrder")
     public void confirmOrder(@Valid SOrder order) throws FebsException {
 

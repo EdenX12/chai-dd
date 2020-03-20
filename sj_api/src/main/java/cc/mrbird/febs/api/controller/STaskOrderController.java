@@ -11,6 +11,7 @@ import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -50,13 +51,31 @@ public class STaskOrderController extends BaseController {
      * 新增任务转让
      */
     @Log("新增任务转让")
+    @Transactional
     @PostMapping("/addTaskOrder")
-    public void addTaskOrder(@Valid STaskOrder taskOrder) throws FebsException {
+    public FebsResponse addTaskOrder(@Valid STaskOrder taskOrder) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
             // 用户任务检索
             SUserTask userTask = userTaskService.getById(taskOrder.getTaskId());
+
+            if (taskOrder.getTaskNumber() <=0) {
+                message = "转让份数必须大于0";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
+            if (userTask.getPayStatus() != 1) {
+                message = "您的任务还没有领取！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
 
             // 转让份数小于任务份数的情况下，在原有的任务上更新转让数量 变为转让中  追加一条剩余转让数量的任务
             // 转让份数等于任务份数的情况下 直接修改为转让中
@@ -104,9 +123,12 @@ public class STaskOrderController extends BaseController {
 
         } catch (Exception e) {
             message = "新增任务转让失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 
     /**

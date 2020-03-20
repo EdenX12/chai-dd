@@ -1,12 +1,10 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SProduct;
-import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.mapper.SProductMapper;
 import cc.mrbird.febs.api.service.ISProductService;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
-import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

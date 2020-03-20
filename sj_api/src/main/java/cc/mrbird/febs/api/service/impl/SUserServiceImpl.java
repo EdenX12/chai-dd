@@ -1,13 +1,11 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.api.mapper.SUserMapper;
 import cc.mrbird.febs.api.service.ISUserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +23,6 @@ public class SUserServiceImpl extends ServiceImpl<SUserMapper, SUser> implements
 	}
 
 	@Override
-	@Transactional
 	public void createUser(SUser user) throws Exception {
 
 		// 创建用户
