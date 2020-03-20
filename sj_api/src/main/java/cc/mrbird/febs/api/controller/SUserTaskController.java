@@ -249,7 +249,11 @@ public class SUserTaskController extends BaseController {
         returnMap.put("taskNumber", product.getTaskNumber());
         returnMap.put("taskPrice", product.getTaskPrice());
         returnMap.put("followCount", followCount);
+        if(userFollowDetail!=null) {
         returnMap.put("followStatus", userFollowDetail.getStatus());
+        }else {
+        	 returnMap.put("followStatus",null);	
+        }
 
         // 辛苦费 见习猎人分0.5%; 初级猎手分1% 中级猎人分2% 高级猎人分3%
         SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
