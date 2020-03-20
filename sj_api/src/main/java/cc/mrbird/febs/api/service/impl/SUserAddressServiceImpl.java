@@ -31,7 +31,7 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
             // 用户ID
             queryWrapper.eq(SUserAddress::getUserId, userAddress.getUserId());
 
-            SortUtil.handlePageSort(request, page, "updateTime", FebsConstant.ORDER_DESC, false);
+            SortUtil.handlePageSort(request, page, "update_time", FebsConstant.ORDER_DESC, false);
 
             return this.baseMapper.selectPage(page, queryWrapper);
         } catch (Exception e) {
@@ -90,7 +90,12 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
         queryWrapper.eq(SUserAddress::getUserId, userAddress.getUserId());
 
         // 用户地址ID
+        if(userAddress.getId()!=null) {
         queryWrapper.eq(SUserAddress::getId, userAddress.getId());
+        }else {
+        	//如果是空 说明是查默认地址
+        	queryWrapper.eq(SUserAddress::getIsDefault, 1);
+        }
 
         return this.baseMapper.selectOne(queryWrapper);
     }
