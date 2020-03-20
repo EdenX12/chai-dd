@@ -51,7 +51,7 @@
 
                 o.price_type priceType,
                 o.order_price orderPrice,
-                o.end_time endTime
+                o.end_time endTime,
 
                 oc.offerCount offerCount,
 
