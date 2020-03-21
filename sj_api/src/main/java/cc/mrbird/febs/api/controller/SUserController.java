@@ -14,6 +14,7 @@ import cc.mrbird.febs.api.service.ISUserLevelService;
 import cc.mrbird.febs.api.service.ISUserMsgService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.controller.BaseController;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,9 +42,12 @@ import cc.mrbird.febs.common.utils.MD5Util;
 /**
  * @author MrBird
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/s-user")
 public class SUserController extends BaseController {
+
+    private String message;
 
 	@Autowired
     private FebsProperties properties;
@@ -72,31 +76,47 @@ public class SUserController extends BaseController {
      */
 	@PostMapping("/login")
     @Limit(key = "login", period = 60, count = 20, name = "登录接口", prefix = "limit")
-    public FebsResponse login(HttpServletRequest request, String openId) throws Exception {
-      
+    public FebsResponse login(HttpServletRequest request, String openId) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
         String expireTimeStr = DateUtil.formatFullTime(expireTime);
         JWTToken jwtToken = new JWTToken(token, expireTimeStr);
 
-        SUser su = userService.findByOpenId(openId);
+        try {
 
-        if (su == null) {
+            SUser su = userService.findByOpenId(openId);
 
-            // 创建用户
-            su = new SUser();
-            su.setOpenId(openId);
-            su.setUserPassword(password);
+            if (su == null) {
 
-            this.userService.createUser(su);
-            su = userService.findByOpenId(openId);
+                // 创建用户
+                su = new SUser();
+                su.setOpenId(openId);
+                su.setUserPassword(password);
+
+                this.userService.createUser(su);
+                su = userService.findByOpenId(openId);
+            }
+
+            this.saveTokenToRedis(su, jwtToken, request);
+
+            Map<String, Object> userInfo = this.generateUserInfo(jwtToken, su);
+
+            response.message("认证成功");
+            response.data(userInfo);
+
+        } catch (Exception e) {
+            message = "用户登录失败！";
+            response.put("code", 1);
+            response.message(message);
+            log.error(message, e);
         }
-        	
-        this.saveTokenToRedis(su, jwtToken, request);
 
-        Map<String, Object> userInfo = this.generateUserInfo(jwtToken, su);
-        return new FebsResponse().message("认证成功").data(userInfo);
+        return response;
     }
 
     /**
@@ -105,7 +125,7 @@ public class SUserController extends BaseController {
      */
     @PostMapping("/getUser")
     @Limit(key = "getUser", period = 60, count = 20, name = "检索个人信息接口", prefix = "limit")
-    public FebsResponse getUser() throws Exception {
+    public FebsResponse getUser() {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);

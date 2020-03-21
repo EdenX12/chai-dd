@@ -10,6 +10,7 @@ import cc.mrbird.febs.api.service.ISUserLevelService;
 import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
+import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,10 @@ public class SUserFollowController extends BaseController {
     @Log("新增用户关注")
     @Transactional
     @PostMapping("/addFollow")
-    public void addFollow(@Valid SUserFollow userFollow) throws FebsException {
+    public FebsResponse addFollow(@Valid SUserFollow userFollow) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -80,9 +84,12 @@ public class SUserFollowController extends BaseController {
 
         } catch (Exception e) {
             message = "新增用户关注失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 
     /**
@@ -92,7 +99,10 @@ public class SUserFollowController extends BaseController {
     @Log("取消用户关注")
     @Transactional
     @PostMapping("/cancelFollow")
-    public void cancelFollow(@Valid SUserFollow userFollow) throws FebsException {
+    public FebsResponse cancelFollow(@Valid SUserFollow userFollow) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -119,8 +129,11 @@ public class SUserFollowController extends BaseController {
 
         } catch (Exception e) {
             message = "取消用户关注失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 }

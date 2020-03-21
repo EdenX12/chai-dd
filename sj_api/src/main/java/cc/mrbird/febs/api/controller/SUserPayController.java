@@ -4,6 +4,7 @@ import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
+import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.*;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,10 @@ public class SUserPayController extends BaseController {
     @Log("新增用户支付")
     @Transactional
     @PostMapping("/addUserPay")
-    public void addUserPay(@Valid SUserPay userPay) throws FebsException {
+    public FebsResponse addUserPay(@Valid SUserPay userPay) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -80,9 +84,12 @@ public class SUserPayController extends BaseController {
 
         } catch (Exception e) {
             message = "新增用户支付失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 
     /**
@@ -91,7 +98,7 @@ public class SUserPayController extends BaseController {
     @Log("微信支付成功回调")
     @Transactional
     @PostMapping("/paySuccess")
-    public void paySuccess(HttpServletRequest request, HttpServletResponse response) throws FebsException {
+    public void paySuccess(HttpServletRequest request, HttpServletResponse response) {
 
         // 获取返回数据
         StringBuffer sb   =new StringBuffer();

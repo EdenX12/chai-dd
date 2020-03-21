@@ -58,7 +58,10 @@ public class SUserAddressController extends BaseController {
      */
     @Log("新增用户收货地址")
     @PostMapping("/addUserAddress")
-    public void addUserAddress(@Valid SUserAddress userAddress) throws FebsException {
+    public FebsResponse addUserAddress(@Valid SUserAddress userAddress) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -68,9 +71,12 @@ public class SUserAddressController extends BaseController {
             this.userAddressService.addUserAddress(userAddress);
         } catch (Exception e) {
             message = "新增用户收货地址失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 
     /**
@@ -78,7 +84,10 @@ public class SUserAddressController extends BaseController {
      */
     @Log("删除用户收货地址")
     @PostMapping("/deleteUserAddress")
-    public void deleteUserAddress(@Valid SUserAddress userAddress) throws FebsException {
+    public FebsResponse deleteUserAddress(@Valid SUserAddress userAddress) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -88,9 +97,12 @@ public class SUserAddressController extends BaseController {
             this.userAddressService.deleteUserAddress(userAddress);
         } catch (Exception e) {
             message = "删除用户收货地址失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 
     /**
@@ -98,7 +110,10 @@ public class SUserAddressController extends BaseController {
      */
     @Log("修改用户收货地址")
     @PostMapping("/updateUserAddress")
-    public void updateUserAddress(@Valid SUserAddress userAddress) throws FebsException {
+    public FebsResponse updateUserAddress(@Valid SUserAddress userAddress) throws FebsException {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -108,9 +123,12 @@ public class SUserAddressController extends BaseController {
             this.userAddressService.updateUserAddress(userAddress);
         } catch (Exception e) {
             message = "修改用户收货地址失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 
     /**

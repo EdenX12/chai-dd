@@ -38,7 +38,7 @@ public class SProductController extends BaseController {
      */
     @PostMapping("/getProductType")
     @Limit(key = "getProductType", period = 60, count = 20, name = "检索商品分类接口", prefix = "limit")
-    public FebsResponse getProductType(HttpServletRequest request) throws Exception {
+    public FebsResponse getProductType(HttpServletRequest request) {
 
         FebsResponse response = new FebsResponse();
 
