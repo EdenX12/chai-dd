@@ -89,7 +89,7 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     public IPage<Map> findUserTaskList(SUserTask userTask, QueryRequest request) {
         try {
             Page<Map> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
             return this.baseMapper.findUserTaskDetail(page, userTask);
         } catch (Exception e) {
             log.error("查询我的任务异常", e);
@@ -101,7 +101,7 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     public IPage<Map> findUserTaskOutList(SUserTask userTask, QueryRequest request) {
         try {
             Page<Map> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
             return this.baseMapper.findUserTaskOutDetail(page, userTask);
         } catch (Exception e) {
             log.error("查询我的任务异常", e);
@@ -113,8 +113,20 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     public IPage<Map> findUserTaskOfferList(SUserTask userTask, QueryRequest request) {
         try {
             Page<Map> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
             return this.baseMapper.findUserTaskOfferDetail(page, userTask);
+        } catch (Exception e) {
+            log.error("查询我的任务异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public IPage<Map> findUserTaskEndList(SUserTask userTask, QueryRequest request) {
+        try {
+            Page<Map> page = new Page<>();
+            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
+            return this.baseMapper.findUserTaskEndDetail(page, userTask);
         } catch (Exception e) {
             log.error("查询我的任务异常", e);
             return null;

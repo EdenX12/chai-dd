@@ -63,145 +63,182 @@
             ON gotTask.parent_id = t.id
 
             WHERE t.pay_status = 1
+            AND t.user_id = #{sUserTask.userId}
+            AND t.status = 0
+
+        </select>
+
+
+        <select id="findUserTaskOutDetail" resultType="java.util.Map" parameterType="sUserTask">
+
+            SELECT
+            t.id taskId,
+            t.user_id userId,
+            t.product_id productId,
+            t.task_number taskNumber,
+            t.status status,
+
+            t.pay_time payTime,
+            datediff(now(), t.pay_time) taskDays,
+
+            p.product_name productName,
+            p.product_img productImg,
+            p.product_des productDes,
+            p.product_detail productDetail,
+            p.task_number totalTaskNumber,
+            t2.taskNumberOK taskNumberOK,
+            p.product_price productPrice,
+            p.total_reward totalReward,
+            p.task_price taskPrice,
+            p.price_unit priceUnit,
+            p.success_reward successReward,
+            p.every_reward everyReward,
+
+            o.create_time createTime,
+            o.price_type priceType,
+            o.order_price orderPrice,
+            o.end_time endTime,
+
+            op.offerCount offerCount,
+
+            frontOffer.amount amount,
+            frontOffer.status frontStatus,
+            opu.user_name frontUserName,
+            opu.user_phone frontUserPhone,
+
+            watchTask.watchCnt watchCnt,
+            gotTask.hunterCnt hunterCnt
+
+            FROM s_user_task t
+            LEFT JOIN s_product p ON p.id = t.product_id
+            LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 AND status !=2 GROUP BY product_id) t2
+            ON t2.product_id = t.product_id
+
+            LEFT JOIN s_task_order o ON o.task_id = t.id AND o.user_id = t.user_id
+
+            LEFT JOIN (SELECT task_order_id, count(*) offerCount FROM s_offer_price WHERE pay_status = 1 GROUP BY task_order_id) op
+            ON op.task_order_id = o.id
+
+            LEFT JOIN s_offer_price frontOffer ON frontOffer.task_order_id = o.id AND frontOffer.status IN (1, 3)
+            LEFT JOIN s_user opu ON opu.id = frontOffer.user_id
+
+            LEFT JOIN (select parent_id, count(*) watchCnt from s_user_task group by parent_id) watchTask
+            ON watchTask.parent_id = t.id
+
+            LEFT JOIN (select parent_id, count(*) hunterCnt from s_user_task where pay_status =1 group by parent_id) gotTask
+            ON gotTask.parent_id = t.id
+
+            WHERE t.pay_status = 1
 
             <if test="sUserTask.userId != null and sUserTask.userId != ''">
                 AND t.user_id = #{sUserTask.userId}
             </if>
 
-            <if test="sUserTask.status != null and sUserTask.status != ''">
-                AND t.status = #{sUserTask.status}
-            </if>
+            AND t.status = 1
 
         </select>
 
 
-    <select id="findUserTaskOutDetail" resultType="java.util.Map" parameterType="sUserTask">
+        <select id="findUserTaskOfferDetail" resultType="java.util.Map" parameterType="sUserTask">
 
-        SELECT
-        t.id taskId,
-        t.user_id userId,
-        t.product_id productId,
-        t.task_number taskNumber,
-        t.status status,
+            SELECT
+            sto.create_time createTime,
 
-        t.pay_time payTime,
-        datediff(now(), t.pay_time) taskDays,
+            t.id taskId,
+            t.product_id productId,
+            t.task_number taskNumber,
 
-        p.product_name productName,
-        p.product_img productImg,
-        p.product_des productDes,
-        p.product_detail productDetail,
-        p.task_number totalTaskNumber,
-        t2.taskNumberOK taskNumberOK,
-        p.product_price productPrice,
-        p.total_reward totalReward,
-        p.task_price taskPrice,
-        p.price_unit priceUnit,
-        p.success_reward successReward,
-        p.every_reward everyReward,
+            p.product_name productName,
+            p.product_img productImg,
+            p.product_des productDes,
+            p.product_detail productDetail,
+            p.task_number totalTaskNumber,
+            t2.taskNumberOK taskNumberOK,
+            p.product_price productPrice,
+            p.total_reward totalReward,
+            p.task_price taskPrice,
+            p.price_unit priceUnit,
+            p.success_reward successReward,
+            p.every_reward everyReward,
 
-        o.create_time createTime,
-        o.price_type priceType,
-        o.order_price orderPrice,
-        o.end_time endTime,
+            oc.offerCount offerCount,
 
-        op.offerCount offerCount,
+            frontOffer.amount amount,
+            frontOffer.status frontStatus,
+            opu.user_name frontUserName,
+            opu.user_phone frontUserPhone,
 
-        frontOffer.amount amount,
-        frontOffer.status frontStatus,
-        opu.user_name frontUserName,
-        opu.user_phone frontUserPhone,
+            lastOffer.amount amount,
+            lastOffer.status lastStatus,
 
-        watchTask.watchCnt watchCnt,
-        gotTask.hunterCnt hunterCnt
+            u.user_name lastUserName,
+            u.user_phone lastUserPhone
+            FROM
+            (SELECT o.id, max(op.create_time) create_time
+                FROM s_offer_price op
+             INNER JOIN s_task_order o ON o.id = op.task_order_id
+             WHERE op.user_id = #{sUserTask.userId}
+                 AND op.pay_status = 1
+            group by o.id) sto
 
-        FROM s_user_task t
-        LEFT JOIN s_product p ON p.id = t.product_id
-        LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 AND status !=2 GROUP BY product_id) t2
-        ON t2.product_id = t.product_id
+            LEFT JOIN s_task_order o ON o.id = sto.id
+            LEFT JOIN s_user_task t ON t.id = o.task_id
+            LEFT JOIN s_product p ON p.id = t.product_id
+            LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 GROUP BY product_id) t2
+            ON t2.product_id = p.id
+            LEFT JOIN (SELECT task_order_id, count(*) offerCount FROM s_offer_price WHERE pay_status = 1 GROUP BY task_order_id) oc
+            ON oc.task_order_id = o.id
+            LEFT JOIN s_offer_price frontOffer ON frontOffer.task_order_id = o.id AND frontOffer.status IN (1, 3)
+            LEFT JOIN s_user opu ON opu.id = frontOffer.user_id
+            LEFT JOIN (select task_order_id, user_id, status, max(amount) amount from s_offer_price where pay_status = 1 and user_id = #{sUserTask.userId} group by task_order_id, user_id) lastOffer
+            ON lastOffer.task_order_id = o.id AND frontOffer.status IN (1, 2, 3)
+            LEFT JOIN s_user u ON u.id = lastOffer.user_id
 
-        LEFT JOIN s_task_order o ON o.task_id = t.id AND o.user_id = t.user_id
+        </select>
 
-        LEFT JOIN (SELECT task_order_id, count(*) offerCount FROM s_offer_price WHERE pay_status = 1 GROUP BY task_order_id) op
-        ON op.task_order_id = o.id
+        <select id="findUserTaskEndDetail" resultType="java.util.Map" parameterType="sUserTask">
 
-        LEFT JOIN s_offer_price frontOffer ON frontOffer.task_order_id = o.id AND frontOffer.status IN (1, 3)
-        LEFT JOIN s_user opu ON opu.id = frontOffer.user_id
+            SELECT
+                t.id taskId,
+                t.user_id userId,
+                t.product_id productId,
+                t.task_number taskNumber,
+                t.status status,
+                t.create_time createTime,
+                t.pay_time payTime,
+                datediff(now(), t.pay_time) taskDays,
+                p.product_name productName,
+                p.product_img productImg,
+                p.product_des productDes,
+                p.product_detail productDetail,
+                p.task_number totalTaskNumber,
+                t2.taskNumberOK taskNumberOK,
+                p.product_price productPrice,
+                p.total_reward totalReward,
+                p.task_price taskPrice,
+                p.price_unit priceUnit,
+                p.success_reward successReward,
+                p.every_reward everyReward,
 
-        LEFT JOIN (select parent_id, count(*) watchCnt from s_user_task group by parent_id) watchTask
-        ON watchTask.parent_id = t.id
+                watchTask.watchCnt watchCnt,
+                gotTask.hunterCnt hunterCnt
 
-        LEFT JOIN (select parent_id, count(*) hunterCnt from s_user_task where pay_status =1 group by parent_id) gotTask
-        ON gotTask.parent_id = t.id
+              FROM s_user_task t
+            LEFT JOIN s_product p ON p.id = t.product_id
+            LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 AND status !=2 GROUP BY product_id) t2
+              ON t2.product_id = t.product_id
 
-        WHERE t.pay_status = 1
+            LEFT JOIN (select parent_id, count(*) watchCnt from s_user_task group by parent_id) watchTask
+            ON watchTask.parent_id = t.id
 
-        <if test="sUserTask.userId != null and sUserTask.userId != ''">
+            LEFT JOIN (select parent_id, count(*) hunterCnt from s_user_task where pay_status =1 group by parent_id) gotTask
+            ON gotTask.parent_id = t.id
+
+            WHERE t.pay_status = 1
             AND t.user_id = #{sUserTask.userId}
-        </if>
+            AND t.status in (3, 4)
 
-        <if test="sUserTask.status != null and sUserTask.status != ''">
-            AND t.status = #{sUserTask.status}
-        </if>
+        </select>
 
-    </select>
-
-
-    <select id="findUserTaskOfferDetail" resultType="java.util.Map" parameterType="sUserTask">
-
-        SELECT
-        sto.create_time createTime,
-
-        t.id taskId,
-        t.product_id productId,
-        t.task_number taskNumber,
-
-        p.product_name productName,
-        p.product_img productImg,
-        p.product_des productDes,
-        p.product_detail productDetail,
-        p.task_number totalTaskNumber,
-        t2.taskNumberOK taskNumberOK,
-        p.product_price productPrice,
-        p.total_reward totalReward,
-        p.task_price taskPrice,
-        p.price_unit priceUnit,
-        p.success_reward successReward,
-        p.every_reward everyReward,
-
-        oc.offerCount offerCount,
-
-        frontOffer.amount amount,
-        frontOffer.status frontStatus,
-        opu.user_name frontUserName,
-        opu.user_phone frontUserPhone,
-
-        lastOffer.amount amount,
-        lastOffer.status lastStatus,
-
-        u.user_name lastUserName,
-        u.user_phone lastUserPhone
-        FROM
-        (SELECT o.id, max(op.create_time) create_time
-            FROM s_offer_price op
-         INNER JOIN s_task_order o ON o.id = op.task_order_id
-         WHERE op.user_id = #{sUserTask.userId}
-             AND op.pay_status = 1
-        group by o.id) sto
-
-        LEFT JOIN s_task_order o ON o.id = sto.id
-        LEFT JOIN s_user_task t ON t.id = o.task_id
-        LEFT JOIN s_product p ON p.id = t.product_id
-        LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 GROUP BY product_id) t2
-        ON t2.product_id = p.id
-	    LEFT JOIN (SELECT task_order_id, count(*) offerCount FROM s_offer_price WHERE pay_status = 1 GROUP BY task_order_id) oc
-	    ON oc.task_order_id = o.id
-	    LEFT JOIN s_offer_price frontOffer ON frontOffer.task_order_id = o.id AND frontOffer.status IN (1, 3)
-	    LEFT JOIN s_user opu ON opu.id = frontOffer.user_id
-	    LEFT JOIN (select task_order_id, user_id, status, max(amount) amount from s_offer_price where pay_status = 1 and user_id = #{sUserTask.userId} group by task_order_id, user_id) lastOffer
-	    ON lastOffer.task_order_id = o.id AND frontOffer.status IN (1, 2, 3)
-	    LEFT JOIN s_user u ON u.id = lastOffer.user_id
-
-    </select>
 
 </mapper>
