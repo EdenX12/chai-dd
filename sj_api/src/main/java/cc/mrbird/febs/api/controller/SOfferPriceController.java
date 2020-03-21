@@ -113,6 +113,8 @@ public class SOfferPriceController extends BaseController {
 
         try {
 
+            // TODO 此转让任务还没有报价
+
             // 修改成交状态 （竞标中 - > 已成交）
             this.offerPriceService.updateOfferPriceOn(offerPrice);
 

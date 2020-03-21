@@ -53,8 +53,8 @@
                 p.every_reward everyReward,
                 p.product_type productType,
                 task.taskNumber taskPayCount,
-                follow.followCnt followCount,
-                f.status followStatus,
+                ifnull(follow.followCnt, 0) followCount,
+                ifnull(f.status, 0) followStatus,
                 level.buy_number buyNumber
             FROM s_product p
             LEFT JOIN (select product_id, sum(task_number) taskNumber from s_user_task where pay_status = 1 and status != 2 group by product_id) task

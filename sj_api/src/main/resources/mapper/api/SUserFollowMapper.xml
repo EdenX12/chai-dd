@@ -43,7 +43,7 @@
             p.product_type productType,
 
             task1.taskNumber taskPayCount,
-            follow1.followCnt followCount
+            ifnull(follow1.followCnt, 0) followCount
 
             t.id taskId,
             t.task_number taskNumber,
@@ -53,7 +53,7 @@
             o.create_time createTime,
             o.end_time endTime,
 
-            oc.offerCount offerCount,
+            ifnull(oc.offerCount, 0) offerCount,
 
             op.amount amount,
             opu.user_name userName,

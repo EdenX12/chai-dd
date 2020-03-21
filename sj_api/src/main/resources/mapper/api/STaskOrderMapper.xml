@@ -34,14 +34,15 @@
             p.task_price taskPrice,
             p.success_reward successReward,
             p.every_reward everyReward,
+            o.id taskOrderId,
             o.task_id taskId,
             o.user_id userId,
             o.task_number taskNumber,
             o.order_price orderPrice,
             o.price_type priceType,
             o.end_time endTime,
-            follow.followCnt followCount,
-            f.status followStatus
+            ifnull(follow.followCnt, 0) followCount,
+            ifnull(f.status, 0) followStatus
 
             FROM s_task_order o
             LEFT JOIN s_user_task u ON u.id = o.task_id
