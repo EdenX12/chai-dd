@@ -32,7 +32,7 @@ public class SAreaController extends BaseController {
 
         FebsResponse response = new FebsResponse();
 
-        List<SArea> areaList = areaService.findAreaList();
+        List<SArea> areaList = areaService.findAreaList(area);
 
         response.put("code", 0);
         response.data(areaList);

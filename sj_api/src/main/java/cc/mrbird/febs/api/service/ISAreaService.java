@@ -13,8 +13,9 @@ public interface ISAreaService extends IService<SArea> {
 
     /**
      * 查询所有地区列表信息
+     * @param area 
      * @return List<SArea>
      */
-    List<SArea> findAreaList();
+    List<SArea> findAreaList(SArea area);
 
 }
