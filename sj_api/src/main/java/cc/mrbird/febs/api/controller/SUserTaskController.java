@@ -304,14 +304,20 @@ public class SUserTaskController extends BaseController {
     }
 
     /**
-     * 取得我的任务列表信息
+     * 取得我的任务【进行中】列表信息
      * @return List<Map>
      */
-    @PostMapping("/getUserTaskList")
-    @Limit(key = "getUserTaskList", period = 60, count = 20, name = "检索我的任务接口", prefix = "limit")
-    public FebsResponse getTaskOrderList(QueryRequest queryRequest, SUserTask userTask) {
+    @PostMapping("/getUserTaskingList")
+    @Limit(key = "getUserTaskingList", period = 60, count = 20, name = "检索我的任务接口", prefix = "limit")
+    public FebsResponse getUserTaskingList(QueryRequest queryRequest, SUserTask userTask) {
 
         FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+        userTask.setUserId(user.getId());
+
+        // 进行中状态
+        userTask.setStatus(0);
 
         Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskList(userTask, queryRequest));
 

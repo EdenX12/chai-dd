@@ -183,6 +183,12 @@ public class SUserPayController extends BaseController {
                     }
                 }
                 user.setUserLevelId(userLevelId);
+
+                // 若是第一次领取任务成功，形成正式上下级绑定关系
+                if (user.getParentId() == null && userTask.getParentId() != null) {
+                    user.setParentId(this.userTaskService.getById(userTask.getParentId()).getUserId());
+                }
+
                 this.userService.updateById(user);
 
                 // 猎豆流水插入
