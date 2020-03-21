@@ -110,15 +110,4 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
         return baseMapper.selectOne(queryWrapper);
     }
 
-    @Override
-    public IPage<Map> findOfferPriceList(SOfferPrice offerPrice, QueryRequest request) {
-        try {
-            Page<Map> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_ASC, false);
-            return this.baseMapper.findOfferPriceDetail(page, offerPrice);
-        } catch (Exception e) {
-            log.error("查询我的报价异常", e);
-            return null;
-        }
-    }
 }

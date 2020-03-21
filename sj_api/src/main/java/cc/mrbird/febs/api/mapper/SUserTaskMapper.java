@@ -17,4 +17,6 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
     IPage<Map> findUserTaskDetail(Page page, @Param("sUserTask") SUserTask sUserTask);
 
     IPage<Map> findUserTaskOutDetail(Page page, @Param("sUserTask") SUserTask sUserTask);
+
+    IPage<Map> findUserTaskOfferDetail(Page page, @Param("sUserTask") SUserTask sUserTask);
 }

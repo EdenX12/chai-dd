@@ -110,6 +110,18 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
+    public IPage<Map> findUserTaskOfferList(SUserTask userTask, QueryRequest request) {
+        try {
+            Page<Map> page = new Page<>();
+            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_ASC, false);
+            return this.baseMapper.findUserTaskOfferDetail(page, userTask);
+        } catch (Exception e) {
+            log.error("查询我的任务异常", e);
+            return null;
+        }
+    }
+
+    @Override
     public List<Long> findUserIdsByParent(Long userId) {
 
         LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();

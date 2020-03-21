@@ -234,22 +234,4 @@ public class SOfferPriceController extends BaseController {
         return response;
     }
 
-    /**
-     * 取得我的报价列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getMyOfferPriceList")
-    @Limit(key = "getMyOfferPriceList", period = 60, count = 20, name = "检索我的任务接口", prefix = "limit")
-    public FebsResponse getMyOfferPriceList(QueryRequest queryRequest, SOfferPrice offerPrice) {
-
-        FebsResponse response = new FebsResponse();
-
-        Map<String, Object> offerPricePageList = getDataTable(this.offerPriceService.findOfferPriceList(offerPrice, queryRequest));
-
-        response.put("code", 0);
-        response.data(offerPricePageList);
-
-        return response;
-    }
-
 }

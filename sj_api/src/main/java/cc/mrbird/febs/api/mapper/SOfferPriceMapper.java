@@ -17,6 +17,4 @@ public interface SOfferPriceMapper extends BaseMapper<SOfferPrice> {
 
     List<SOfferPrice> findOfferPriceList(@Param("sOfferPrice") SOfferPrice sOfferPrice);
 
-    IPage<Map> findOfferPriceDetail(Page page, @Param("sOfferPrice") SOfferPrice sOfferPrice);
-
 }

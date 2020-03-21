@@ -53,6 +53,15 @@ public interface ISUserTaskService extends IService<SUserTask> {
     IPage<Map> findUserTaskOutList(SUserTask userTask, QueryRequest queryRequest);
 
     /**
+     * 查询我的任务【收购中】列表
+     *
+     * @param userTask SUserTask
+     * @param queryRequest queryRequest
+     * @return IPage
+     */
+    IPage<Map> findUserTaskOfferList(SUserTask userTask, QueryRequest queryRequest);
+
+    /**
      * 查询我的预备队
      *
      * @param userId Long

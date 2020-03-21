@@ -56,12 +56,4 @@ public interface ISOfferPriceService extends IService<SOfferPrice> {
      */
     SOfferPrice findOfferPriceDetail(SOfferPrice offerPrice);
 
-    /**
-     * 查询我的报价列表
-     *
-     * @param offerPrice SOfferPrice
-     * @param queryRequest queryRequest
-     * @return IPage
-     */
-    IPage<Map> findOfferPriceList(SOfferPrice offerPrice, QueryRequest queryRequest);
 }
