@@ -145,6 +145,33 @@ public class STaskOrderController extends BaseController {
     }
 
     /**
+     * 取消终止任务转让
+     */
+    @Log("取消终止任务转让")
+    @Transactional
+    @PostMapping("/cancelTaskOrder")
+    public FebsResponse cancelTaskOrder(@Valid STaskOrder taskOrder) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        try {
+
+            SUser user = FebsUtil.getCurrentUser();
+
+           // TODO 取消终止转让任务
+
+        } catch (Exception e) {
+            message = "取消终止任务转让失败";
+            response.put("code", 1);
+            response.message(message);
+            log.error(message, e);
+        }
+
+        return response;
+    }
+
+    /**
      * 取得所有转让任务信息
      * @return List<Map>
      */
