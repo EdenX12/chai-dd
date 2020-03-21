@@ -53,9 +53,9 @@ public class SOfferPriceController extends BaseController {
     private ISUserAmountLogService userAmountLogService;
 
     /**
-     * 新增任务报价
+     * 新增转让任务报价
      */
-    @Log("新增任务报价")
+    @Log("新增转让任务报价")
     @Transactional
     @PostMapping("/addOfferPrice")
     public FebsResponse addOfferPrice(HttpServletRequest request, @Valid SOfferPrice offerPrice) {
@@ -101,9 +101,9 @@ public class SOfferPriceController extends BaseController {
     }
 
     /**
-     * 任务报价成交
+     * 转让任务报价成交
      */
-    @Log("任务报价成交")
+    @Log("转让任务报价成交")
     @Transactional
     @PostMapping("/updateOfferPrice")
     public FebsResponse updateOfferPrice(@Valid SOfferPrice offerPrice) {

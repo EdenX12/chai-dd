@@ -71,11 +71,17 @@
         <select id="findUserTaskOutDetail" resultType="java.util.Map" parameterType="sUserTask">
 
             SELECT
+
+            o.task_number taskNumber,
+            o.create_time createTime,
+            o.price_type priceType,
+            o.order_price orderPrice,
+            o.end_time endTime,
+            o.status,
+
             t.id taskId,
             t.user_id userId,
             t.product_id productId,
-            t.task_number taskNumber,
-            t.status status,
 
             t.pay_time payTime,
             datediff(now(), t.pay_time) taskDays,
@@ -93,12 +99,7 @@
             p.success_reward successReward,
             p.every_reward everyReward,
 
-            o.create_time createTime,
-            o.price_type priceType,
-            o.order_price orderPrice,
-            o.end_time endTime,
-
-            op.offerCount offerCount,
+            ifnull(op.offerCount, 0) offerCount,
 
             frontOffer.amount amount,
             frontOffer.status frontStatus,
@@ -108,12 +109,11 @@
             ifnull(watchTask.watchCnt, 0) watchCnt,
             ifnull(gotTask.hunterCnt, 0) hunterCnt
 
-            FROM s_user_task t
+            FROM s_task_order o
+            LEFT JOIN s_user_task t ON t.id = o.task_id AND t.pay_status = 1
             LEFT JOIN s_product p ON p.id = t.product_id
             LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 AND status !=2 GROUP BY product_id) t2
             ON t2.product_id = t.product_id
-
-            LEFT JOIN s_task_order o ON o.task_id = t.id AND o.user_id = t.user_id
 
             LEFT JOIN (SELECT task_order_id, count(*) offerCount FROM s_offer_price WHERE pay_status = 1 GROUP BY task_order_id) op
             ON op.task_order_id = o.id
@@ -127,13 +127,8 @@
             LEFT JOIN (select parent_id, count(*) hunterCnt from s_user_task where pay_status =1 group by parent_id) gotTask
             ON gotTask.parent_id = t.id
 
-            WHERE t.pay_status = 1
-
-            <if test="sUserTask.userId != null and sUserTask.userId != ''">
-                AND t.user_id = #{sUserTask.userId}
-            </if>
-
-            AND t.status = 1
+            WHERE 1=1
+            AND o.user_id = AND t.user_id = #{sUserTask.userId}
 
         </select>
 

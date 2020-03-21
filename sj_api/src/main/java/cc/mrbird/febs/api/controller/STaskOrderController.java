@@ -76,6 +76,20 @@ public class STaskOrderController extends BaseController {
                 return response;
             }
 
+            if (taskOrder.getTaskNumber() > userTask.getTaskNumber()) {
+                message = "转让份数不能超过已有任务份数！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
+            if (userTask.getStatus() != 0) {
+                message = "您现在的任务不能转让！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
             // 转让份数小于任务份数的情况下，在原有的任务上更新转让数量 变为转让中  追加一条剩余转让数量的任务
             // 转让份数等于任务份数的情况下 直接修改为转让中
             if (taskOrder.getTaskNumber() < userTask.getTaskNumber()) {
