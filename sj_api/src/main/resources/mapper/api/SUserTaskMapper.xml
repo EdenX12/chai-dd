@@ -47,9 +47,8 @@
                 p.price_unit priceUnit,
                 p.success_reward successReward,
                 p.every_reward everyReward,
-
-                watchTask.watchCnt watchCnt,
-                gotTask.hunterCnt hunterCnt
+                ifnull(watchTask.watchCnt, 0) watchCnt,
+                ifnull(gotTask.hunterCnt, 0) hunterCnt
 
               FROM s_user_task t
             LEFT JOIN s_product p ON p.id = t.product_id
@@ -106,8 +105,8 @@
             opu.user_name frontUserName,
             opu.user_phone frontUserPhone,
 
-            watchTask.watchCnt watchCnt,
-            gotTask.hunterCnt hunterCnt
+            ifnull(watchTask.watchCnt, 0) watchCnt,
+            ifnull(gotTask.hunterCnt, 0) hunterCnt
 
             FROM s_user_task t
             LEFT JOIN s_product p ON p.id = t.product_id
@@ -220,8 +219,8 @@
                 p.success_reward successReward,
                 p.every_reward everyReward,
 
-                watchTask.watchCnt watchCnt,
-                gotTask.hunterCnt hunterCnt
+                ifnull(watchTask.watchCnt, 0) watchCnt,
+                ifnull(gotTask.hunterCnt, 0) hunterCnt
 
               FROM s_user_task t
             LEFT JOIN s_product p ON p.id = t.product_id
