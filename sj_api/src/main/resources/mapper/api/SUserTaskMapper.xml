@@ -128,7 +128,7 @@
             ON gotTask.parent_id = t.id
 
             WHERE 1=1
-            AND o.user_id = AND t.user_id = #{sUserTask.userId}
+            AND o.user_id =#{sUserTask.userId} AND t.user_id = #{sUserTask.userId}
 
         </select>
 
