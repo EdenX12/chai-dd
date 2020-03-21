@@ -308,7 +308,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getUserTaskingList")
-    @Limit(key = "getUserTaskingList", period = 60, count = 20, name = "检索我的任务接口", prefix = "limit")
+    @Limit(key = "getUserTaskingList", period = 60, count = 20, name = "检索我的任务【进行中】接口", prefix = "limit")
     public FebsResponse getUserTaskingList(QueryRequest queryRequest, SUserTask userTask) {
 
         FebsResponse response = new FebsResponse();
@@ -320,6 +320,30 @@ public class SUserTaskController extends BaseController {
         userTask.setStatus(0);
 
         Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskList(userTask, queryRequest));
+
+        response.put("code", 0);
+        response.data(userTaskPageList);
+
+        return response;
+    }
+
+    /**
+     * 取得我的任务【转出中】列表信息
+     * @return List<Map>
+     */
+    @PostMapping("/getUserTaskOutingList")
+    @Limit(key = "getUserTaskOutingList", period = 60, count = 20, name = "检索我的任务【转初中】接口", prefix = "limit")
+    public FebsResponse getUserTaskOutingList(QueryRequest queryRequest, SUserTask userTask) {
+
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+        userTask.setUserId(user.getId());
+
+        // 转让中状态
+        userTask.setStatus(1);
+
+        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskOutList(userTask, queryRequest));
 
         response.put("code", 0);
         response.data(userTaskPageList);

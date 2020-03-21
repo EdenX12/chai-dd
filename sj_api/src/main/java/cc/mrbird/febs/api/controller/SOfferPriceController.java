@@ -65,7 +65,7 @@ public class SOfferPriceController extends BaseController {
 
         try {
 
-            // 输入金额必须要大于所有报价中最大报价金额（不需要 删除）
+            // TODO 输入金额必须要大于所有报价中最大报价金额
 
             // 先更新出局
             this.offerPriceService.updateOfferPriceOut(offerPrice);
