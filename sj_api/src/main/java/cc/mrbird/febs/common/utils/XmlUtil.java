@@ -1,8 +1,8 @@
 /*
- * (C) 2015 EBANG 宜修网络科技有限公司All Rights Reserved.
+ * (C) 2020 上海执讯实业有限公司All Rights Reserved.
  * 
  * 项目名 :
- *   一修哥微信公众平台
+ *   执讯微信公众平台
  *
  */
 package cc.mrbird.febs.common.utils;
@@ -25,7 +25,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * @author wangmingzhen
+ * @author 
  *
  */
 public final class XmlUtil {

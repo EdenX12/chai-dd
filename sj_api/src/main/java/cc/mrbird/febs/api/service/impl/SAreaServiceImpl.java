@@ -16,8 +16,9 @@ import java.util.List;
 public class SAreaServiceImpl extends ServiceImpl<SAreaMapper, SArea> implements ISAreaService {
 
     @Override
-    public List<SArea> findAreaList() {
-        return baseMapper.selectList(new LambdaQueryWrapper<SArea>().eq(SArea::getIsDel, 0).orderByAsc(SArea::getAreaSort));
+    public List<SArea> findAreaList(SArea area) {
+    	
+        return baseMapper.selectList(new LambdaQueryWrapper<SArea>().eq(SArea::getAreaParentId, area.getAreaParentId()).eq(SArea::getIsDel, 0).orderByAsc(SArea::getAreaSort));
     }
 
 }

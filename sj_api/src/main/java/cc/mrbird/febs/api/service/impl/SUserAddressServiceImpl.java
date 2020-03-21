@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author MrBird
@@ -92,11 +93,13 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
         // 用户地址ID
         if (userAddress.getId()!=null) {
             queryWrapper.eq(SUserAddress::getId, userAddress.getId());
-        } else {
-        	//如果是空 说明是查默认地址
-        	queryWrapper.eq(SUserAddress::getIsDefault, 1);
+        } 
+        queryWrapper.orderByDesc(SUserAddress::getIsDefault);
+        List<SUserAddress> list=baseMapper.selectList(queryWrapper);
+        if(list!=null&&list.size()>0) {
+        	return list.get(0);
+        }else {
+        	return null;
         }
-
-        return this.baseMapper.selectOne(queryWrapper);
     }
 }
