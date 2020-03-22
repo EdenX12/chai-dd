@@ -22,12 +22,41 @@ import java.util.Map;
 public class STaskOrderServiceImpl extends ServiceImpl<STaskOrderMapper, STaskOrder> implements ISTaskOrderService {
 
     @Override
-    public Long createTaskOrder(STaskOrder taskOrder) {
+    public STaskOrder createTaskOrder(STaskOrder taskOrder) {
 
         this.baseMapper.insert(taskOrder);
 
-        return taskOrder.getId();
+        return taskOrder;
     }
+
+    @Override
+    public STaskOrder findTaskOrder(STaskOrder taskOrder) {
+
+        LambdaQueryWrapper<STaskOrder> queryWrapper = new LambdaQueryWrapper();
+
+        // 用户ID不为空的情况下
+        if (taskOrder.getUserId() != null) {
+            queryWrapper.eq(STaskOrder::getUserId, taskOrder.getUserId());
+        }
+
+        // 转让ID不为空的情况下
+        if (taskOrder.getId() != null) {
+            queryWrapper.eq(STaskOrder::getId, taskOrder.getId());
+        }
+
+        // 转让任务ID不为空的情况下
+        if (taskOrder.getTaskId() != null) {
+            queryWrapper.eq(STaskOrder::getTaskId, taskOrder.getTaskId());
+        }
+
+        // 状态 0：转让中 1：已成交 2：未成交流标
+        if (taskOrder.getStatus() != null) {
+            queryWrapper.eq(STaskOrder::getStatus, taskOrder.getStatus());
+        }
+
+        return this.baseMapper.selectOne(queryWrapper);
+    }
+
 
     @Override
     public List<STaskOrder> findTaskOrderList(STaskOrder taskOrder) {
@@ -46,7 +75,6 @@ public class STaskOrderServiceImpl extends ServiceImpl<STaskOrderMapper, STaskOr
 
         return this.baseMapper.selectList(queryWrapper);
     }
-
 
     @Override
     public IPage<Map> findTaskOrderList(STaskOrder taskOrder, QueryRequest request) {

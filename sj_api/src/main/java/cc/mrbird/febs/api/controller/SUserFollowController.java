@@ -11,7 +11,6 @@ import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
-import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +63,7 @@ public class SUserFollowController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
             userFollow.setUserId(user.getId());
 
-            this.userFollowService.createUserFollow(userFollow);
+            userFollow = this.userFollowService.createUserFollow(userFollow);
 
             // 每关注一个任务（任务广场，转让中心），（10颗） * 猎人等级倍数
             SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
@@ -109,7 +108,7 @@ public class SUserFollowController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
             userFollow.setUserId(user.getId());
 
-            this.userFollowService.updateUserFollow(userFollow);
+            userFollow = this.userFollowService.updateUserFollow(userFollow);
 
             // 每取消一个任务（任务广场，转让中心），（-10颗） * 猎人等级倍数
             SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());

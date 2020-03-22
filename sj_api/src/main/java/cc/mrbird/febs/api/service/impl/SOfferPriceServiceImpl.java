@@ -3,17 +3,11 @@ package cc.mrbird.febs.api.service.impl;
 import cc.mrbird.febs.api.entity.SOfferPrice;
 import cc.mrbird.febs.api.mapper.SOfferPriceMapper;
 import cc.mrbird.febs.api.service.ISOfferPriceService;
-import cc.mrbird.febs.common.domain.FebsConstant;
-import cc.mrbird.febs.common.domain.QueryRequest;
-import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author MrBird
@@ -22,15 +16,15 @@ import java.util.Map;
 public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOfferPrice> implements ISOfferPriceService {
 
     @Override
-    public Long createOfferPrice(SOfferPrice offerPrice) {
+    public SOfferPrice createOfferPrice(SOfferPrice offerPrice) {
 
         this.baseMapper.insert(offerPrice);
 
-        return offerPrice.getId();
+        return offerPrice;
     }
 
     @Override
-    public void updateOfferPriceOn(SOfferPrice offerPrice) {
+    public SOfferPrice updateOfferPriceOn(SOfferPrice offerPrice) {
 
         LambdaQueryWrapper<SOfferPrice> queryWrapper = new LambdaQueryWrapper<SOfferPrice>();
 
@@ -41,13 +35,16 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
 
         queryWrapper.eq(SOfferPrice::getTaskOrderId, offerPrice.getTaskOrderId());
 
+        offerPrice = this.baseMapper.selectOne(queryWrapper);
+
         offerPrice.setStatus(3);
 
         this.baseMapper.update(offerPrice, queryWrapper);
+        return offerPrice;
     }
 
     @Override
-    public void updateOfferPriceOut(SOfferPrice offerPrice) {
+    public SOfferPrice updateOfferPriceOut(SOfferPrice offerPrice) {
 
         LambdaQueryWrapper<SOfferPrice> queryWrapper = new LambdaQueryWrapper<SOfferPrice>();
 
@@ -56,9 +53,12 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
 
         queryWrapper.eq(SOfferPrice::getTaskOrderId, offerPrice.getTaskOrderId());
 
+        offerPrice = this.baseMapper.selectOne(queryWrapper);
+
         offerPrice.setStatus(2);
 
         this.baseMapper.update(offerPrice, queryWrapper);
+        return offerPrice;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
         // 按照报价金额降序（求最高报价）
         queryWrapper.orderByDesc(SOfferPrice::getAmount);
 
-        return baseMapper.selectOne(queryWrapper);
+        return this.baseMapper.selectOne(queryWrapper);
     }
 
 }

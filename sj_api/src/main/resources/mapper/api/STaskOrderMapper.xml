@@ -54,6 +54,10 @@
             WHERE o.status = 0
             AND o.end_time > now()
 
+            <if test="sTaskOrder.id != null and sTaskOrder.id != ''">
+                AND o.id = #{sTaskOrder.id}
+            </if>
+
         </select>
 
 </mapper>

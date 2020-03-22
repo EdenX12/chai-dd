@@ -82,10 +82,10 @@ public class SOrderController extends BaseController {
             order.setOrderAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
             order.setPayAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
 
-            Long orderId = this.orderService.addOrder(order);
+            order = this.orderService.addOrder(order);
 
             // 调起微信支付
-            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(orderId),
+            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(order.getId()),
                     product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber().longValue())).toString(),
                     user.getOpenId(),
                     request.getRemoteAddr(),
@@ -161,7 +161,7 @@ public class SOrderController extends BaseController {
             order.setUserId(user.getId());
 
             order.setOrderStatus(3);
-            this.orderService.updateOrder(order);
+            order = this.orderService.updateOrder(order);
 
             SProduct product = productService.getById(order.getProductId());
 

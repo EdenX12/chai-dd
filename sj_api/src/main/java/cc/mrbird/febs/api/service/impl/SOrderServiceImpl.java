@@ -21,11 +21,11 @@ import org.springframework.stereotype.Service;
 public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> implements ISOrderService {
 
     @Override
-    public Long addOrder(SOrder order) {
+    public SOrder addOrder(SOrder order) {
 
         this.baseMapper.insert(order);
 
-        return order.getId();
+        return order;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     }
 
     @Override
-    public void updateOrder(SOrder order) {
+    public SOrder updateOrder(SOrder order) {
 
         SUser user = FebsUtil.getCurrentUser();
         order.setUserId(user.getId());
@@ -65,6 +65,7 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
         queryWrapper.eq(SOrder::getId, order.getId());
 
         this.baseMapper.update(order, queryWrapper);
+        return order;
     }
 
 }

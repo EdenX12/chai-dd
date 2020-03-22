@@ -1,6 +1,5 @@
 package cc.mrbird.febs.api.controller;
 
-
 import cc.mrbird.febs.api.entity.SUserMsg;
 import cc.mrbird.febs.api.service.ISUserMsgService;
 import cc.mrbird.febs.common.annotation.Limit;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
 
 /**

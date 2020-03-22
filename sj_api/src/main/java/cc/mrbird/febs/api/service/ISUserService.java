@@ -23,7 +23,7 @@ public interface ISUserService extends IService<SUser> {
 	 *
 	 * @param user user
 	 */
-	void createUser(SUser user) throws Exception;
+	SUser createUser(SUser user) throws Exception;
 
 	/**
 	 * 根据上级ID查询下级所有用户

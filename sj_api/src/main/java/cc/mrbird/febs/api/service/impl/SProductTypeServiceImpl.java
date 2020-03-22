@@ -17,6 +17,6 @@ public class SProductTypeServiceImpl extends ServiceImpl<SProductTypeMapper, SPr
 
     @Override
     public List<SProductType> findByTypeStatus(int typeStatus) {
-        return baseMapper.selectList(new LambdaQueryWrapper<SProductType>().eq(SProductType::getTypeStatus, typeStatus));
+        return this.baseMapper.selectList(new LambdaQueryWrapper<SProductType>().eq(SProductType::getTypeStatus, typeStatus));
     }
 }

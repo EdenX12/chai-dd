@@ -6,7 +6,6 @@ import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
-import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author MrBird
@@ -65,10 +63,20 @@ public class SOfferPriceController extends BaseController {
 
         try {
 
-            // TODO 输入金额必须要大于所有报价中最大报价金额
+            // 输入金额必须要大于所有报价中最大报价金额
+            SOfferPrice maxOfferPrice = new SOfferPrice();
+            maxOfferPrice.setTaskOrderId(offerPrice.getTaskOrderId());
+            maxOfferPrice = this.offerPriceService.findOfferPriceDetail(maxOfferPrice);
+
+            if (maxOfferPrice != null && offerPrice.getAmount().compareTo(maxOfferPrice.getAmount()) <= 0) {
+                message = "您的报价必须超过最后一次报价金额！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
 
             // 先更新出局
-            this.offerPriceService.updateOfferPriceOut(offerPrice);
+            offerPrice = this.offerPriceService.updateOfferPriceOut(offerPrice);
 
             // 再新建一个新报价
             SUser user = FebsUtil.getCurrentUser();
@@ -78,10 +86,10 @@ public class SOfferPriceController extends BaseController {
             offerPrice.setPayStatus(0);
             offerPrice.setStatus(1);
 
-            Long offerPriceId = this.offerPriceService.createOfferPrice(offerPrice);
+            offerPrice = this.offerPriceService.createOfferPrice(offerPrice);
 
             // 调起微信支付
-            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(offerPriceId),
+            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(offerPrice.getId()),
                     offerPrice.getAmount().toString(),
                     user.getOpenId(),
                     request.getRemoteAddr(),
@@ -113,10 +121,17 @@ public class SOfferPriceController extends BaseController {
 
         try {
 
-            // TODO 此转让任务还没有报价
+            // 此转让任务还没有报价
+            List<SOfferPrice> offerPriceList = this.offerPriceService.findOfferPriceList(offerPrice);
+            if (offerPriceList == null) {
+                message = "此转让任务还没有报价，不能成交！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
 
             // 修改成交状态 （竞标中 - > 已成交）
-            this.offerPriceService.updateOfferPriceOn(offerPrice);
+            offerPrice = this.offerPriceService.updateOfferPriceOn(offerPrice);
 
             // 转让任务状态更新 （转让中 - > 已成交）
             STaskOrder taskOrder = this.taskOrderService.getById(offerPrice.getTaskOrderId());

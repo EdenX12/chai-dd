@@ -113,11 +113,11 @@ public class SUserTaskController extends BaseController {
                 userTask.setCreateTime(new Date());
                 userTask.setUpdateTime(new Date());
 
-                this.userTaskService.createUserTask(userTask);
+                userTask = this.userTaskService.createUserTask(userTask);
             } else {
                 userTask.setUpdateTime(new Date());
 
-                this.userTaskService.updateUserTask(userTask);
+                userTask = this.userTaskService.updateUserTask(userTask);
             }
 
             // 调起微信支付
@@ -273,9 +273,9 @@ public class SUserTaskController extends BaseController {
             searchUserTask.setShareFlag(0);
             searchUserTask.setCreateTime(new Date());
             searchUserTask.setUpdateTime(new Date());
-            newTaskId = this.userTaskService.createUserTask(searchUserTask);
+            SUserTask newUserTask = this.userTaskService.createUserTask(searchUserTask);
             // 新生成的任务ID
-            returnMap.put("taskId", newTaskId);
+            returnMap.put("taskId", newUserTask.getId());
 
             // 有人查看或转发“我”分享的任务时，“我”获10颗
             // 猎豆追加 本人（10颗） * 猎人等级倍数
@@ -365,7 +365,6 @@ public class SUserTaskController extends BaseController {
 
         return response;
     }
-
 
     /**
      * 取得我的任务【已完成】列表信息

@@ -1,7 +1,6 @@
 package cc.mrbird.febs.api.service;
 
 import cc.mrbird.febs.api.entity.SOrder;
-import cc.mrbird.febs.api.entity.SUserAddress;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -16,7 +15,7 @@ public interface ISOrderService extends IService<SOrder> {
      *
      * @param order SOrder
      */
-    Long addOrder(SOrder order);
+    SOrder addOrder(SOrder order);
 
     /**
      * 查询用户购买订单列表
@@ -40,5 +39,5 @@ public interface ISOrderService extends IService<SOrder> {
      *
      * @param order SOrder
      */
-    void updateOrder(SOrder order);
+    SOrder updateOrder(SOrder order);
 }

@@ -19,16 +19,18 @@ public class SUserServiceImpl extends ServiceImpl<SUserMapper, SUser> implements
 	@Override
 	public SUser findByOpenId(String openId) {
 
-		return baseMapper.selectOne(new LambdaQueryWrapper<SUser>().eq(SUser::getOpenId, openId));
+		return this.baseMapper.selectOne(new LambdaQueryWrapper<SUser>().eq(SUser::getOpenId, openId));
 	}
 
 	@Override
-	public void createUser(SUser user) throws Exception {
+	public SUser createUser(SUser user) throws Exception {
 
 		// 创建用户
 		user.setCreateTime(new Date());
 
-		save(user);
+		this.baseMapper.insert(user);
+
+		return user;
 	}
 
 	@Override

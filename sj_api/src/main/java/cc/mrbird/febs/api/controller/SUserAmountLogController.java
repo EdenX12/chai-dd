@@ -1,6 +1,5 @@
 package cc.mrbird.febs.api.controller;
 
-
 import cc.mrbird.febs.common.controller.BaseController;
 import org.springframework.web.bind.annotation.RequestMapping;
 

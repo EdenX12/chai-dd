@@ -43,7 +43,7 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
 
     @Override
     @Transactional
-    public void updateUserAddress(SUserAddress userAddress) {
+    public SUserAddress updateUserAddress(SUserAddress userAddress) {
 
         LambdaQueryWrapper<SUserAddress> queryWrapper = new LambdaQueryWrapper<SUserAddress>();
 
@@ -56,6 +56,7 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
         userAddress.setUpdateTime(new Date());
 
         this.baseMapper.update(userAddress, queryWrapper);
+        return userAddress;
     }
 
     @Override
@@ -75,11 +76,12 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
 
     @Override
     @Transactional
-    public void addUserAddress(SUserAddress userAddress) {
+    public SUserAddress addUserAddress(SUserAddress userAddress) {
 
         userAddress.setCreateTime(new Date());
 
         this.baseMapper.insert(userAddress);
+        return userAddress;
     }
 
     @Override
@@ -95,7 +97,7 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
             queryWrapper.eq(SUserAddress::getId, userAddress.getId());
         } 
         queryWrapper.orderByDesc(SUserAddress::getIsDefault);
-        List<SUserAddress> list=baseMapper.selectList(queryWrapper);
+        List<SUserAddress> list= this.baseMapper.selectList(queryWrapper);
         if(list!=null&&list.size()>0) {
         	return list.get(0);
         }else {

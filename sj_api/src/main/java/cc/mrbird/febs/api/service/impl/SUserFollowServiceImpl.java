@@ -32,7 +32,7 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
             queryWrapper.eq(SUserFollow::getFollowType, 0);
         }
 
-        return baseMapper.selectOne(queryWrapper);
+        return this.baseMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -52,11 +52,11 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
         // 已关注
         queryWrapper.eq(SUserFollow::getStatus, 1);
 
-        return baseMapper.selectCount(queryWrapper);
+        return this.baseMapper.selectCount(queryWrapper);
     }
 
     @Override
-    public void createUserFollow(SUserFollow userFollow) {
+    public SUserFollow createUserFollow(SUserFollow userFollow) {
 
         LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper<SUserFollow>();
 
@@ -81,19 +81,22 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
             userFollow.setUpdateTime(new Date());
             userFollow.setStatus(1);
 
-            this.save(userFollow);
+            this.baseMapper.insert(userFollow);
 
+            return userFollow;
         } else {
 
             userFollowOne.setUpdateTime(new Date());
             userFollowOne.setStatus(1);
 
             this.baseMapper.updateById(userFollowOne);
+
+            return userFollowOne;
         }
     }
 
     @Override
-    public void updateUserFollow(SUserFollow userFollow) {
+    public SUserFollow updateUserFollow(SUserFollow userFollow) {
 
         LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper<SUserFollow>();
 
@@ -118,5 +121,7 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
 
             this.baseMapper.updateById(userFollowOne);
         }
+
+        return userFollowOne;
     }
 }

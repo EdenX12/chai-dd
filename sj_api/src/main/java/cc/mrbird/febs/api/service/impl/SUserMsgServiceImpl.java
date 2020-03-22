@@ -36,7 +36,7 @@ public class SUserMsgServiceImpl extends ServiceImpl<SUserMsgMapper, SUserMsg> i
         Page<SUserMsg> page = new Page<>();
         SortUtil.handlePageSort(request, page, "msg_time", FebsConstant.ORDER_DESC, false);
 
-        return baseMapper.selectPage(page, queryWrapper);
+        return this.baseMapper.selectPage(page, queryWrapper);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SUserMsgServiceImpl extends ServiceImpl<SUserMsgMapper, SUserMsg> i
 
         queryWrapper.eq(SUserMsg::getStatus, 0);
 
-        return baseMapper.selectCount(queryWrapper);
+        return this.baseMapper.selectCount(queryWrapper);
     }
 
 }

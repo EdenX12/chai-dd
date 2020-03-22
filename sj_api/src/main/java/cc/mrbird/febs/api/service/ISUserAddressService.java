@@ -31,14 +31,14 @@ public interface ISUserAddressService extends IService<SUserAddress> {
      *
      * @param userAddress SUserAddress
      */
-    void addUserAddress(SUserAddress userAddress);
+    SUserAddress addUserAddress(SUserAddress userAddress);
 
     /**
      * 修改用户收货地址
      *
      * @param userAddress SUserAddress
      */
-    void updateUserAddress(SUserAddress userAddress);
+    SUserAddress updateUserAddress(SUserAddress userAddress);
 
     /**
      * 查询用户收货地址

@@ -18,7 +18,15 @@ public interface ISTaskOrderService extends IService<STaskOrder> {
      *
      * @param taskOrder STaskOrder
      */
-    Long createTaskOrder(STaskOrder taskOrder);
+    STaskOrder createTaskOrder(STaskOrder taskOrder);
+
+    /**
+     * 查询转让任务
+     *
+     * @param taskOrder STaskOrder
+     * @return STaskOrder
+     */
+    STaskOrder findTaskOrder(STaskOrder taskOrder);
 
     /**
      * 查询转让任务列表

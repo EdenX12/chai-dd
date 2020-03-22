@@ -27,12 +27,12 @@ public interface ISUserFollowService extends IService<SUserFollow> {
      *
      * @param userFollow SUserFollow
      */
-    void createUserFollow(SUserFollow userFollow);
+    SUserFollow createUserFollow(SUserFollow userFollow);
 
     /**
      * 取消用户关注 （可针对产品 也可针对任务）
      *
      * @param userFollow SUserFollow
      */
-    void updateUserFollow(SUserFollow userFollow);
+    SUserFollow updateUserFollow(SUserFollow userFollow);
 }
