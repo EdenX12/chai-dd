@@ -34,7 +34,7 @@ febs:
     jwtTimeOut: 3600
 
 weChat:
-  app_id: wxcbb6f0ef4d1929dd
-  mch_id: 1441663202
-  app_key: wqejhjksadl0o8730hjUJjsalkdawoo0
+  app_id: wx84e3a803bae71f3a
+  mch_id: 1580883331
+  app_key: 7c6159c45083f13870698aee1929dafb
   nonce_str: jianpan
