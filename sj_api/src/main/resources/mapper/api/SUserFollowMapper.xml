@@ -57,6 +57,7 @@
 
             op.amount amount,
             opu.user_name userName,
+            opu.nick_name nickName,
             opu.user_phone userPhone
 
           FROM s_user_follow follow

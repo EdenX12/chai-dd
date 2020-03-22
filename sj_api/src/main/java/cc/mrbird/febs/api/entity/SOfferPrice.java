@@ -60,4 +60,20 @@ public class SOfferPrice implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 用户名
+     */
+    private transient String userName;
+
+    /**
+     * 用户昵称
+     */
+    private transient String nickName;
+
+    /**
+     * 用户电话
+     */
+    private transient String userPhone;
+
 }

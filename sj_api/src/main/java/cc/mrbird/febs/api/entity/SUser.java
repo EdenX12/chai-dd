@@ -32,6 +32,11 @@ public class SUser implements Serializable {
     private String userName;
 
     /**
+     * 用户昵称
+     */
+    private String nickName;
+
+    /**
      * 密码
      */
     private String userPassword;

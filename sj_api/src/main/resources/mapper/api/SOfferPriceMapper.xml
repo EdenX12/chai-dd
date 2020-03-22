@@ -23,10 +23,11 @@
         </sql>
 
 
-    <select id="findOfferPriceList" resultType="java.util.Map" parameterType="sOfferPrice">
+    <select id="findOfferPriceList" resultType="sOfferPrice" parameterType="sOfferPrice">
 
         SELECT
         u.user_name userName,
+        u.nick_name nickName,
         u.user_phone userPhone,
         o.amount amount,
         (CASE WHEN o.status = 1 THEN '领先' WHEN o.status = 2 THEN '出局' END) status

@@ -105,6 +105,7 @@
             frontOffer.amount amount,
             frontOffer.status frontStatus,
             opu.user_name frontUserName,
+            opu.nick_name frontNickName,
             opu.user_phone frontUserPhone,
 
             ifnull(watchTask.watchCnt, 0) watchCnt,
@@ -164,12 +165,14 @@
             frontOffer.amount amount,
             frontOffer.status frontStatus,
             opu.user_name frontUserName,
+            opu.nick_name frontNickName,
             opu.user_phone frontUserPhone,
 
             lastOffer.amount amount,
             lastOffer.status lastStatus,
 
             u.user_name lastUserName,
+            u.nick_name lastNickName,
             u.user_phone lastUserPhone
             FROM
             (SELECT o.id, max(op.create_time) create_time
