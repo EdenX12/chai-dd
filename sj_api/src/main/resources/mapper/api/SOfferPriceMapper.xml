@@ -23,7 +23,7 @@
         </sql>
 
 
-    <select id="findOfferPriceList" resultType="sOfferPrice" parameterType="sOfferPrice">
+    <select id="findOfferPriceList" resultType="java.util.Map" parameterType="sOfferPrice">
 
         SELECT
         u.user_name userName,
