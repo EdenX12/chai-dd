@@ -1,11 +1,14 @@
 package cc.mrbird.febs.api.controller;
 
+import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.entity.SUserMsg;
 import cc.mrbird.febs.api.service.ISUserMsgService;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.domain.QueryRequest;
+import cc.mrbird.febs.common.utils.FebsUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +36,10 @@ public class SUserMsgController extends BaseController {
     public FebsResponse getUserMsg(QueryRequest queryRequest, SUserMsg userMsg)  {
 
         FebsResponse response = new FebsResponse();
-
+        //如果userType!=1 只能查询当前登录人的
+        SUser user = FebsUtil.getCurrentUser();
+        if(userMsg.getMsgType()==null)
+        	userMsg.setUserId(user.getId());
         Map<String, Object> userMsgPageList = getDataTable(userMsgService.findUserMsgList(userMsg, queryRequest));
 
         response.put("code", 0);
