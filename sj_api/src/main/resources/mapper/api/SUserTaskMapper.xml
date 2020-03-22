@@ -218,8 +218,10 @@
                 p.total_reward totalReward,
                 p.task_price taskPrice,
                 p.price_unit priceUnit,
-                p.success_reward successReward,
-                p.every_reward everyReward,
+
+                bonus3.bonus_amount successReward,
+                bonus4.bonus_amount everyReward,
+                bonus5.bonus_amount levelReReward,
 
                 ifnull(watchTask.watchCnt, 0) watchCnt,
                 ifnull(gotTask.hunterCnt, 0) hunterCnt
@@ -235,8 +237,13 @@
             LEFT JOIN (select parent_id, count(*) hunterCnt from s_user_task where pay_status =1 group by parent_id) gotTask
             ON gotTask.parent_id = t.id
 
+            LEFT JOIN s_user_bonus_log bonus3 ON bonus3.task_id = t.id AND bonus3.bonus_type=3
+            LEFT JOIN s_user_bonus_log bonus4 ON bonus4.task_id = t.id AND bonus4.bonus_type=4
+            LEFT JOIN s_user_bonus_log bonus5 ON bonus5.task_id = t.id AND bonus5.bonus_type=5
+            LEFT JOIN s_user_bonus_log bonus9 ON bonus9.task_id = t.id AND bonus9.bonus_type=9
+
             WHERE t.pay_status = 1
-            AND t.user_id = #{sUserTask.userId}
+            AND t.user_id = 1
             AND t.status in (3, 4)
 
         </select>
