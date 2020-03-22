@@ -143,6 +143,9 @@
             t.product_id productId,
             t.task_number taskNumber,
 
+            o.id taskOrderId,
+            o.end_time endTime,
+
             p.product_name productName,
             p.product_img productImg,
             p.product_des productDes,
