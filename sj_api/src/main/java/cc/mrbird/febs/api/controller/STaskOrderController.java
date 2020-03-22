@@ -179,7 +179,7 @@ public class STaskOrderController extends BaseController {
             // 已报价用户报价状态修改为已出局 金额退还到余额
             SOfferPrice offerPrice = new SOfferPrice();
             offerPrice.setTaskOrderId(taskOrder.getId());
-            offerPrice = this.offerPriceService.updateOfferPriceOut(offerPrice);
+            this.offerPriceService.updateOfferPriceOut(offerPrice);
 
             List<SOfferPrice> offerPriceOutList = this.offerPriceService.findOfferPriceOutList(offerPrice);
 

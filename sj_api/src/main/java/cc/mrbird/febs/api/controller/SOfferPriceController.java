@@ -76,7 +76,7 @@ public class SOfferPriceController extends BaseController {
             }
 
             // 先更新出局
-            offerPrice = this.offerPriceService.updateOfferPriceOut(offerPrice);
+            this.offerPriceService.updateOfferPriceOut(offerPrice);
 
             // 再新建一个新报价
             SUser user = FebsUtil.getCurrentUser();

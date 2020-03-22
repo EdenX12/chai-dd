@@ -55,9 +55,12 @@ public class SOfferPriceServiceImpl extends ServiceImpl<SOfferPriceMapper, SOffe
 
         offerPrice = this.baseMapper.selectOne(queryWrapper);
 
-        offerPrice.setStatus(2);
+        if (offerPrice != null) {
 
-        this.baseMapper.update(offerPrice, queryWrapper);
+            offerPrice.setStatus(2);
+            this.baseMapper.update(offerPrice, queryWrapper);
+        }
+
         return offerPrice;
     }
 
