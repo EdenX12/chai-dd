@@ -102,7 +102,7 @@
 
             ifnull(op.offerCount, 0) offerCount,
 
-            frontOffer.amount amount,
+            frontOffer.amount frontAmount,
             frontOffer.status frontStatus,
             opu.user_name frontUserName,
             opu.nick_name frontNickName,
@@ -162,7 +162,7 @@
 
             oc.offerCount offerCount,
 
-            frontOffer.amount amount,
+            frontOffer.amount frontAmount,
             frontOffer.status frontStatus,
             opu.user_name frontUserName,
             opu.nick_name frontNickName,
