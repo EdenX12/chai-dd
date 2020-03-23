@@ -203,7 +203,7 @@
          SELECT
 
             follow.follow_type,
-            follow.create_time,
+            follow.create_time createTime,
 
             p.id,
             p.product_name productName,
@@ -260,7 +260,7 @@
         LEFT JOIN s_user opu ON opu.id = frontOffer.user_id
 
         WHERE follow.status = 1
-          AND follow.user_id = #{sUserFollow.userId}
+          AND follow.user_id = #{sUserTask.userId}
 
         </select>
 
