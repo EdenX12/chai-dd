@@ -425,6 +425,9 @@ public class SUserPayController extends BaseController {
 
                 this.userPayService.save(userPay);
 
+                // 先更新出局
+                this.offerPriceService.updateOfferPriceOut(offerPrice);
+
                 // 变更订单状态 已付款
                 offerPrice.setPayStatus(1);
                 offerPrice.setUpdateTime(new Date());
