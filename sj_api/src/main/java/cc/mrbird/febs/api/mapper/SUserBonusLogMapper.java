@@ -1,12 +1,11 @@
 package cc.mrbird.febs.api.mapper;
 
-import cc.mrbird.febs.api.entity.SUserFollow;
-
+import cc.mrbird.febs.api.entity.SUserBonusLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * @author MrBird
  */
-public interface SUserFollowMapper extends BaseMapper<SUserFollow> {
+public interface SUserBonusLogMapper extends BaseMapper<SUserBonusLog> {
 
 }

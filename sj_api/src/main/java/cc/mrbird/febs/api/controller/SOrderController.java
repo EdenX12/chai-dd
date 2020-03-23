@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,13 +48,13 @@ public class SOrderController extends BaseController {
     private ISUserService userService;
 
     @Autowired
-    private ISUserLevelService userLevelService;
-
-    @Autowired
     private WeChatPayUtil weChatPayUtil;
 
     @Autowired
     private ISUserAmountLogService userAmountLogService;
+
+    @Autowired
+    private ISUserBonusLogService userBonusLogService;
 
     /**
      * 新增用户购买订单
@@ -171,147 +170,104 @@ public class SOrderController extends BaseController {
             userTask.setPayStatus(1);
             userTask.setStatus(3);
             List<SUserTask> userTaskList = userTaskService.findUserTaskList(userTask);
-
-            // 判断此用户是否领取过任务
-            boolean taskGotUser = false;
-
-            // 其他人总的领取份数
-            int totalTaskNumberOther = 0;
-
             for (SUserTask userTasked : userTaskList) {
-                if (order.getUserId().equals(userTasked.getUserId())) {
-                    taskGotUser = true;
-                } else {
-                    totalTaskNumberOther = totalTaskNumberOther + userTasked.getTaskNumber();
-                }
-            }
-
-            // 独赢收益计算 (如领取过任务 40%  50%由其他领取该任务者均分 未领取过任务 5%  80%被其他领取该任务者均分)
-            BigDecimal everyReward = new BigDecimal(0);
-            if (taskGotUser) {
-                SUser user1 = this.userService.getById(userTask.getUserId());
-
-                // 金额流水插入
-                SUserAmountLog userAmountLog = new SUserAmountLog();
-                userAmountLog.setUserId(user1.getId());
-                userAmountLog.setChangeType(3);
-                userAmountLog.setChangeAmount(product.getTotalReward().multiply(BigDecimal.valueOf(0.4)));
-                userAmountLog.setChangeTime(new Date());
-                userAmountLog.setRelationId(userTask.getId());
-                userAmountLog.setRemark("关联任务ID");
-                userAmountLog.setOldAmount(user.getTotalAmount());
-                this.userAmountLogService.save(userAmountLog);
-
-                user1.setTotalAmount(user1.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.4))));
-                this.userService.updateById(user1);
-
-                // 每份任务的躺赢收益
-                everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.5)).divide(BigDecimal.valueOf(totalTaskNumberOther));
-            } else {
-                SUser user1 = this.userService.getById(userTask.getUserId());
-
-                // 金额流水插入
-                SUserAmountLog userAmountLog = new SUserAmountLog();
-                userAmountLog.setUserId(user1.getId());
-                userAmountLog.setChangeType(3);
-                userAmountLog.setChangeAmount(product.getTotalReward().multiply(BigDecimal.valueOf(0.05)));
-                userAmountLog.setChangeTime(new Date());
-                userAmountLog.setRelationId(userTask.getId());
-                userAmountLog.setRemark("关联任务ID");
-                userAmountLog.setOldAmount(user.getTotalAmount());
-                this.userAmountLogService.save(userAmountLog);
-
-                user1.setTotalAmount(user1.getTotalAmount().add(product.getTotalReward().multiply(BigDecimal.valueOf(0.05))));
-                this.userService.updateById(user1);
-
-                // 每份任务的躺赢收益
-                everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.valueOf(totalTaskNumberOther));
-            }
-
-            for (SUserTask userTasked : userTaskList) {
-
-                // 躺赢收益计算  任务金退还（冻结 - > 余额）
-                SUser user1 = this.userService.getById(userTasked.getUserId());
-
-                // 任务金退还（冻结 - > 余额）
-                // 冻结金额-
-                user1.setLockAmount(user1.getLockAmount().subtract(product.getTaskPrice().multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
-                // 余额+
-                user1.setTotalAmount(user1.getTotalAmount().add(product.getTaskPrice().multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
-
-                // 任务解冻金额流水插入
-                SUserAmountLog userAmountLog = new SUserAmountLog();
-                userAmountLog.setUserId(user1.getId());
-                userAmountLog.setChangeType(9);
-                userAmountLog.setChangeAmount(product.getTaskPrice().multiply(BigDecimal.valueOf(userTasked.getTaskNumber())));
-                userAmountLog.setChangeTime(new Date());
-                userAmountLog.setRelationId(userTasked.getId());
-                userAmountLog.setRemark("关联任务ID");
-                userAmountLog.setOldAmount(user.getTotalAmount());
-                this.userAmountLogService.save(userAmountLog);
-
-                // 躺赢收益计算
-                user1.setTotalAmount(user1.getTotalAmount().add(everyReward.multiply(BigDecimal.valueOf(userTasked.getTaskNumber()))));
-                this.userService.updateById(user1);
-
-                // 躺赢金额流水插入
-                userAmountLog = new SUserAmountLog();
-                userAmountLog.setUserId(user1.getId());
-                userAmountLog.setChangeType(4);
-                userAmountLog.setChangeAmount(everyReward.multiply(BigDecimal.valueOf(userTasked.getTaskNumber())));
-                userAmountLog.setChangeTime(new Date());
-                userAmountLog.setRelationId(userTasked.getId());
-                userAmountLog.setRemark("关联任务ID");
-                userAmountLog.setOldAmount(user.getTotalAmount());
-                this.userAmountLogService.save(userAmountLog);
 
                 // 佣金已入账 状态更新
                 userTasked.setUpdateTime(new Date());
                 userTasked.setStatus(4);
-                userTaskService.updateById(userTasked);
+                this.userTaskService.updateById(userTasked);
             }
 
-            // 下级贡献收益计算 往上推四级
-            List<SUser> userList = new ArrayList();
-            if (user.getParentId() != null) {
-                // 第一级
-                SUser user1 = userService.getById(user.getParentId());
-                userList.add(user1);
-                if (user1.getParentId() != null) {
-                    // 第二级
-                    SUser user2 = userService.getById(user1.getParentId());
-                    userList.add(user2);
-                    if (user2.getParentId() != null) {
-                        // 第三级
-                        SUser user3 = userService.getById(user2.getParentId());
-                        userList.add(user3);
-                        if (user3.getParentId() != null) {
-                            // 第四级
-                            SUser user4 = userService.getById(user3.getParentId());
-                            userList.add(user4);
-                        }
-                    }
+            SUserBonusLog userBonusLog = new SUserBonusLog();
+
+            userBonusLog.setOrderId(order.getId());
+
+            List<SUserBonusLog> userBonusLogList = userBonusLogService.findUserBonusList(userBonusLog);
+
+            for (SUserBonusLog userBonus : userBonusLogList) {
+
+                if (userBonus.getBonusType() == 3) {
+
+                    // 独赢奖励 （余额+）
+                    SUser user1 = this.userService.getById(userBonus.getUserId());
+
+                    // 金额流水插入
+                    SUserAmountLog userAmountLog = new SUserAmountLog();
+                    userAmountLog.setUserId(user1.getId());
+                    userAmountLog.setChangeType(3);
+                    userAmountLog.setChangeAmount(userBonus.getBonusAmount());
+                    userAmountLog.setChangeTime(new Date());
+                    userAmountLog.setRelationId(userBonus.getTaskId());
+                    userAmountLog.setRemark("关联任务ID");
+                    userAmountLog.setOldAmount(user1.getTotalAmount());
+                    this.userAmountLogService.save(userAmountLog);
+
+                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
+                    this.userService.updateById(user1);
+
+                } else if (userBonus.getBonusType() == 4) {
+
+                    // 躺赢奖励（余额+）
+                    SUser user1 = this.userService.getById(userBonus.getUserId());
+
+                    // 躺赢金额流水插入
+                    SUserAmountLog userAmountLog = new SUserAmountLog();
+                    userAmountLog = new SUserAmountLog();
+                    userAmountLog.setUserId(user1.getId());
+                    userAmountLog.setChangeType(4);
+                    userAmountLog.setChangeAmount(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber())));
+                    userAmountLog.setChangeTime(new Date());
+                    userAmountLog.setRelationId(userBonus.getTaskId());
+                    userAmountLog.setRemark("关联任务ID");
+                    userAmountLog.setOldAmount(user1.getTotalAmount());
+                    this.userAmountLogService.save(userAmountLog);
+
+                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
+                    this.userService.updateById(user1);
+
+                } else if (userBonus.getBonusType() == 5) {
+
+                    // 下级奖励（余额+）
+                    SUser user1 = this.userService.getById(userBonus.getUserId());
+
+                    // 躺赢金额流水插入
+                    SUserAmountLog userAmountLog = new SUserAmountLog();
+                    userAmountLog = new SUserAmountLog();
+                    userAmountLog.setUserId(user1.getId());
+                    userAmountLog.setChangeType(5);
+                    userAmountLog.setChangeAmount(userBonus.getBonusAmount());
+                    userAmountLog.setChangeTime(new Date());
+                    userAmountLog.setRelationId(userBonus.getTaskId());
+                    userAmountLog.setRemark("关联任务ID");
+                    userAmountLog.setOldAmount(user1.getTotalAmount());
+                    this.userAmountLogService.save(userAmountLog);
+
+                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
+                    this.userService.updateById(user1);
+
+                } else if (userBonus.getBonusType() == 9) {
+
+                    // 任务金奖励（余额+ 冻结-）
+                    SUser user1 = this.userService.getById(userBonus.getUserId());
+
+                    // 冻结-
+                    user1.setLockAmount(user1.getLockAmount().subtract(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
+                    // 余额+
+                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
+
+                    this.userService.updateById(user1);
+
+                    // 任务解冻金额流水插入
+                    SUserAmountLog userAmountLog = new SUserAmountLog();
+                    userAmountLog.setUserId(user1.getId());
+                    userAmountLog.setChangeType(9);
+                    userAmountLog.setChangeAmount(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber())));
+                    userAmountLog.setChangeTime(new Date());
+                    userAmountLog.setRelationId(userBonus.getTaskId());
+                    userAmountLog.setRemark("关联任务ID");
+                    userAmountLog.setOldAmount(user1.getTotalAmount());
+                    this.userAmountLogService.save(userAmountLog);
                 }
-            }
-
-            // （如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
-            for (SUser user0 : userList) {
-                SUserLevel userLevel = userLevelService.getById(user0.getUserLevelId());
-
-                // 金额流水插入
-                SUserAmountLog userAmountLog = new SUserAmountLog();
-                userAmountLog.setUserId(user0.getId());
-                userAmountLog.setChangeType(5);
-                userAmountLog.setChangeAmount(product.getTotalReward().multiply(userLevel.getIncomeRate()));
-                userAmountLog.setChangeTime(new Date());
-                userAmountLog.setRelationId(order.getId());
-                userAmountLog.setRemark("关联订单ID");
-                userAmountLog.setOldAmount(user.getTotalAmount());
-                this.userAmountLogService.save(userAmountLog);
-
-                user0.setTotalAmount(user0.getTotalAmount().add(
-                        product.getTotalReward().multiply(userLevel.getIncomeRate())));
-                this.userService.updateById(user0);
             }
 
         } catch (Exception e) {

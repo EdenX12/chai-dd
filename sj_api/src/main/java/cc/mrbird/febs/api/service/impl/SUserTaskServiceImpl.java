@@ -122,6 +122,18 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
+    public IPage<Map> findUserTaskFollowList(SUserTask userTask, QueryRequest request) {
+        try {
+            Page<Map> page = new Page<>();
+            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
+            return this.baseMapper.findUserTaskFollowDetail(page, userTask);
+        } catch (Exception e) {
+            log.error("查询我的任务异常", e);
+            return null;
+        }
+    }
+
+    @Override
     public IPage<Map> findUserTaskEndList(SUserTask userTask, QueryRequest request) {
         try {
             Page<Map> page = new Page<>();
