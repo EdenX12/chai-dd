@@ -35,6 +35,7 @@ febs:
 
 weChat:
   app_id: wx84e3a803bae71f3a
+  app_secret: 7c6159c45083f13870698aee1929dafb
   mch_id: 1580883331
-  app_key: 7c6159c45083f13870698aee1929dafb
+  app_key: sajsakdjasnm922ssadklhvnvzxkxncm
   nonce_str: jianpan
