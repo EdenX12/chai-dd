@@ -1,5 +1,6 @@
 package cc.mrbird.febs.api.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.common.annotation.Limit;
@@ -38,6 +38,7 @@ import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.properties.FebsProperties;
 import cc.mrbird.febs.common.service.RedisService;
 import cc.mrbird.febs.common.utils.AddressUtil;
+import cc.mrbird.febs.common.utils.ContentUtil;
 import cc.mrbird.febs.common.utils.DateUtil;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.HttpRequest;
@@ -100,6 +101,7 @@ public class SUserController extends BaseController {
 		String jsonStr=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/oauth2/access_token", params, "utf-8");
 		JSONObject object = JSONObject.parseObject(jsonStr);
 		String openId=object.getString("openid");
+    	//String openId="11111";
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
@@ -111,12 +113,34 @@ public class SUserController extends BaseController {
             SUser su = userService.findByOpenId(openId);
 
             if (su == null) {
-
+            	//查询用户信息
+            	String newToke=object.getString("access_token");
+    				
+    	    		//请求微信头像
+    	    		Map<String, String> params1=new HashMap<String, String>();
+    	        	params1.put("access_token",newToke);
+    	        	params1.put("openid",object.getString("openid"));
+    	        	params1.put("lang","zh_CN");
+    	    		String 	aa = HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/userinfo", params1, "utf-8");
+    	    		JSONObject object1 = JSONObject.parseObject(aa);
+    	    		String nick=object1.getString("nickname");
+    	    		String pic=object1.getString("headimgurl");
+    	    		String sex=object1.getString("sex");
+    	    		Object unionid=object1.get("unionid");
+    	    		nick=ContentUtil.getString(nick);
                 // 创建用户
                 su = new SUser();
                 su.setOpenId(openId);
                 su.setUserPassword(password);
-
+                su.setLockAmount(BigDecimal.ZERO);
+                su.setCanuseBean(0);
+                su.setNickName(nick);
+                su.setRewardBean(0);
+                su.setTaskCount(0);
+                su.setTotalAmount(BigDecimal.ZERO);
+                su.setUserImg(pic);
+                su.setUserLevelId(1L);
+                su.setUserName(nick);
                 this.userService.createUser(su);
                 su = userService.findByOpenId(openId);
             }
