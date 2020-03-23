@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -48,6 +49,14 @@ public class SUserWithdrawController extends BaseController {
 
             SUser user = FebsUtil.getCurrentUser();
             userWithdraw.setUserId(user.getId());
+
+            // 最低提现金额10元
+            if (userWithdraw.getAmount().compareTo(BigDecimal.valueOf(10)) < 0) {
+                message = "提现金额最低10元起！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
 
             // 用户提现金额大于余额
             if (userWithdraw.getAmount().compareTo(user.getTotalAmount()) > 0) {
