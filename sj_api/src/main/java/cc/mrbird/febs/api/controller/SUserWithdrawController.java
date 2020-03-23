@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.entity.SUserWithdraw;
+import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.api.service.ISUserWithdrawService;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -29,6 +30,9 @@ public class SUserWithdrawController extends BaseController {
 
     @Autowired
     private ISUserWithdrawService userWithdrawService;
+
+    @Autowired
+    private ISUserService userService;
 
     /**
      * 新增用户提现
@@ -58,6 +62,12 @@ public class SUserWithdrawController extends BaseController {
             userWithdraw.setStatus(0);
 
             this.userWithdrawService.save(userWithdraw);
+
+            // 用户冻结金额追加
+            user.setLockAmount(user.getLockAmount().add(userWithdraw.getAmount()));
+            user.setTotalAmount(user.getTotalAmount().subtract(userWithdraw.getAmount()));
+            this.userService.updateById(user);
+
         } catch (Exception e) {
             message = "新增用户提现";
             response.put("code", 1);
