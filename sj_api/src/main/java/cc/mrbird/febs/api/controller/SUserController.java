@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -81,6 +82,17 @@ public class SUserController extends BaseController {
 
     @Value("${weChat.app_secret}")
     private String appSecret;
+    /**
+     * 临时用一下 因为我的前端访问链接里带# 微信处理这种链接会出错
+     * @param code
+     * @return
+     */
+    @RequestMapping("/index")
+    public ModelAndView indexUtil(String code) {
+    	ModelAndView mav=new ModelAndView("redirect:http://www.person-info.com/#/index?code="+code);
+		return mav;
+    	
+    }
 
     /**
      * 用户登录
@@ -99,8 +111,10 @@ public class SUserController extends BaseController {
     	params.put("grant_type", "authorization_code");
     	params.put("code", code);
 		String jsonStr=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/oauth2/access_token", params, "utf-8");
+		System.out.println(jsonStr);
 		JSONObject object = JSONObject.parseObject(jsonStr);
 		String openId=object.getString("openid");
+    	//JSONObject object=null;
     	//String openId="11111";
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
