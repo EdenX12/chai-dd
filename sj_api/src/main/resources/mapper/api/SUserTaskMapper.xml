@@ -288,6 +288,10 @@
                 p.price_unit priceUnit,
 
                 bonus3.bonus_amount successReward,
+                u.user_name successUserName,
+                u.nick_name successNickName,
+                u.user_phone successUserPhone,
+
                 bonus4.bonus_amount everyReward,
                 bonus5.bonus_amount levelReReward,
 
@@ -306,6 +310,7 @@
             ON gotTask.product_id = t.product_id
 
             LEFT JOIN s_user_bonus_log bonus3 ON bonus3.task_id = t.id AND bonus3.bonus_type=3
+            LEFT JOIN s_user u ON u.id = bonus3.user_id
             LEFT JOIN s_user_bonus_log bonus4 ON bonus4.task_id = t.id AND bonus4.bonus_type=4
             LEFT JOIN s_user_bonus_log bonus5 ON bonus5.task_id = t.id AND bonus5.bonus_type=5
             LEFT JOIN s_user_bonus_log bonus9 ON bonus9.task_id = t.id AND bonus9.bonus_type=9
