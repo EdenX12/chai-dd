@@ -15,13 +15,17 @@ import cc.mrbird.febs.api.service.ISUserMsgService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.service.ISUserService;
@@ -36,6 +40,8 @@ import cc.mrbird.febs.common.service.RedisService;
 import cc.mrbird.febs.common.utils.AddressUtil;
 import cc.mrbird.febs.common.utils.DateUtil;
 import cc.mrbird.febs.common.utils.FebsUtil;
+import cc.mrbird.febs.common.utils.HttpRequest;
+import cc.mrbird.febs.common.utils.HttpRequestWechatUtil;
 import cc.mrbird.febs.common.utils.IPUtil;
 import cc.mrbird.febs.common.utils.MD5Util;
 
@@ -69,18 +75,31 @@ public class SUserController extends BaseController {
 
     @Autowired
     private ISUserTaskService userTaskService;
+    @Value("${weChat.app_id}")
+    private String appId;
+
+    @Value("${weChat.app_secret}")
+    private String appSecret;
 
     /**
      * 用户登录
      * @return SUser
+     * @throws Exception 
      */
 	@PostMapping("/login")
     @Limit(key = "login", period = 60, count = 20, name = "登录接口", prefix = "limit")
-    public FebsResponse login(HttpServletRequest request, String openId) {
+    public FebsResponse login(HttpServletRequest request, String code) throws Exception {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
-
+        Map<String, String> params=new HashMap<String, String>();
+		params.put("appid",appId);
+    	params.put("secret",appSecret);
+    	params.put("grant_type", "authorization_code");
+    	params.put("code", code);
+		String jsonStr=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/oauth2/access_token", params, "utf-8");
+		JSONObject object = JSONObject.parseObject(jsonStr);
+		String openId=object.getString("openid");
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
