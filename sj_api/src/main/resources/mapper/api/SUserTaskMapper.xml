@@ -311,7 +311,7 @@
             LEFT JOIN s_user_bonus_log bonus9 ON bonus9.task_id = t.id AND bonus9.bonus_type=9
 
             WHERE t.pay_status = 1
-            AND t.user_id = 1
+            AND t.user_id = #{sUserTask.userId}
             AND t.status in (3, 4)
 
         </select>
