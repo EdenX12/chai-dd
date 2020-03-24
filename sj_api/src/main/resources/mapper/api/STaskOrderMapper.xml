@@ -31,6 +31,7 @@
             p.product_price productPrice,
             p.product_price productPrice,
             p.price_unit priceUnit,
+            p.total_reward totalReward,
             p.task_price taskPrice,
             p.success_reward successReward,
             p.every_reward everyReward,
