@@ -27,6 +27,9 @@ public class WeChatPayUtil {
 
     @Value("${weChat.nonce_str}")
     private String nonceStr;
+    
+    @Value("${weChat.service_name}")
+    private String serviceName;
 
     /**
      * 微信支付请求
@@ -38,11 +41,9 @@ public class WeChatPayUtil {
         mm1.put("appid", appId);
         mm1.put("mch_id", mchId);
         mm1.put("nonce_str", nonceStr);
-        try {
-            mm1.put("body",  new String(productName.getBytes(),"utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+       
+            mm1.put("body",  productName);
+        
 
         mm1.put("attach", relationId);
 
@@ -65,7 +66,7 @@ public class WeChatPayUtil {
 
         mm1.put("spbill_create_ip", ip);
 
-        mm1.put("notify_url","http://hycw-api.hellokeeper.com/api/s-user-pay/paySuccess");
+        mm1.put("notify_url",serviceName+"/api/s-user-pay/paySuccess");
         mm1.put("trade_type", "JSAPI");
 
         mm1.put("openid", openid);
@@ -76,7 +77,13 @@ public class WeChatPayUtil {
         String aa1 = XmlUtil.maptoXml(mm1);
 
         String aa = HttpRequest.sendPost("https://api.mch.weixin.qq.com/pay/unifiedorder", aa1);
-
+        try {
+			System.out.println(new String(aa.getBytes(),"utf-8"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println("支付返回信息："+aa);
         Map<String, Object> map2 = XmlUtil.xmltoMap(aa);
 
         Calendar c1 = Calendar.getInstance();

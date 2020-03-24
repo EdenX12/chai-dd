@@ -87,6 +87,8 @@ public class HttpRequest {
         	Long a=new Date().getTime();
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
+            Long a1=new Date().getTime();
+           // Log4jUtil.Log4jError("时间1:"+(a1-a));
             URLConnection conn = realUrl.openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("accept", "*/*");
@@ -96,9 +98,19 @@ public class HttpRequest {
             // 发送POST请求必须设置如下两行
             conn.setDoOutput(true);
             conn.setDoInput(true);
-
+            // 获取URLConnection对象对应的输出流
+            Long a11=new Date().getTime();
+          //  Log4jUtil.Log4jError("时间2:"+(a11-a1));
             out = new PrintWriter(conn.getOutputStream());
-
+            Long a111=new Date().getTime();
+         //   Log4jUtil.Log4jError("时间3:"+(a111-a11));
+            // 发送请求参数
+            out.print(param);
+            // flush输出流的缓冲
+            Long a1111=new Date().getTime();
+            //Log4jUtil.Log4jError("时间4:"+(a1111-a111));
+            out.flush();
+            Long a11111=new Date().getTime();
             // 定义BufferedReader输入流来读取URL的响应
             in = new BufferedReader(
                     new InputStreamReader(conn.getInputStream()));
@@ -106,6 +118,10 @@ public class HttpRequest {
             while ((line = in.readLine()) != null) {
                 result += line;
             }
+        //    Log4jUtil.Log4jError("jieguoji:"+result);
+         //   Log4jUtil.Log4jError("jieguoji:"+new String(result.getBytes("ISO-8859-1"),"UTF-8"));
+       //     Long a111111=new Date().getTime();
+       //     Log4jUtil.Log4jError("时间5:"+(a111111-a11111));
         } catch (Exception e) {
             System.out.println("发送 POST 请求出现异常！"+e);
             e.printStackTrace();
