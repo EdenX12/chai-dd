@@ -225,7 +225,7 @@ public class SUserTaskController extends BaseController {
         userFollowDetail = this.userFollowService.findUserFollowDetail(userFollowDetail);
 
         Map<String, Object> returnMap = new HashMap<>();
-
+        returnMap.put("payStatus", userTask.getPayStatus());
         // 用户名称
         returnMap.put("userName", taskUser.getUserName());
         // 用户电话
