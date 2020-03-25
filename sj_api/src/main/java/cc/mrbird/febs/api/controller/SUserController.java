@@ -1,8 +1,10 @@
 package cc.mrbird.febs.api.controller;
 
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import cc.mrbird.febs.api.entity.SUserMsg;
 import cc.mrbird.febs.api.service.ISUserLevelService;
 import cc.mrbird.febs.api.service.ISUserMsgService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
+import cc.mrbird.febs.api.service.ITokenService;
 import cc.mrbird.febs.common.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +49,7 @@ import cc.mrbird.febs.common.utils.HttpRequest;
 import cc.mrbird.febs.common.utils.HttpRequestWechatUtil;
 import cc.mrbird.febs.common.utils.IPUtil;
 import cc.mrbird.febs.common.utils.MD5Util;
+import cc.mrbird.febs.common.utils.SignUtil;
 
 /**
  * @author MrBird
@@ -82,6 +86,8 @@ public class SUserController extends BaseController {
 
     @Value("${weChat.app_secret}")
     private String appSecret;
+    @Autowired
+    private ITokenService tokenService;
     /**
      * 临时用一下 因为我的前端访问链接里带# 微信处理这种链接会出错
      * @param code
@@ -96,6 +102,12 @@ public class SUserController extends BaseController {
     @RequestMapping("/customer")
     public ModelAndView indexUtil(String code,String tId) {
     	ModelAndView mav=new ModelAndView("redirect:http://www.person-info.com/#/taskForCustomer/"+tId+"?code="+code);
+		return mav;
+    	
+    }
+    @RequestMapping("/forshare")
+    public ModelAndView forshare(String id) {
+    	ModelAndView mav=new ModelAndView("redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx84e3a803bae71f3a&redirect_uri=http%3a%2f%2fwww.person-info.com%2fweb%2fapi%2fs-user%2fcustomer%3ftId%3d"+id+"&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect");
 		return mav;
     	
     }
@@ -181,6 +193,26 @@ public class SUserController extends BaseController {
 
         return response;
     }
+	 @PostMapping("/getJsInfo")
+	 @Limit(key = "getJsInfo", period = 60, count = 20, name = "获取jssdk加密信息", prefix = "limit")
+	public FebsResponse getJsInfo(String url) throws Exception {
+		 //先url解码
+		 url=URLDecoder.decode(url);
+		 Map<String,Object> map=new HashMap<String,Object>();
+		 map.put("noncestr","e-rongque" );
+		 map.put("jsapi_ticket",tokenService.getJsToken() );
+		 System.out.println(tokenService.getJsToken());
+		 Calendar c1 = Calendar.getInstance();
+		 map.put("timestamp", (c1.getTimeInMillis() + "").substring(0, 10));
+		 map.put("url",url );
+		 map.put("signature", SignUtil.findSignature(map));
+		 map.put("appId", appId);
+		 FebsResponse response = new FebsResponse();
+		 response.put("code", 0);
+		 response.put("data", map);
+		 return response;
+		 
+	 }
 
     /**
      * 取得我的个人信息

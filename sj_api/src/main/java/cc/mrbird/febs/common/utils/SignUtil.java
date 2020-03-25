@@ -10,6 +10,8 @@ package cc.mrbird.febs.common.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +20,16 @@ public final class SignUtil {
 
 	// 与接口配置信息中的Token要一致  
 	private static String token = "rongque";  
+	public static void main(String[] args)throws Exception {
+		Map<String,Object> map=new HashMap<String,Object>();
+		 map.put("noncestr","e-rongque" );
+		 Calendar c1 = Calendar.getInstance();
+		 map.put("timestamp", (c1.getTimeInMillis() + "").substring(0, 10));
+		 String bb=SignUtil.findMd5(map);
+		 System.out.println(bb);
+		 System.out.println(MD5.encode("1234wwww56"));
+		 
+	}
 
 	/** 
 	 * 验证签名 
@@ -106,9 +118,7 @@ public final class SignUtil {
 		return tmpStr;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(System.currentTimeMillis());
-	}
+	
 
 	// MD5加密
 	public static String findMd5(Map<String,Object> map){
@@ -130,7 +140,7 @@ public final class SignUtil {
 
 		// 将三个参数字符串拼接成一个字符串进行sha1加密  
 		MD5 md2=new MD5();
-		tmpStr=MD5.encode(ss).toUpperCase();
+		tmpStr=MD5.encode(ss).toLowerCase();
 
 		return tmpStr;
 	}
