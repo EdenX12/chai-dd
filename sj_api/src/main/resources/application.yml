@@ -29,7 +29,7 @@ febs:
         num: 1000
   shiro:
     # 后端免认证接口 url
-    anonUrl: /api/s-user/login,/api/s-user/index,/logout/**,/regist,/user/check/**
+    anonUrl: /api/s-user/login,/api/s-user/index,/api/s-user/forshare,/api/s-user/customer,/logout/**,/regist,/user/check/**,/api/s-user-pay/paySuccess
     # token有效期，单位秒
     jwtTimeOut: 3600
 
@@ -39,3 +39,4 @@ weChat:
   mch_id: 1580883331
   app_key: sajsakdjasnm922ssadklhvnvzxkxncm
   nonce_str: jianpan
+  service_name: http://www.person-info.com:8088
