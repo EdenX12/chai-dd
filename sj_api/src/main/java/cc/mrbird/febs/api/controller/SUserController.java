@@ -116,12 +116,12 @@ public class SUserController extends BaseController {
     	params.put("secret",appSecret);
     	params.put("grant_type", "authorization_code");
     	params.put("code", code);
-		//String jsonStr=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/oauth2/access_token", params, "utf-8");
+		String jsonStr=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/oauth2/access_token", params, "utf-8");
 		//System.out.println(jsonStr);
-		//JSONObject object = JSONObject.parseObject(jsonStr);
-		//String openId=object.getString("openid");
-    	JSONObject object=null;
-    	String openId="ojuKPv844Q3LBwRTCh_3mxFfLehM";
+		JSONObject object = JSONObject.parseObject(jsonStr);
+		String openId=object.getString("openid");
+    	//JSONObject object=null;
+    	//String openId="ojuKPv844Q3LBwRTCh_3mxFfLehM";
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
