@@ -38,8 +38,10 @@ public class SUserMsgController extends BaseController {
         FebsResponse response = new FebsResponse();
         //如果userType!=1 只能查询当前登录人的
         SUser user = FebsUtil.getCurrentUser();
-        if(userMsg.getMsgType()==null)
-        	userMsg.setUserId(user.getId());
+        if(userMsg.getMsgType()==null) {
+            userMsg.setUserId(user.getId());
+        }
+
         Map<String, Object> userMsgPageList = getDataTable(userMsgService.findUserMsgList(userMsg, queryRequest));
 
         response.put("code", 0);
