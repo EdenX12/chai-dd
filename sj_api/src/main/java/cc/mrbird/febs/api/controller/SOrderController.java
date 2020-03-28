@@ -155,7 +155,10 @@ public class SOrderController extends BaseController {
     @Log("用户确认收货")
     @Transactional
     @PostMapping("/confirmOrder")
-    public void confirmOrder(@Valid SOrder order) throws FebsException {
+    public FebsResponse confirmOrder(@Valid SOrder order) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
         try {
 
@@ -164,6 +167,20 @@ public class SOrderController extends BaseController {
 
             order.setOrderStatus(3);
             order = this.orderService.updateOrder(order);
+
+            if (order.getPaymentState() != 1) {
+                message = "此订单还没有完成支付！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
+            if (order.getOrderStatus() != 2) {
+                message = "此订单还没有完成发货！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
 
             SProduct product = productService.getById(order.getProductId());
 
@@ -331,8 +348,11 @@ public class SOrderController extends BaseController {
 
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";
+            response.put("code", 1);
+            response.message(message);
             log.error(message, e);
-            throw new FebsException(message);
         }
+
+        return response;
     }
 }
