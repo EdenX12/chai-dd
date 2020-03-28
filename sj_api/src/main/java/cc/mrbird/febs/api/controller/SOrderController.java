@@ -56,6 +56,9 @@ public class SOrderController extends BaseController {
     @Autowired
     private ISUserBonusLogService userBonusLogService;
 
+    @Autowired
+    private ISUserMsgService userMsgService;
+
     /**
      * 新增用户购买订单
      */
@@ -184,6 +187,15 @@ public class SOrderController extends BaseController {
 
             List<SUserBonusLog> userBonusLogList = userBonusLogService.findUserBonusList(userBonusLog);
 
+            // 独赢用户
+            String rewardUserName = "";
+            // 独赢奖励
+            BigDecimal successReward = null;
+            // 躺赢人数
+            int rewardCount = 0;
+            // 躺赢奖励
+            BigDecimal everyReward = null;
+
             for (SUserBonusLog userBonus : userBonusLogList) {
 
                 if (userBonus.getBonusType() == 3) {
@@ -205,7 +217,22 @@ public class SOrderController extends BaseController {
                     user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
                     this.userService.updateById(user1);
 
+                    SUserMsg userMsg = new SUserMsg();
+                    userMsg.setUserId(user1.getId());
+                    userMsg.setMsgTime(new Date());
+                    userMsg.setMsgType(1);
+                    userMsg.setStatus(0);
+                    userMsg.setMsgTitle("恭喜您获得独赢奖励" + userBonus.getBonusAmount() + "元。");
+                    userMsg.setMsgInfo("恭喜您获得独赢奖励" + userBonus.getBonusAmount() + "元。");
+
+                    userMsgService.save(userMsg);
+
+                    rewardUserName = user1.getNickName();
+                    successReward = userBonus.getBonusAmount();
+
                 } else if (userBonus.getBonusType() == 4) {
+
+                    rewardCount = rewardCount + 1;
 
                     // 躺赢奖励（余额+）
                     SUser user1 = this.userService.getById(userBonus.getUserId());
@@ -224,6 +251,18 @@ public class SOrderController extends BaseController {
 
                     user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
                     this.userService.updateById(user1);
+
+                    SUserMsg userMsg = new SUserMsg();
+                    userMsg.setUserId(user1.getId());
+                    userMsg.setMsgTime(new Date());
+                    userMsg.setMsgType(2);
+                    userMsg.setStatus(0);
+                    userMsg.setMsgTitle("恭喜您获得躺赢奖励" + userBonus.getBonusAmount() + "元。");
+                    userMsg.setMsgInfo("恭喜您获得躺赢奖励" + userBonus.getBonusAmount() + "元。");
+
+                    userMsgService.save(userMsg);
+
+                    everyReward = userBonus.getBonusAmount();
 
                 } else if (userBonus.getBonusType() == 5) {
 
@@ -244,6 +283,16 @@ public class SOrderController extends BaseController {
 
                     user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
                     this.userService.updateById(user1);
+
+                    SUserMsg userMsg = new SUserMsg();
+                    userMsg.setUserId(user1.getId());
+                    userMsg.setMsgTime(new Date());
+                    userMsg.setMsgType(3);
+                    userMsg.setStatus(0);
+                    userMsg.setMsgTitle("恭喜您获得下级奖励" + userBonus.getBonusAmount() + "元。");
+                    userMsg.setMsgInfo("恭喜您获得下级奖励" + userBonus.getBonusAmount() + "元。");
+
+                    userMsgService.save(userMsg);
 
                 } else if (userBonus.getBonusType() == 9) {
 
@@ -269,6 +318,16 @@ public class SOrderController extends BaseController {
                     this.userAmountLogService.save(userAmountLog);
                 }
             }
+
+            SUserMsg userMsg = new SUserMsg();
+            userMsg.setUserId(null);
+            userMsg.setMsgTime(new Date());
+            userMsg.setMsgType(0);
+            userMsg.setStatus(0);
+            userMsg.setMsgTitle("恭喜" + rewardUserName + "独赢" + successReward + "元，其他" + rewardCount + "人分配躺赢奖金" + everyReward.multiply(BigDecimal.valueOf(rewardCount))+ "元。");
+            userMsg.setMsgInfo("恭喜" + rewardUserName + "独赢" + successReward + "元，其他" + rewardCount + "人分配躺赢奖金" + everyReward.multiply(BigDecimal.valueOf(rewardCount))+ "元。");
+
+            userMsgService.save(userMsg);
 
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";
