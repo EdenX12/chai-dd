@@ -159,9 +159,9 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
         for (SUserTask userTask : userTaskList) {
 
             LambdaQueryWrapper<SUserTask> queryWrapper1 = new LambdaQueryWrapper<SUserTask>();
-            queryWrapper.eq(SUserTask::getParentId, userTask.getId());
+            queryWrapper1.eq(SUserTask::getParentId, userTask.getId());
 
-            List<SUserTask> userTaskList2 = this.baseMapper.selectList(queryWrapper);
+            List<SUserTask> userTaskList2 = this.baseMapper.selectList(queryWrapper1);
             for (SUserTask userTask2 : userTaskList2) {
                 userIds.add(userTask2.getUserId());
             }
