@@ -259,43 +259,50 @@ public class SUserTaskController extends BaseController {
         SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
         returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
-        // 第一次打开的话，生成新任务（未支付  未分享）
-        SUserTask searchUserTask = new SUserTask();
-        searchUserTask.setUserId(user.getId());
-        searchUserTask.setProductId(userTask.getProductId());
-        searchUserTask.setParentId(userTaskId);
-        List<SUserTask> userTaskOne = this.userTaskService.findUserTaskList(searchUserTask);
-        Long newTaskId;
-        if (userTaskOne == null||userTaskOne.size()==0) {
-            searchUserTask.setPayStatus(2);
-            searchUserTask.setTaskNumber(1);
-            searchUserTask.setStatus(0);
-            searchUserTask.setShareFlag(0);
-            searchUserTask.setCreateTime(new Date());
-            searchUserTask.setUpdateTime(new Date());
-            SUserTask newUserTask = this.userTaskService.createUserTask(searchUserTask);
-            // 新生成的任务ID
-            returnMap.put("taskId", newUserTask.getId());
 
-            // 有人查看或转发“我”分享的任务时，“我”获10颗
-            // 猎豆追加 本人（10颗） * 猎人等级倍数
-            SUser user2 = this.userService.getById(userTask.getUserId());
-            SUserLevel userLevel2 = this.userLevelService.getById(user2.getUserLevelId());
-            user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-            this.userService.updateById(user2);
-
-            // 猎豆流水插入
-            SUserBeanLog userBeanLog = new SUserBeanLog();
-            userBeanLog.setUserId(user2.getId());
-            userBeanLog.setChangeType(7);
-            userBeanLog.setChangeAmount(userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-            userBeanLog.setChangeTime(new Date());
-            userBeanLog.setRelationId(userTask.getId());
-            userBeanLog.setRemark("关联任务ID");
-            userBeanLog.setOldAmount(user.getCanuseBean());
-            this.userBeanLogService.save(userBeanLog);
+        // 如果是本人打开自己的分享页面时，直接返回
+        if (userTask.getUserId() == user.getId()) {
+            returnMap.put("taskId", userTask.getId());
         } else {
-            returnMap.put("taskId", userTaskOne.get(0).getId());
+
+            // 第一次打开的话，生成新任务（未支付  未分享）
+            SUserTask searchUserTask = new SUserTask();
+            searchUserTask.setUserId(user.getId());
+            searchUserTask.setProductId(userTask.getProductId());
+            searchUserTask.setParentId(userTaskId);
+            List<SUserTask> userTaskOne = this.userTaskService.findUserTaskList(searchUserTask);
+            Long newTaskId;
+            if (userTaskOne == null || userTaskOne.size() == 0) {
+                searchUserTask.setPayStatus(2);
+                searchUserTask.setTaskNumber(1);
+                searchUserTask.setStatus(0);
+                searchUserTask.setShareFlag(0);
+                searchUserTask.setCreateTime(new Date());
+                searchUserTask.setUpdateTime(new Date());
+                SUserTask newUserTask = this.userTaskService.createUserTask(searchUserTask);
+                // 新生成的任务ID
+                returnMap.put("taskId", newUserTask.getId());
+
+                // 有人查看或转发“我”分享的任务时，“我”获10颗
+                // 猎豆追加 本人（10颗） * 猎人等级倍数
+                SUser user2 = this.userService.getById(userTask.getUserId());
+                SUserLevel userLevel2 = this.userLevelService.getById(user2.getUserLevelId());
+                user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+                this.userService.updateById(user2);
+
+                // 猎豆流水插入
+                SUserBeanLog userBeanLog = new SUserBeanLog();
+                userBeanLog.setUserId(user2.getId());
+                userBeanLog.setChangeType(7);
+                userBeanLog.setChangeAmount(userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+                userBeanLog.setChangeTime(new Date());
+                userBeanLog.setRelationId(userTask.getId());
+                userBeanLog.setRemark("关联任务ID");
+                userBeanLog.setOldAmount(user.getCanuseBean());
+                this.userBeanLogService.save(userBeanLog);
+            } else {
+                returnMap.put("taskId", userTaskOne.get(0).getId());
+            }
         }
 
         response.data(returnMap);
