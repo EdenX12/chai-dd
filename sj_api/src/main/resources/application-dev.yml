@@ -21,7 +21,7 @@ spring:
           username: root
           password: jianpan@123
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://47.100.130.18:3306/febs?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+          url: jdbc:mysql://47.100.130.18:3306/febs?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
   aop:
     proxy-target-class: true
 
