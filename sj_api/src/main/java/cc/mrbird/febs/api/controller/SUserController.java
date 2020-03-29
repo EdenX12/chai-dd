@@ -261,7 +261,11 @@ public class SUserController extends BaseController {
         for (SUser user1 : userList1) {
             parentIds2.add(user1.getId());
         }
-        List<SUser> userList2 = userService.findByParentId(parentIds2);
+
+        List<SUser> userList2 = new ArrayList();
+        if (parentIds2 != null && parentIds2.size() >0 ) {
+            userList2 = userService.findByParentId(parentIds2);
+        }
         returnMap.put("levelCount2", userList2.size());
 
         // 三级组织人数
@@ -269,7 +273,10 @@ public class SUserController extends BaseController {
         for (SUser user2 : userList2) {
             parentIds3.add(user2.getId());
         }
-        List<SUser> userList3 = userService.findByParentId(parentIds3);
+        List<SUser> userList3 = new ArrayList();
+        if (parentIds3 != null && parentIds3.size() > 0) {
+            userList3 = userService.findByParentId(parentIds3);
+        }
         returnMap.put("levelCount3", userList3.size());
 
         // 四级组织人数
@@ -277,7 +284,10 @@ public class SUserController extends BaseController {
         for (SUser user3 : userList3) {
             parentIds4.add(user3.getId());
         }
-        List<SUser> userList4 = userService.findByParentId(parentIds4);
+        List<SUser> userList4 = new ArrayList();
+        if (parentIds4 != null && parentIds4.size() > 0) {
+            userList4 = userService.findByParentId(parentIds4);
+        }
         returnMap.put("levelCount4", userList4.size());
 
         // 预备队人数

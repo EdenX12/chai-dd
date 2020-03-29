@@ -39,7 +39,6 @@ public class SUserServiceImpl extends ServiceImpl<SUserMapper, SUser> implements
 		LambdaQueryWrapper<SUser> queryWrapper = new LambdaQueryWrapper<SUser>();
 
 		// 上级用户ID
-		if(parentIds!=null&&parentIds.size()>0)
 		queryWrapper.in(SUser::getParentId, parentIds);
 
 		return this.baseMapper.selectList(queryWrapper);
