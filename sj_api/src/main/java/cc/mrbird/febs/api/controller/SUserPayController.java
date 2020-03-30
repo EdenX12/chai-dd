@@ -356,16 +356,21 @@ public class SUserPayController extends BaseController {
 
                     // 躺赢收益
                     SUserBonusLog userBonusLog = new SUserBonusLog();
-                    userBonusLog.setUserId(userTasked.getUserId());
-                    userBonusLog.setTaskId(userTasked.getId());
-                    userBonusLog.setOrderId(order.getId());
-                    userBonusLog.setBonusType(4);
-                    userBonusLog.setBonusAmount(everyReward);
-                    userBonusLog.setCreateTime(new Date());
-                    userBonusLog.setStatus(0);
-                    userBonusLog.setTaskNumber(userTasked.getTaskNumber());
 
-                    this.userBonusLogService.save(userBonusLog);
+                    // 独赢的人 不分得躺赢收益
+                    if (order.getUserId() != userTasked.getUserId() || order.getTaskId() != userTasked.getId()) {
+
+                        userBonusLog.setUserId(userTasked.getUserId());
+                        userBonusLog.setTaskId(userTasked.getId());
+                        userBonusLog.setOrderId(order.getId());
+                        userBonusLog.setBonusType(4);
+                        userBonusLog.setBonusAmount(everyReward);
+                        userBonusLog.setCreateTime(new Date());
+                        userBonusLog.setStatus(0);
+                        userBonusLog.setTaskNumber(userTasked.getTaskNumber());
+
+                        this.userBonusLogService.save(userBonusLog);
+                    }
 
                     // 任务金解冻入账
                     userBonusLog = new SUserBonusLog();
