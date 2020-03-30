@@ -53,9 +53,6 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     @Override
     public SOrder updateOrder(SOrder order) {
 
-        SUser user = FebsUtil.getCurrentUser();
-        order.setUserId(user.getId());
-
         LambdaQueryWrapper<SOrder> queryWrapper = new LambdaQueryWrapper<SOrder>();
 
         // 用户ID

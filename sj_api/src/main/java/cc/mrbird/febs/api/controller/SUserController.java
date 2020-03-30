@@ -132,8 +132,8 @@ public class SUserController extends BaseController {
 		//System.out.println(jsonStr);
 		JSONObject object = JSONObject.parseObject(jsonStr);
 		String openId=object.getString("openid");
-    	//JSONObject object=null;
-    	//String openId="ojuKPv844Q3LBwRTCh_3mxFfLehM";
+//    	JSONObject object=null;
+//    	String openId="ojuKPv_-zqTPidaHx4V_OSx7HYrA";
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
