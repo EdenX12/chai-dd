@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vdurmont.emoji.EmojiParser;
 
 import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.service.ISUserService;
@@ -159,7 +160,7 @@ public class SUserController extends BaseController {
     	    		String pic=object1.getString("headimgurl");
     	    		String sex=object1.getString("sex");
     	    		Object unionid=object1.get("unionid");
-    	    		nick=ContentUtil.getString(nick);
+    	    		nick=EmojiParser.removeAllEmojis(nick);
                 // 创建用户
                 su = new SUser();
                 su.setOpenId(openId);
