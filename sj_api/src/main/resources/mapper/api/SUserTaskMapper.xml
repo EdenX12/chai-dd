@@ -287,13 +287,13 @@
                 p.task_price taskPrice,
                 p.price_unit priceUnit,
 
-                bonus3.bonus_amount successReward,
+                ifnull(bonus3.bonus_amount, 0) successReward,
                 u.user_name successUserName,
                 u.nick_name successNickName,
                 u.user_phone successUserPhone,
 
-                bonus4.bonus_amount everyReward,
-                bonus5.bonus_amount levelReReward,
+                ifnull(bonus4.bonus_amount, 0) everyReward,
+                ifnull(bonus5.bonus_amount, 0) levelReReward,
 
                 ifnull(watchTask.watchCnt, 0) watchCnt,
                 ifnull(gotTask.hunterCnt, 0) hunterCnt

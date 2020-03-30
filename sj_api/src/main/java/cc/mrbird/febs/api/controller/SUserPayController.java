@@ -141,7 +141,7 @@ public class SUserPayController extends BaseController {
 
         // 支付金额
         String total_fee = map.get("total_fee").toString();
-        BigDecimal total = new BigDecimal(total_fee).divide(new BigDecimal("100"));
+        BigDecimal total = new BigDecimal(total_fee).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
 
         // openId
         String openid = map.get("openid").toString();
@@ -281,8 +281,8 @@ public class SUserPayController extends BaseController {
                         this.taskOrderService.updateById(taskOrdering);
                     }
 
-                    // 3.用户任务表状态更新（转让中 -> 任务完结）
-                    userTasking.setStatus(3);
+                    // 3.用户任务表状态更新（转让中 -> 已接任务   -->下面会变为任务完结）
+                    userTasking.setStatus(0);
                     this.userTaskService.updateById(userTasking);
                 }
 
@@ -326,7 +326,10 @@ public class SUserPayController extends BaseController {
                     this.userBonusLogService.save(userBonusLog);
 
                     // 每份任务的躺赢收益
-                    everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.5)).divide(BigDecimal.valueOf(totalTaskNumberOther));
+                    if (totalTaskNumberOther != 0) {
+                        everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.5)).divide(
+                                new BigDecimal(totalTaskNumberOther), 2, BigDecimal.ROUND_HALF_UP);
+                    }
                 } else {
 
                     SUserBonusLog userBonusLog = new SUserBonusLog();
@@ -342,7 +345,11 @@ public class SUserPayController extends BaseController {
                     this.userBonusLogService.save(userBonusLog);
 
                     // 每份任务的躺赢收益
-                    everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.valueOf(totalTaskNumberOther));
+                    if (totalTaskNumberOther != 0) {
+                        everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.8)).divide(
+                                new BigDecimal(totalTaskNumberOther), 2, BigDecimal.ROUND_HALF_UP);
+                    }
+
                 }
 
                 for (SUserTask userTasked : userTaskList) {
