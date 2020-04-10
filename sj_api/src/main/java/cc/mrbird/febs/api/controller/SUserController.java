@@ -173,7 +173,6 @@ public class SUserController extends BaseController {
                 su.setTotalAmount(BigDecimal.ZERO);
                 su.setUserImg(pic);
                 su.setUserLevelId(1L);
-                su.setUserName(nick);
                 su.setUnionId(unionid);
                 this.userService.createUser(su);
                 su = userService.findByOpenId(openId);
