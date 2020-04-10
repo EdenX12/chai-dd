@@ -100,4 +100,6 @@ public class SUser implements Serializable {
      * 上级id
      */
     private Long parentId;
+
+    private String unionId;
 }

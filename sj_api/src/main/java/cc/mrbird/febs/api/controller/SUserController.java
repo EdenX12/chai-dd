@@ -159,7 +159,7 @@ public class SUserController extends BaseController {
     	    		String nick=object1.getString("nickname");
     	    		String pic=object1.getString("headimgurl");
     	    		String sex=object1.getString("sex");
-    	    		Object unionid=object1.get("unionid");
+    	    		String unionid=object1.getString("unionid");
     	    		nick=EmojiParser.removeAllEmojis(nick);
                 // 创建用户
                 su = new SUser();
@@ -174,6 +174,7 @@ public class SUserController extends BaseController {
                 su.setUserImg(pic);
                 su.setUserLevelId(1L);
                 su.setUserName(nick);
+                su.setUnionId(unionid);
                 this.userService.createUser(su);
                 su = userService.findByOpenId(openId);
             }
