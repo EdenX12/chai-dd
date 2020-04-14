@@ -71,40 +71,40 @@ public class SUserTaskController extends BaseController {
         try {
 
             SUser user = FebsUtil.getCurrentUser();
+            userTask.setUserId(user.getId());
 
-            // 最大购买份数判断
-            SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+            // 每件商品最高领取任务线判断
+            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
 
-            // 已购买任务  （现在 转让成功 的 也算在内  后续可能需要调整）
-            SUserTask oldUserTask = new SUserTask();
-            oldUserTask.setUserId(user.getId());
-            oldUserTask.setPayStatus(1);
-            oldUserTask.setProductId(userTask.getProductId());
-            List<SUserTask> oldUserTaskList = this.userTaskService.findUserTaskList(oldUserTask);
-            int oldTaskNumber = 0;
-            for (SUserTask userTask1 : oldUserTaskList) {
-                oldTaskNumber = oldTaskNumber + userTask1.getTaskNumber();
-            }
-
-            // 上限不仅是这次的领取份数要加上之前的领取份数
-            if (oldTaskNumber + userTask.getTaskNumber() > userLevel.getBuyNumber()) {
+            if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
                 response.put("code", 1);
                 response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
                 return response;
             }
 
-            // 老手不能购买新手标
+            // 新手只能购买新手标  其他只能购买正常标
             SProduct product = this.productService.getById(userTask.getProductId());
 
-            if (userLevel.getLevelType() > 1 && product.getProductType() == 1) {
-
+            if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
                 response.put("code", 1);
-                response.message("抱歉！您已不能领取新手任务！");
+                response.message("抱歉！您现在只能在新手区领取新手任务！");
                 return response;
             }
 
-            // 用户ID
-            userTask.setUserId(user.getId());
+            if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
+                response.put("code", 1);
+                response.message("抱歉！您已经不能再次领取新手任务！");
+                return response;
+            }
+
+            // 最多并行商品件数
+            Integer productCount = this.userTaskService.findProductCount(userTask);
+
+            if (productCount >= userLevel.getProductNumber()) {
+                response.put("code", 1);
+                response.message("抱歉！您已超过领取商品件数的任务！");
+                return response;
+            }
 
             if (userTask.getId() == null) {
                 userTask.setPayStatus(2);
@@ -168,7 +168,7 @@ public class SUserTaskController extends BaseController {
 
             if (userTask.getShareFlag() == 0) {
 
-                SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+                SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
                 this.userService.updateById(user);
 
@@ -256,7 +256,7 @@ public class SUserTaskController extends BaseController {
         }
 
         // 辛苦费 见习猎人分0.5%; 初级猎手分1% 中级猎人分2% 高级猎人分3%
-        SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+        SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
         returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
 
@@ -286,7 +286,7 @@ public class SUserTaskController extends BaseController {
                 // 有人查看或转发“我”分享的任务时，“我”获10颗
                 // 猎豆追加 本人（10颗） * 猎人等级倍数
                 SUser user2 = this.userService.getById(userTask.getUserId());
-                SUserLevel userLevel2 = this.userLevelService.getById(user2.getUserLevelId());
+                SUserLevel userLevel2 = this.userLevelService.findByLevelType(user2.getUserLevelType());
                 user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
                 this.userService.updateById(user2);
 

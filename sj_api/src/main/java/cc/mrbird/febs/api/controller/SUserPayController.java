@@ -181,7 +181,7 @@ public class SUserPayController extends BaseController {
 
                 // 用户冻结金额追加  猎豆追加  领取任务的人（20颗）  * 猎人等级倍数
                 SUser user = this.userService.getById(userTask.getUserId());
-                SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+                SUserLevel userLevel = userLevelService.findByLevelType(user.getUserLevelType());
                 user.setLockAmount(user.getLockAmount().add(total));
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
                 // 领取任务次数 + 1
@@ -189,13 +189,13 @@ public class SUserPayController extends BaseController {
                 user.setTaskCount(taskCount);
                 // 变更个人等级
                 List<SUserLevel> userLevelList = userLevelService.list();
-                Long userLevelId = null;
+                Integer userLevelType = null;
                 for (SUserLevel userLevelAll : userLevelList) {
                     if (taskCount>= userLevelAll.getMinNumber() && taskCount <= userLevelAll.getMaxNumber()) {
-                        userLevelId = userLevelAll.getId();
+                        userLevelType = userLevelAll.getLevelType();
                     }
                 }
-                user.setUserLevelId(userLevelId);
+                user.setUserLevelType(userLevelType);
 
                 // 若是第一次领取任务成功，形成正式上下级绑定关系
                 if (user.getParentId() == null && userTask.getParentId() != null&&userTask.getParentId()>0) {
@@ -413,7 +413,7 @@ public class SUserPayController extends BaseController {
 
                 // （如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
                 for (SUser user0 : userList) {
-                    SUserLevel userLevel = this.userLevelService.getById(user0.getUserLevelId());
+                    SUserLevel userLevel = userLevelService.findByLevelType(user0.getUserLevelType());
 
                     SUserBonusLog userBonusLog = new SUserBonusLog();
                     userBonusLog.setUserId(user0.getId());
@@ -447,7 +447,7 @@ public class SUserPayController extends BaseController {
 
                 // 用户冻结金额追加   每参与一次任务报价 （10颗） * 猎人等级倍数
                 SUser user = this.userService.getById(offerPrice.getUserId());
-                SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+                SUserLevel userLevel = userLevelService.findByLevelType(user.getUserLevelType());
                 user.setLockAmount(user.getLockAmount().add(total));
                 user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
                 this.userService.updateById(user);

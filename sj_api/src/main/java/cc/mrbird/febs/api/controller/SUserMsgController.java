@@ -36,9 +36,10 @@ public class SUserMsgController extends BaseController {
     public FebsResponse getUserMsg(QueryRequest queryRequest, SUserMsg userMsg)  {
 
         FebsResponse response = new FebsResponse();
-        //如果userType!=1 只能查询当前登录人的
+
+        // 如果userType!=1 只能查询当前登录人的
         SUser user = FebsUtil.getCurrentUser();
-        if(userMsg.getMsgType()==null) {
+        if (userMsg.getMsgType() == null) {
             userMsg.setUserId(user.getId());
         }
 

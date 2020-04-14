@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author MrBird
@@ -79,7 +80,6 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
     public SUserAddress addUserAddress(SUserAddress userAddress) {
 
         userAddress.setCreateTime(new Date());
-
         this.baseMapper.insert(userAddress);
         return userAddress;
     }

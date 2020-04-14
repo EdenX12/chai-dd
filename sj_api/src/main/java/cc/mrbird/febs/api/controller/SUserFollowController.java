@@ -66,7 +66,7 @@ public class SUserFollowController extends BaseController {
             userFollow = this.userFollowService.createUserFollow(userFollow);
 
             // 每关注一个任务（任务广场，转让中心），（10颗） * 猎人等级倍数
-            SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
             user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
 
@@ -111,7 +111,7 @@ public class SUserFollowController extends BaseController {
             userFollow = this.userFollowService.updateUserFollow(userFollow);
 
             // 每取消一个任务（任务广场，转让中心），（-10颗） * 猎人等级倍数
-            SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
             user.setCanuseBean(user.getCanuseBean() - userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
 

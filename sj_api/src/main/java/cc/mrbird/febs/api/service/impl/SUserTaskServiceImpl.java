@@ -50,13 +50,46 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
             queryWrapper.eq(SUserTask::getStatus, userTask.getStatus());
         }
 
-        // 上级任务ID
-        if (userTask.getParentId() != null) {
-            queryWrapper.eq(SUserTask::getParentId, userTask.getParentId());
-        }
-
         return this.baseMapper.selectList(queryWrapper);
     }
+
+    @Override
+    public Integer findProductCount(SUserTask userTask) {
+
+        LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
+
+        // 用户ID
+        queryWrapper.eq(SUserTask::getUserId, userTask.getUserId());
+
+        // 商品ID
+        queryWrapper.eq(SUserTask::getProductId, userTask.getProductId());
+
+        // 支付状态
+        queryWrapper.eq(SUserTask::getPayStatus, 1);
+
+        // 状态  0 已接任务  1 转让中 3 任务完结  进行中+结算中
+        List status = new ArrayList();
+        status.add(0);
+        status.add(1);
+        status.add(3);
+        queryWrapper.in(SUserTask::getStatus, status);
+
+        List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
+
+        List<String> productIdList = new ArrayList();
+        for (SUserTask userTask1 : userTaskList) {
+            productIdList.add(userTask1.getProductId());
+        }
+
+        // 去掉重复商品ID
+        Set set = new HashSet();
+        set.addAll(productIdList);
+        productIdList.clear();
+        productIdList.addAll(set);
+
+        return productIdList.size();
+    }
+
 
     @Override
     public SUserTask createUserTask(SUserTask userTask) {
@@ -146,7 +179,7 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
-    public List<Long> findUserIdsByParent(Long userId) {
+    public List<String> findUserIdsByParent(String userId) {
 
         LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
 
@@ -154,12 +187,12 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
 
         List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
 
-        List<Long> userIds = new ArrayList();
+        List<String> userIds = new ArrayList();
 
         for (SUserTask userTask : userTaskList) {
 
             LambdaQueryWrapper<SUserTask> queryWrapper1 = new LambdaQueryWrapper<SUserTask>();
-            queryWrapper1.eq(SUserTask::getParentId, userTask.getId());
+
 
             List<SUserTask> userTaskList2 = this.baseMapper.selectList(queryWrapper1);
             for (SUserTask userTask2 : userTaskList2) {

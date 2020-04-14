@@ -62,6 +62,12 @@ public class SUserController extends BaseController {
 
     private String message;
 
+    @Value("${weChat.app_id}")
+    private String appId;
+
+    @Value("${weChat.app_secret}")
+    private String appSecret;
+
 	@Autowired
     private FebsProperties properties;
 
@@ -82,13 +88,10 @@ public class SUserController extends BaseController {
 
     @Autowired
     private ISUserTaskService userTaskService;
-    @Value("${weChat.app_id}")
-    private String appId;
 
-    @Value("${weChat.app_secret}")
-    private String appSecret;
     @Autowired
     private ITokenService tokenService;
+
     /**
      * 临时用一下 因为我的前端访问链接里带# 微信处理这种链接会出错
      * @param code
@@ -98,19 +101,18 @@ public class SUserController extends BaseController {
     public ModelAndView indexUtil(String code) {
     	ModelAndView mav=new ModelAndView("redirect:http://www.person-info.com/#/index?code="+code);
 		return mav;
-    	
     }
+
     @RequestMapping("/customer")
     public ModelAndView indexUtil(String code,String tId) {
     	ModelAndView mav=new ModelAndView("redirect:http://www.person-info.com/#/taskForCustomer/"+tId+"?code="+code);
 		return mav;
-    	
     }
+
     @RequestMapping("/forshare")
     public ModelAndView forshare(String id) {
     	ModelAndView mav=new ModelAndView("redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx84e3a803bae71f3a&redirect_uri=http%3a%2f%2fwww.person-info.com%2fweb%2fapi%2fs-user%2fcustomer%3ftId%3d"+id+"&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect");
 		return mav;
-    	
     }
 
     /**
@@ -146,21 +148,23 @@ public class SUserController extends BaseController {
             SUser su = userService.findByOpenId(openId);
 
             if (su == null) {
-            	//查询用户信息
+
+            	// 查询用户信息
             	String newToke=object.getString("access_token");
     				
-    	    		//请求微信头像
-    	    		Map<String, String> params1=new HashMap<String, String>();
-    	        	params1.put("access_token",newToke);
-    	        	params1.put("openid",object.getString("openid"));
-    	        	params1.put("lang","zh_CN");
-    	    		String 	aa = HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/userinfo", params1, "utf-8");
-    	    		JSONObject object1 = JSONObject.parseObject(aa);
-    	    		String nick=object1.getString("nickname");
-    	    		String pic=object1.getString("headimgurl");
-    	    		String sex=object1.getString("sex");
-    	    		String unionid=object1.getString("unionid");
-    	    		nick=EmojiParser.removeAllEmojis(nick);
+                // 请求微信头像
+                Map<String, String> params1=new HashMap<String, String>();
+                params1.put("access_token",newToke);
+                params1.put("openid",object.getString("openid"));
+                params1.put("lang","zh_CN");
+                String 	aa = HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/userinfo", params1, "utf-8");
+                JSONObject object1 = JSONObject.parseObject(aa);
+                String nick=object1.getString("nickname");
+                String pic=object1.getString("headimgurl");
+                String sex=object1.getString("sex");
+                String unionid=object1.getString("unionid");
+                nick=EmojiParser.removeAllEmojis(nick);
+
                 // 创建用户
                 su = new SUser();
                 su.setOpenId(openId);
@@ -172,7 +176,7 @@ public class SUserController extends BaseController {
                 su.setTaskCount(0);
                 su.setTotalAmount(BigDecimal.ZERO);
                 su.setUserImg(pic);
-                su.setUserLevelId(1L);
+                su.setUserLevelType(0);
                 su.setUnionId(unionid);
                 this.userService.createUser(su);
                 su = userService.findByOpenId(openId);
@@ -194,10 +198,12 @@ public class SUserController extends BaseController {
 
         return response;
     }
-	 @PostMapping("/getJsInfo")
-	 @Limit(key = "getJsInfo", period = 60, count = 20, name = "获取jssdk加密信息", prefix = "limit")
+
+    @PostMapping("/getJsInfo")
+    @Limit(key = "getJsInfo", period = 60, count = 20, name = "获取jssdk加密信息", prefix = "limit")
 	public FebsResponse getJsInfo(String url) throws Exception {
-		 //先url解码
+
+		 // 先url解码
 		 url=URLDecoder.decode(url);
 		 Map<String,Object> map=new HashMap<String,Object>();
 		 map.put("noncestr","e-rongque" );
@@ -212,7 +218,6 @@ public class SUserController extends BaseController {
 		 response.put("code", 0);
 		 response.put("data", map);
 		 return response;
-		 
 	 }
 
     /**
@@ -243,7 +248,7 @@ public class SUserController extends BaseController {
         // 冻结金额
         returnMap.put("lockAmount", user.getLockAmount());
         // 等级名称
-        SUserLevel userLevel = userLevelService.getById(user.getUserLevelId());
+        SUserLevel userLevel = userLevelService.findByLevelType(user.getUserLevelType());
         returnMap.put("levelName", userLevel.getLevelName());
         // 未读消息数
         SUserMsg userMsg = new SUserMsg();
@@ -292,7 +297,7 @@ public class SUserController extends BaseController {
         returnMap.put("levelCount4", userList4.size());
 
         // 预备队人数
-        List<Long> userIds = userTaskService.findUserIdsByParent(user.getId());
+        List<String> userIds = userTaskService.findUserIdsByParent(user.getId());
         returnMap.put("reserveCount", userIds.size());
 
         response.data(returnMap);

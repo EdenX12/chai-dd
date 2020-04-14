@@ -2,22 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserMsgMapper">
 
-        <!-- 通用查询映射结果 -->
-        <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserMsg">
-                <result column="id" property="id" />
-                    <result column="user_id" property="userId" />
-                    <result column="msg_time" property="msgTime" />
-                    <result column="status" property="status" />
-                    <result column="msg_type" property="msgType" />
-                    <result column="msg_title" property="msgTitle" />
-                    <result column="msg_info" property="msgInfo" />
-        </resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserMsg">
+        <result column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="msg_time" property="msgTime" />
+        <result column="status" property="status" />
+        <result column="msg_type" property="msgType" />
+        <result column="msg_title" property="msgTitle" />
+        <result column="msg_info" property="msgInfo" />
+    </resultMap>
 
-        <!-- 通用查询结果列 -->
-        <sql id="Base_Column_List">
-                id,
-            user_id, msg_time, status, msg_type, msg_title, msg_info
-        </sql>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, msg_time, status, msg_type, msg_title, msg_info
+    </sql>
 
     
 </mapper>

@@ -23,8 +23,11 @@ public class SProduct implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 商品分类
@@ -116,6 +119,25 @@ public class SProduct implements Serializable {
      */
     private Integer productType;
 
+    /**
+     * 显示顺序
+     */
+    private Integer sOrder;
+
+    /**
+     * 商品数量也是任务线总数
+     */
+    private Integer totalNumber;
+
+    /**
+     * 任务有效天数
+     */
+    private Integer validDays;
+
+    /**
+     * 商品标签
+     */
+    private String productTag;
 
     /**
      * 商品已领任务数量
@@ -130,7 +152,7 @@ public class SProduct implements Serializable {
     /**
      * 用户ID
      */
-    private transient Long userId;
+    private transient String userId;
 
     /**
      * 是否已关注商品（1：已关注  0：未关注）

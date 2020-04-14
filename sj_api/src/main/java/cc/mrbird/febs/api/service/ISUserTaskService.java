@@ -35,6 +35,14 @@ public interface ISUserTaskService extends IService<SUserTask> {
     List<SUserTask> findUserTaskList(SUserTask userTask);
 
     /**
+     * 检索进行中+结算中 并行商品数量
+     *
+     * @param userTask SUserTask
+     @return 商品数量
+     */
+    Integer findProductCount(SUserTask userTask);
+
+    /**
      * 查询我的任务【进行中】列表
      *
      * @param userTask SUserTask
@@ -85,5 +93,5 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @param userId Long
      * @return List
      */
-    List<Long> findUserIdsByParent(Long userId);
+    List<String> findUserIdsByParent(String userId);
 }

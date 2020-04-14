@@ -145,7 +145,7 @@ public class SOfferPriceController extends BaseController {
             SUserTask userTaskNew = new SUserTask();
             userTaskNew.setUserId(offerPrice.getUserId());
             userTaskNew.setProductId(userTaskOld.getProductId());
-            userTaskNew.setParentId(userTaskOld.getParentId());
+
             userTaskNew.setPayStatus(userTaskOld.getPayStatus());
             userTaskNew.setTaskNumber(userTaskOld.getTaskNumber());
             userTaskNew.setStatus(0);

@@ -22,23 +22,26 @@ public class SUserFollow implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 用户id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 产品id
      */
-    private Long productId;
+    private String productId;
 
     /**
      * 转让任务id
      */
-    private Long taskOrderId;
+    private String taskOrderId;
 
     /**
      * 关注类别

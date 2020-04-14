@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -23,8 +22,11 @@ public class SProductType implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 分类名称
@@ -49,7 +51,7 @@ public class SProductType implements Serializable {
     /**
      * 创建人
      */
-    private Long createUser;
+    private String createUser;
 
     /**
      * 更新日期
@@ -59,5 +61,5 @@ public class SProductType implements Serializable {
     /**
      * 更新人
      */
-    private Long updateUser;
+    private String updateUser;
 }

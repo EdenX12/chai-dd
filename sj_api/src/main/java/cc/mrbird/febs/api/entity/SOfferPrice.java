@@ -23,8 +23,11 @@ public class SOfferPrice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 出价金额
@@ -39,12 +42,12 @@ public class SOfferPrice implements Serializable {
     /**
      * 任务转让主键
      */
-    private Long taskOrderId;
+    private String taskOrderId;
 
     /**
      * 竞标人
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 0 未支付 1 已支付

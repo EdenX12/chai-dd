@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author MrBird
@@ -27,7 +28,6 @@ public class SUserServiceImpl extends ServiceImpl<SUserMapper, SUser> implements
 
 		// 创建用户
 		user.setCreateTime(new Date());
-
 		this.baseMapper.insert(user);
 
 		return user;

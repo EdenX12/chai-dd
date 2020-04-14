@@ -22,13 +22,16 @@ public class SUserMsg implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 用户id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 消息日期

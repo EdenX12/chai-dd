@@ -23,13 +23,16 @@ public class SUserAmountLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 关联的用户
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 变动类型 1 充值 2 提现 3 独赢奖励 4 躺赢奖励 5 提现驳回 6任务转让收入 7 其他
@@ -59,7 +62,7 @@ public class SUserAmountLog implements Serializable {
     /**
      * 关联的id 充值关联的充值记录 转让关联的转让记录 赢关联任务 提现关联提现申请
      */
-    private Long relationId;
+    private String relationId;
 
     /**
      * 变动之前的金额

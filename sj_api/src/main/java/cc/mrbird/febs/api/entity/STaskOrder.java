@@ -23,18 +23,21 @@ public class STaskOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 任务id
      */
-    private Long taskId;
+    private String taskId;
 
     /**
      * 用户id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 转让分数

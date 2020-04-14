@@ -23,13 +23,16 @@ public class SUserWithdraw implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 提现人
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 申请日期

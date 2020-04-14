@@ -25,7 +25,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
     public IPage<SProduct> findProductList(SProduct product, QueryRequest request) {
         try {
             Page<SProduct> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "updateTime", FebsConstant.ORDER_DESC, false);
+            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
             return this.baseMapper.findProductDetail(page, product);
         } catch (Exception e) {

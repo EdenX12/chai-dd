@@ -2,23 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserLevelMapper">
 
-        <!-- 通用查询映射结果 -->
-        <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserLevel">
-                <result column="id" property="id" />
-                    <result column="level_type" property="levelType" />
-                    <result column="level_name" property="levelName" />
-                    <result column="min_number" property="minNumber" />
-                    <result column="max_number" property="maxNumber" />
-                    <result column="bean_rate" property="beanRate" />
-                    <result column="income_rate" property="incomeRate" />
-                    <result column="buy_number" property="buyNumber" />
-        </resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserLevel">
+        <result column="id" property="id" />
+        <result column="level_type" property="levelType" />
+        <result column="level_name" property="levelName" />
+        <result column="min_number" property="minNumber" />
+        <result column="max_number" property="maxNumber" />
+        <result column="bean_rate" property="beanRate" />
+        <result column="income_rate" property="incomeRate" />
+        <result column="buy_number" property="buyNumber" />
+    </resultMap>
 
-        <!-- 通用查询结果列 -->
-        <sql id="Base_Column_List">
-                id, level_type,
-            level_name, min_number, max_number, bean_rate, income_rate, buy_number
-        </sql>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, level_type, level_name, min_number, max_number, bean_rate, income_rate, buy_number
+    </sql>
 
     
 </mapper>

@@ -23,8 +23,11 @@ public class SUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 用户名（先写手机号）
@@ -87,9 +90,9 @@ public class SUser implements Serializable {
     private Integer taskCount;
 
     /**
-     * 用户等级 用户等级表主键  1 初级猎人 2。。。
+     * 用户等级 0：新人 1：见习猎人 2：初级猎人 3：中级猎人 4：高级猎人
      */
-    private Long userLevelId;
+    private Integer userLevelType;
 
     /**
      * 可以使用的猎豆数量
@@ -101,5 +104,18 @@ public class SUser implements Serializable {
      */
     private Long parentId;
 
+    /**
+     * 1、普通客户；2-商家；；3-拆家；4-即是拆家也是商家
+     */
+    private Integer userType;
+
+    /**
+     * 微信unionid
+     */
     private String unionId;
+
+    /**
+     * 最后一次登录时间
+     */
+    private Date lastLogin;
 }

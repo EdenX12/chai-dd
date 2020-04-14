@@ -2,31 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserAddressMapper">
 
-        <!-- 通用查询映射结果 -->
-        <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserAddress">
-            <result column="id" property="id" />
-            <result column="user_id" property="userId" />
-            <result column="true_name" property="trueName" />
-            <result column="province_id" property="provinceId" />
-            <result column="province_name" property="provinceName" />
-            <result column="city_id" property="cityId" />
-            <result column="city_name" property="cityName" />
-            <result column="area_id" property="areaId" />
-            <result column="area_name" property="areaName" />
-            <result column="area_info" property="areaInfo" />
-            <result column="tel_phone" property="telPhone" />
-            <result column="mob_phone" property="mobPhone" />
-            <result column="is_default" property="isDefault" />
-            <result column="zip_code" property="zipCode" />
-            <result column="create_time" property="createTime" />
-            <result column="update_time" property="updateTime" />
-        </resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserAddress">
+        <result column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="true_name" property="trueName" />
+        <result column="province_id" property="provinceId" />
+        <result column="province_name" property="provinceName" />
+        <result column="city_id" property="cityId" />
+        <result column="city_name" property="cityName" />
+        <result column="area_id" property="areaId" />
+        <result column="area_name" property="areaName" />
+        <result column="area_info" property="areaInfo" />
+        <result column="tel_phone" property="telPhone" />
+        <result column="mob_phone" property="mobPhone" />
+        <result column="is_default" property="isDefault" />
+        <result column="zip_code" property="zipCode" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
 
-        <!-- 通用查询结果列 -->
-        <sql id="Base_Column_List">
-                id,
-            user_id, true_name, province_id, province_name, city_id, city_name, area_id, area_name, area_info, tel_phone, mob_phone, is_default, zip_code, create_time, update_time
-        </sql>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, true_name, province_id, province_name, city_id, city_name, area_id,
+        area_name, area_info, tel_phone, mob_phone, is_default, zip_code, create_time, update_time
+    </sql>
 
     
 </mapper>

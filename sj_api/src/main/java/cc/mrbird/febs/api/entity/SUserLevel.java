@@ -22,8 +22,11 @@ public class SUserLevel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 等级类型
@@ -56,7 +59,12 @@ public class SUserLevel implements Serializable {
     private BigDecimal incomeRate;
 
     /**
-     * 最大购买分数
+     * 最大购买任务线数量
      */
     private Integer buyNumber;
+
+    /**
+     * 最多并行商品数量
+     */
+    private Integer productNumber;
 }

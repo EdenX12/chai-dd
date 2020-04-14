@@ -8,4 +8,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISUserLevelService extends IService<SUserLevel> {
 
+    /**
+     * 根据用户等级查询
+     * @param userLevelType Integer
+     * @return SUserLevel
+     */
+    SUserLevel findByLevelType(Integer userLevelType);
 }

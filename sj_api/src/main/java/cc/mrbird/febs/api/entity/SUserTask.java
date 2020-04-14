@@ -23,23 +23,22 @@ public class SUserTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 用户id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 产品id
      */
-    private Long productId;
+    private String productId;
 
-    /**
-     * 上级id
-     */
-    private Long parentId;
 
     /**
      * 状态 1 已支付 2 不支付
@@ -62,7 +61,7 @@ public class SUserTask implements Serializable {
     private Integer taskNumber;
 
     /**
-     * 0 已接任务 （任务完成时联合支付状态分佣金 ） 1 转让中 2 转让成功 3 任务完结 4 佣金已入账
+     * 0 已接任务 1 转让中 2 转让成功 3 任务完结 4 佣金已入账
      */
     private Integer status;
 

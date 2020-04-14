@@ -22,13 +22,16 @@ public class SUserBeanLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 关联的用户
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 变动类型 1 下线奖励 2 。。
@@ -58,7 +61,7 @@ public class SUserBeanLog implements Serializable {
     /**
      * 关联的id
      */
-    private Long relationId;
+    private String relationId;
 
     /**
      * 变动之前的猎豆

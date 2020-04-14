@@ -23,8 +23,11 @@ public class SOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 订单编号
@@ -34,12 +37,12 @@ public class SOrder implements Serializable {
     /**
      * 用户ID
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 任务ID
      */
-    private Long taskId;
+    private String taskId;
 
     /**
      * 支付方式
@@ -79,7 +82,7 @@ public class SOrder implements Serializable {
     /**
      * 收货地址id
      */
-    private Long addressId;
+    private String addressId;
 
     /**
      * 订单应付金额
@@ -119,7 +122,7 @@ public class SOrder implements Serializable {
     /**
      * 产品id
      */
-    private Long productId;
+    private String productId;
 
     /**
      * 购买数量

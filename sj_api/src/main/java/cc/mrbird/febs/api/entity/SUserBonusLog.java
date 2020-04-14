@@ -23,23 +23,26 @@ public class SUserBonusLog implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 用户ID
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 任务ID
      */
-    private Long taskId;
+    private String taskId;
 
     /**
      * 购买订单ID
      */
-    private Long orderId;
+    private String orderId;
 
     /**
      * 任务份数

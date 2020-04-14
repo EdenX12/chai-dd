@@ -23,8 +23,11 @@ public class SUserPay implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type= IdType.UUID)
+    private String id;
 
     /**
      * 订单号
@@ -34,7 +37,7 @@ public class SUserPay implements Serializable {
     /**
      * 用户id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 创建日期
@@ -49,7 +52,7 @@ public class SUserPay implements Serializable {
     /**
      * 关联得到任务id
      */
-    private Long relationId;
+    private String relationId;
 
     /**
      * 总金额
