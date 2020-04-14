@@ -126,7 +126,7 @@ public class STaskOrderController extends BaseController {
             taskOrder = this.taskOrderService.createTaskOrder(taskOrder);
 
             // 每参与一次任务转出 猎豆追加 10颗  * 猎人等级倍数
-            SUserLevel userLevel = this.userLevelService.getById(user.getUserLevelId());
+            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
             user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
 

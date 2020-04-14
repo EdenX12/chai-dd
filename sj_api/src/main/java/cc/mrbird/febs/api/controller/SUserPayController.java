@@ -159,7 +159,7 @@ public class SUserPayController extends BaseController {
             userPay.setPaySn(paySn);
             userPay.setPayStatus(1);
             userPay.setPayTime(new Date());
-            userPay.setRelationId(Long.parseLong(relationId));
+            userPay.setRelationId(relationId);
             userPay.setTransSn(transSn);
             userPay.setPayType(1);
 
@@ -198,9 +198,9 @@ public class SUserPayController extends BaseController {
                 user.setUserLevelType(userLevelType);
 
                 // 若是第一次领取任务成功，形成正式上下级绑定关系
-                if (user.getParentId() == null && userTask.getParentId() != null&&userTask.getParentId()>0) {
-                    user.setParentId(this.userTaskService.getById(userTask.getParentId()).getUserId());
-                }
+//                if (user.getParentId() == null && userTask.getParentId() != null&&userTask.getParentId()>0) {
+//                    user.setParentId(this.userTaskService.getById(userTask.getParentId()).getUserId());
+//                }
 
                 this.userService.updateById(user);
 

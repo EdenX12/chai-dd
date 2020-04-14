@@ -147,7 +147,7 @@ public class SUserTaskController extends BaseController {
     @Transactional
     @PostMapping("/getShareTaskSuccess")
     @Limit(key = "getShareTaskSuccess", period = 60, count = 20, name = "根据任务ID检索商品详情接口", prefix = "limit")
-    public FebsResponse getShareTaskSuccess(Long userTaskId) {
+    public FebsResponse getShareTaskSuccess(String userTaskId) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -269,7 +269,7 @@ public class SUserTaskController extends BaseController {
             SUserTask searchUserTask = new SUserTask();
             searchUserTask.setUserId(user.getId());
             searchUserTask.setProductId(userTask.getProductId());
-            searchUserTask.setParentId(userTaskId);
+            //searchUserTask.setParentId(userTaskId);
             List<SUserTask> userTaskOne = this.userTaskService.findUserTaskList(searchUserTask);
             Long newTaskId;
             if (userTaskOne == null || userTaskOne.size() == 0) {
