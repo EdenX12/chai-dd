@@ -20,8 +20,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SUserAddress implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -77,6 +75,11 @@ public class SUserAddress implements Serializable {
      * 座机电话
      */
     private String telPhone;
+
+    /**
+     * 手机电话
+     */
+    private String mobPhone;
 
     /**
      * 1默认收货地址

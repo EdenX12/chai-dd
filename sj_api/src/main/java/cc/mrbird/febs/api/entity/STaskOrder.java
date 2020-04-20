@@ -21,8 +21,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class STaskOrder implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -60,12 +58,12 @@ public class STaskOrder implements Serializable {
     private Date endTime;
 
     /**
-     * 创建日期
-     */
-    private Date createTime;
-
-    /**
      * 状态
      */
     private Integer status;
+
+    /**
+     * 创建日期
+     */
+    private Date createTime;
 }

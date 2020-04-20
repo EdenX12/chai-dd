@@ -21,8 +21,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SUserBonusLog implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -35,14 +33,14 @@ public class SUserBonusLog implements Serializable {
     private String userId;
 
     /**
-     * 任务ID
+     * 用户任务线ID
      */
-    private String taskId;
+    private String userTaskLineId;
 
     /**
      * 购买订单ID
      */
-    private String orderId;
+    private String orderDetailId;
 
     /**
      * 任务份数

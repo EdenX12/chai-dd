@@ -2,42 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SOrderMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SOrder">
-        <result column="id" property="id" />
-        <result column="order_sn" property="orderSn" />
-        <result column="user_id" property="userId" />
-        <result column="task_id" property="taskId" />
-        <result column="payment_type" property="paymentType" />
-        <result column="payment_state" property="paymentState" />
-        <result column="shipping_express_code" property="shippingExpressCode" />
-        <result column="shipping_express_id" property="shippingExpressId" />
-        <result column="shipping_code" property="shippingCode" />
-        <result column="shipping_fee" property="shippingFee" />
-        <result column="deliver_explain" property="deliverExplain" />
-        <result column="address_id" property="addressId" />
-        <result column="order_amount" property="orderAmount" />
-        <result column="pay_amount" property="payAmount" />
-        <result column="order_message" property="orderMessage" />
-        <result column="order_status" property="orderStatus" />
-        <result column="address_name" property="addressName" />
-        <result column="address_phone" property="addressPhone" />
-        <result column="address_detail" property="addressDetail" />
-        <result column="product_id" property="productId" />
-        <result column="product_number" property="productNumber" />
-        <result column="shipping_time" property="shippingTime" />
-        <result column="payment_time" property="paymentTime" />
-        <result column="create_time" property="createTime" />
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, order_sn, user_id, task_id, payment_type, payment_state, shipping_express_code, shipping_express_id,
-        shipping_code, shipping_fee, deliver_explain, address_id, order_amount, pay_amount, order_message,
-        order_status, address_name, address_phone, address_detail,product_id, product_number, shipping_time,
-        payment_time, create_time
-    </sql>
-
     <select id="findOrderDetail" resultType="sOrder" parameterType="sOrder">
 
         SELECT

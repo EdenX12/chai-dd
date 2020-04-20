@@ -20,8 +20,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class STaskLine implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */

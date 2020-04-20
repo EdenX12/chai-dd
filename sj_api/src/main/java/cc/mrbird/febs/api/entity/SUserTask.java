@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 用户任务类
+ * 用户任务批量类
  * @author MrBird
  */
 @Data
@@ -20,8 +20,6 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class SUserTask implements Serializable {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键ID
@@ -39,7 +37,6 @@ public class SUserTask implements Serializable {
      */
     private String productId;
 
-
     /**
      * 状态 1 已支付 2 不支付
      */
@@ -56,19 +53,9 @@ public class SUserTask implements Serializable {
     private Date payTime;
 
     /**
-     * 任务份数
+     * 0-APP,1-微信公众号,2-小程序
      */
-    private Integer taskNumber;
-
-    /**
-     * 0 已接任务 1 转让中 2 转让成功 3 任务完结 4 佣金已入账
-     */
-    private Integer status;
-
-    /**
-     * 是否已转发朋友圈（0：未 1：已）
-     */
-    private Integer shareFlag;
+    private Integer channel;
 
     /**
      * 创建日期

@@ -21,8 +21,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SUserAmountLog implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */

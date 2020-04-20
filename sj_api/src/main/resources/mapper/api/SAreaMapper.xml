@@ -2,22 +2,4 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SAreaMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SArea">
-        <result column="id" property="id" />
-        <result column="area_name" property="areaName" />
-        <result column="area_parent_id" property="areaParentId" />
-        <result column="area_sort" property="areaSort" />
-        <result column="area_deep" property="areaDeep" />
-        <result column="is_del" property="isDel" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, area_name, area_parent_id, area_sort, area_deep, is_del, create_time, update_time
-    </sql>
-
-    
 </mapper>

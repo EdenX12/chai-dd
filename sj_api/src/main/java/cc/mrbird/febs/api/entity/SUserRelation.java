@@ -20,8 +20,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SUserRelation implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -42,6 +40,11 @@ public class SUserRelation implements Serializable {
      * 关系类型 0-预备队 1-近卫军
      */
     private Integer relationType;
+
+    /**
+     * 微信unionid
+     */
+    private String unionId;
 
     /**
      * 创建日期

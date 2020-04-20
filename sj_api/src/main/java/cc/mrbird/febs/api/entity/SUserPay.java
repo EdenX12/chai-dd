@@ -21,8 +21,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SUserPay implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -38,11 +36,6 @@ public class SUserPay implements Serializable {
      * 用户id
      */
     private String userId;
-
-    /**
-     * 创建日期
-     */
-    private Date createTime;
 
     /**
      * 1 任务网上付款 2 充值
@@ -65,6 +58,11 @@ public class SUserPay implements Serializable {
     private BigDecimal payAmount;
 
     /**
+     * 券id
+     */
+    private String couponId;
+
+    /**
      * 状态 0 未支付 1 已支付
      */
     private Integer payStatus;
@@ -78,4 +76,9 @@ public class SUserPay implements Serializable {
      * 支付流水号
      */
     private String transSn;
+
+    /**
+     * 创建日期
+     */
+    private Date createTime;
 }

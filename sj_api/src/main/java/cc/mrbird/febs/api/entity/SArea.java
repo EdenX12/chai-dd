@@ -20,8 +20,9 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SArea implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
+    /**
+     * 主键ID
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 

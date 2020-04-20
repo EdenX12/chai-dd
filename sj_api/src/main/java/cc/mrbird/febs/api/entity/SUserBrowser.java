@@ -20,8 +20,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SUserBrowser implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -44,14 +42,14 @@ public class SUserBrowser implements Serializable {
     private String productId;
 
     /**
-     * 任务ID
-     */
-    private String taskId;
-
-    /**
      * 微信unionid
      */
     private String unionId;
+
+    /**
+     * 0-APP,1-微信公众号,2-小程序
+     */
+    private Integer channel;
 
     /**
      * 创建日期

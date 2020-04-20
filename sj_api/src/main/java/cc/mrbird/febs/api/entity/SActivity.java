@@ -11,16 +11,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户任务明细类
+ * 活动类
  * @author MrBird
  */
 @Data
-@TableName("s_user_task_detail")
+@TableName("s_activity")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SUserTaskDetail implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class SActivity implements Serializable {
 
     /**
      * 主键ID
@@ -29,37 +27,52 @@ public class SUserTaskDetail implements Serializable {
     private String id;
 
     /**
-     * 用户id
+     * 活动名称
      */
-    private String userId;
+    private String actName;
 
     /**
-     * 产品id
+     * 活动类型
      */
-    private String productId;
+    private String actType;
 
     /**
-     * 任务id
+     * 广告图片
      */
-    private String taskId;
+    private String pictureUrl;
 
     /**
-     * 任务线id
+     * 状态 0-创建 1-发布 2-下架 3-删除
      */
-    private String taskLineId;
+    private Integer actStatus;
 
     /**
-     * 0 已接任务 1 转让中 2 转让成功 3 任务完结 4 佣金已入账
+     * 显示顺序
      */
-    private Integer status;
+    private Integer sOrder;
 
     /**
-     * 创建日期
+     * 倒计时标记0-不需要倒计时 1-需要
+     */
+    private Integer flag;
+
+    /**
+     * 创建时间
      */
     private Date createTime;
 
     /**
-     * 修改日期
+     * 修改时间
      */
     private Date updateTime;
+
+    /**
+     * 创建者
+     */
+    private Long createUser;
+
+    /**
+     * 更新者
+     */
+    private Long updateUser;
 }

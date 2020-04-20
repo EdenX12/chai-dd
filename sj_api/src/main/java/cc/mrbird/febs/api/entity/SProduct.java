@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 产品类
+ * 商品类
  * @author MrBird
  */
 @Data
@@ -20,8 +20,6 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class SProduct implements Serializable {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键ID
@@ -55,29 +53,9 @@ public class SProduct implements Serializable {
     private String productDetail;
 
     /**
-     * 创建日期
+     * 商品数量也是任务线总数
      */
-    private Date createTime;
-
-    /**
-     * 创建人
-     */
-    private Integer createUser;
-
-    /**
-     * 更新日期
-     */
-    private Date updateTime;
-
-    /**
-     * 更新人
-     */
-    private Integer updateUser;
-
-    /**
-     * 商品状态  0 未发布 1 已发布 未成交 2 已成交 3 已下架
-     */
-    private Integer productStatus;
+    private Integer totalNumber;
 
     /**
      * 总任务份数
@@ -88,6 +66,11 @@ public class SProduct implements Serializable {
      * 商品价格（单位元）
      */
     private BigDecimal productPrice;
+
+    /**
+     * 划线价格
+     */
+    private BigDecimal scribingPrice;
 
     /**
      * 总佣金（单位元）
@@ -105,17 +88,7 @@ public class SProduct implements Serializable {
     private String priceUnit;
 
     /**
-     * 独赢奖励（页面展示，真正分钱另有规则）
-     */
-    private String successReward;
-
-    /**
-     * 躺赢奖励（页面展示，真正分钱另有规则）
-     */
-    private String everyReward;
-
-    /**
-     * 产品类型 1 新手标 2 正常标
+     * 商品类型 1 新手商品 2 正常商品
      */
     private Integer productType;
 
@@ -125,42 +98,37 @@ public class SProduct implements Serializable {
     private Integer sOrder;
 
     /**
-     * 商品数量也是任务线总数
-     */
-    private Integer totalNumber;
-
-    /**
-     * 任务有效天数
-     */
-    private Integer validDays;
-
-    /**
-     * 商品标签
+     * 商品标签,限时商品|特价商品|精选商品|优惠商品
      */
     private String productTag;
 
     /**
-     * 商品已领任务数量
+     * 商品状态  0 未发布 1 已发布 未成交 2 已成交 3 已下架
      */
-    private transient Integer taskPayCount;
+    private Integer productStatus;
 
     /**
-     * 商品关注数量
+     * 删除标识：0未删除 1已删除
      */
-    private transient Integer followCount;
+    private Integer deleteFlag;
 
     /**
-     * 用户ID
+     * 创建日期
      */
-    private transient String userId;
+    private Date createTime;
 
     /**
-     * 是否已关注商品（1：已关注  0：未关注）
+     * 更新日期
      */
-    private transient Integer followStatus;
+    private Date updateTime;
 
     /**
-     * 购买上限
+     * 创建人
      */
-    private transient Integer buyNumber;
+    private Long createUser;
+
+    /**
+     * 更新人
+     */
+    private Long updateUser;
 }

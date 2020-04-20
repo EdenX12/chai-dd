@@ -21,8 +21,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SUser implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
@@ -45,19 +43,19 @@ public class SUser implements Serializable {
     private String userPassword;
 
     /**
-     * 创建日期
+     * 用户头像
      */
-    private Date createTime;
+    private String userImg;
+
+    /**
+     * 邀请码（随机生成 大写字母+数字 4位 ）
+     */
+    private String inviteCode;
 
     /**
      * 微信openId(打款时需要)
      */
     private String openId;
-
-    /**
-     * 用户头像
-     */
-    private String userImg;
 
     /**
      * 用户手机号码
@@ -75,6 +73,11 @@ public class SUser implements Serializable {
     private BigDecimal lockAmount;
 
     /**
+     * 领取任务次数
+     */
+    private Integer taskCount;
+
+    /**
      * 猎豆数量
      */
     private Integer rewardBean;
@@ -83,11 +86,6 @@ public class SUser implements Serializable {
      * 0 可用  1 不可用
      */
     private Integer userStatus;
-
-    /**
-     * 领取任务次数
-     */
-    private Integer taskCount;
 
     /**
      * 用户等级 0：新人 1：见习猎人 2：初级猎人 3：中级猎人 4：高级猎人
@@ -102,7 +100,7 @@ public class SUser implements Serializable {
     /**
      * 上级id
      */
-    private Long parentId;
+    private String parentId;
 
     /**
      * 1、普通客户；2-商家；；3-拆家；4-即是拆家也是商家
@@ -115,7 +113,22 @@ public class SUser implements Serializable {
     private String unionId;
 
     /**
+     * appopenId(打款时需要)
+     */
+    private String app_open_id;
+
+    /**
      * 最后一次登录时间
      */
     private Date lastLogin;
+
+    /**
+     * 0-APP,1-微信公众号,2-小程序
+     */
+    private Integer channel;
+
+    /**
+     * 创建日期
+     */
+    private Date createTime;
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 产品分类类
+ * 商品分类类
  * @author MrBird
  */
 @Data
@@ -20,13 +20,16 @@ import java.util.Date;
 @Accessors(chain = true)
 public class SProductType implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */
     @TableId(value = "id", type= IdType.UUID)
     private String id;
+
+    /**
+     * 上级分类id
+     */
+    private String parentId;
 
     /**
      * 分类名称
@@ -44,19 +47,34 @@ public class SProductType implements Serializable {
     private Integer typeStatus;
 
     /**
+     * 显示顺序
+     */
+    private Integer sOrder;
+
+    /**
+     * 级别
+     */
+    private Integer level;
+
+    /**
+     * 0-普通; 1-推荐
+     */
+    private Integer flag;
+
+    /**
      * 创建日期
      */
     private Date createTime;
 
     /**
-     * 创建人
-     */
-    private String createUser;
-
-    /**
      * 更新日期
      */
     private Date updateTime;
+
+    /**
+     * 创建人
+     */
+    private String createUser;
 
     /**
      * 更新人

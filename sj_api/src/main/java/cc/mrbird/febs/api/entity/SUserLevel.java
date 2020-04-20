@@ -1,6 +1,5 @@
 package cc.mrbird.febs.api.entity;
 
-import java.math.BigDecimal;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -19,8 +18,6 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class SUserLevel implements Serializable {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键ID
@@ -47,16 +44,6 @@ public class SUserLevel implements Serializable {
      * 最大单数
      */
     private Integer maxNumber;
-
-    /**
-     * 猎豆百分比
-     */
-    private BigDecimal beanRate;
-
-    /**
-     * 下级贡献收益百分比
-     */
-    private BigDecimal incomeRate;
 
     /**
      * 最大购买任务线数量
