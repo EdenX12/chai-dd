@@ -93,11 +93,6 @@ public class SProduct implements Serializable {
     private BigDecimal taskPrice;
 
     /**
-     * 单位 只 座
-     */
-    private String priceUnit;
-
-    /**
      * 商品类型 1 新手商品 2 正常商品
      */
     private Integer productType;

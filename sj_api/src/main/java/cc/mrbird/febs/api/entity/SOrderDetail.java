@@ -120,7 +120,7 @@ public class SOrderDetail implements Serializable {
     /**
      * 收货人
      */
-    private String address_name;
+    private String addressName;
 
     /**
      * 收货电话

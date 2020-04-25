@@ -8,4 +8,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISUserShopCarService extends IService<SUserShopCar> {
 
+    SUserShopCar addUserShopCar(SUserShopCar userShopCar);
 }

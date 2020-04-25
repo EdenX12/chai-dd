@@ -12,5 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SOrderProductServiceImpl extends ServiceImpl<SOrderProductMapper, SOrderProduct> implements ISOrderProductService {
 
+    @Override
+    public SOrderProduct addOrderProduct(SOrderProduct orderProduct) {
+
+        this.baseMapper.insert(orderProduct);
+
+        return orderProduct;
+    }
 
 }
