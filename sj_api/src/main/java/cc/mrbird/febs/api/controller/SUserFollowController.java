@@ -67,14 +67,14 @@ public class SUserFollowController extends BaseController {
 
             // 每关注一个任务（任务广场，转让中心），（10颗） * 猎人等级倍数
             SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-            user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//            user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
 
             // 猎豆流水插入
             SUserBeanLog userBeanLog = new SUserBeanLog();
             userBeanLog.setUserId(user.getId());
             userBeanLog.setChangeType(3);
-            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             userBeanLog.setChangeTime(new Date());
             userBeanLog.setRelationId(userFollow.getId());
             userBeanLog.setRemark("关联用户关注ID");
@@ -112,14 +112,14 @@ public class SUserFollowController extends BaseController {
 
             // 每取消一个任务（任务广场，转让中心），（-10颗） * 猎人等级倍数
             SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-            user.setCanuseBean(user.getCanuseBean() - userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//            user.setCanuseBean(user.getCanuseBean() - userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
             this.userService.updateById(user);
 
             // 猎豆流水插入
             SUserBeanLog userBeanLog = new SUserBeanLog();
             userBeanLog.setUserId(user.getId());
             userBeanLog.setChangeType(3);
-            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue() * (-1));
+//            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue() * (-1));
             userBeanLog.setChangeTime(new Date());
             userBeanLog.setRelationId(userFollow.getId());
             userBeanLog.setRemark("关联用户关注ID");

@@ -76,11 +76,11 @@ public class SUserTaskController extends BaseController {
             // 每件商品最高领取任务线判断
             SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
 
-            if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
-                response.put("code", 1);
-                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
-                return response;
-            }
+//            if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
+//                response.put("code", 1);
+//                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
+//                return response;
+//            }
 
             // 新手只能购买新手标  其他只能购买正常标
             SProduct product = this.productService.getById(userTask.getProductId());
@@ -108,8 +108,8 @@ public class SUserTaskController extends BaseController {
 
             if (userTask.getId() == null) {
                 userTask.setPayStatus(2);
-                userTask.setStatus(0);
-                userTask.setShareFlag(0);
+//                userTask.setStatus(0);
+//                userTask.setShareFlag(0);
                 userTask.setCreateTime(new Date());
                 userTask.setUpdateTime(new Date());
 
@@ -120,15 +120,15 @@ public class SUserTaskController extends BaseController {
                 userTask = this.userTaskService.updateUserTask(userTask);
             }
 
-            // 调起微信支付
-            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
-                    product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
-                    user.getOpenId(),
-                    request.getRemoteAddr(),
-                    "1",
-                    "任务金");
+//            // 调起微信支付
+//            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
+//                    product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
+//                    user.getOpenId(),
+//                    request.getRemoteAddr(),
+//                    "1",
+//                    "任务金");
 
-            response.data(jsonObject);
+//            response.data(jsonObject);
 
         } catch (Exception e) {
             message = "领取任务失败！";
@@ -166,23 +166,23 @@ public class SUserTaskController extends BaseController {
         if (userTaskList != null && userTaskList.size() > 0) {
             userTask = userTaskList.get(0);
 
-            if (userTask.getShareFlag() == 0) {
-
-                SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-                user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-                this.userService.updateById(user);
-
-                // 猎豆流水插入
-                SUserBeanLog userBeanLog = new SUserBeanLog();
-                userBeanLog.setUserId(user.getId());
-                userBeanLog.setChangeType(2);
-                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-                userBeanLog.setChangeTime(new Date());
-                userBeanLog.setRelationId(userTask.getId());
-                userBeanLog.setRemark("关联任务ID");
-                userBeanLog.setOldAmount(user.getCanuseBean());
-                this.userBeanLogService.save(userBeanLog);
-            }
+//            if (userTask.getShareFlag() == 0) {
+//
+//                SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+//                user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//                this.userService.updateById(user);
+//
+//                // 猎豆流水插入
+//                SUserBeanLog userBeanLog = new SUserBeanLog();
+//                userBeanLog.setUserId(user.getId());
+//                userBeanLog.setChangeType(2);
+//                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//                userBeanLog.setChangeTime(new Date());
+//                userBeanLog.setRelationId(userTask.getId());
+//                userBeanLog.setRemark("关联任务ID");
+//                userBeanLog.setOldAmount(user.getCanuseBean());
+//                this.userBeanLogService.save(userBeanLog);
+//            }
         }
 
         return response;
@@ -231,7 +231,7 @@ public class SUserTaskController extends BaseController {
         // 用户电话
         returnMap.put("userPhone", taskUser.getUserPhone());
         // 用户已领取任务
-        returnMap.put("userTaskNumber", userTask.getTaskNumber());
+//        returnMap.put("userTaskNumber", userTask.getTaskNumber());
         // 商品ID
         returnMap.put("productId", product.getId());
         // 产品类型（新手标 正常标）
@@ -243,9 +243,9 @@ public class SUserTaskController extends BaseController {
         returnMap.put("productPrice", product.getProductPrice());
         returnMap.put("priceUnit", product.getPriceUnit());
         returnMap.put("totalReward", product.getTotalReward());
-        returnMap.put("successReward", product.getSuccessReward());
-        returnMap.put("everyReward", product.getEveryReward());
-        // 总任务数
+//        returnMap.put("successReward", product.getSuccessReward());
+//        returnMap.put("everyReward", product.getEveryReward());
+//        // 总任务数
         returnMap.put("taskNumber", product.getTaskNumber());
         returnMap.put("taskPrice", product.getTaskPrice());
         returnMap.put("followCount", followCount);
@@ -257,7 +257,7 @@ public class SUserTaskController extends BaseController {
 
         // 辛苦费 见习猎人分0.5%; 初级猎手分1% 中级猎人分2% 高级猎人分3%
         SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-        returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
+//        returnMap.put("commissionFee", userLevel.getIncomeRate().multiply(product.getTotalReward()));
 
 
         // 如果是本人打开自己的分享页面时，直接返回
@@ -272,37 +272,37 @@ public class SUserTaskController extends BaseController {
             //searchUserTask.setParentId(userTaskId);
             List<SUserTask> userTaskOne = this.userTaskService.findUserTaskList(searchUserTask);
             Long newTaskId;
-            if (userTaskOne == null || userTaskOne.size() == 0) {
-                searchUserTask.setPayStatus(2);
-                searchUserTask.setTaskNumber(1);
-                searchUserTask.setStatus(0);
-                searchUserTask.setShareFlag(0);
-                searchUserTask.setCreateTime(new Date());
-                searchUserTask.setUpdateTime(new Date());
-                SUserTask newUserTask = this.userTaskService.createUserTask(searchUserTask);
-                // 新生成的任务ID
-                returnMap.put("taskId", newUserTask.getId());
-
-                // 有人查看或转发“我”分享的任务时，“我”获10颗
-                // 猎豆追加 本人（10颗） * 猎人等级倍数
-                SUser user2 = this.userService.getById(userTask.getUserId());
-                SUserLevel userLevel2 = this.userLevelService.findByLevelType(user2.getUserLevelType());
-                user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-                this.userService.updateById(user2);
-
-                // 猎豆流水插入
-                SUserBeanLog userBeanLog = new SUserBeanLog();
-                userBeanLog.setUserId(user2.getId());
-                userBeanLog.setChangeType(7);
-                userBeanLog.setChangeAmount(userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-                userBeanLog.setChangeTime(new Date());
-                userBeanLog.setRelationId(userTask.getId());
-                userBeanLog.setRemark("关联任务ID");
-                userBeanLog.setOldAmount(user.getCanuseBean());
-                this.userBeanLogService.save(userBeanLog);
-            } else {
-                returnMap.put("taskId", userTaskOne.get(0).getId());
-            }
+//            if (userTaskOne == null || userTaskOne.size() == 0) {
+//                searchUserTask.setPayStatus(2);
+//                searchUserTask.setTaskNumber(1);
+//                searchUserTask.setStatus(0);
+//                searchUserTask.setShareFlag(0);
+//                searchUserTask.setCreateTime(new Date());
+//                searchUserTask.setUpdateTime(new Date());
+//                SUserTask newUserTask = this.userTaskService.createUserTask(searchUserTask);
+//                // 新生成的任务ID
+//                returnMap.put("taskId", newUserTask.getId());
+//
+//                // 有人查看或转发“我”分享的任务时，“我”获10颗
+//                // 猎豆追加 本人（10颗） * 猎人等级倍数
+//                SUser user2 = this.userService.getById(userTask.getUserId());
+//                SUserLevel userLevel2 = this.userLevelService.findByLevelType(user2.getUserLevelType());
+//                user2.setCanuseBean(user2.getCanuseBean() + userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//                this.userService.updateById(user2);
+//
+//                // 猎豆流水插入
+//                SUserBeanLog userBeanLog = new SUserBeanLog();
+//                userBeanLog.setUserId(user2.getId());
+//                userBeanLog.setChangeType(7);
+//                userBeanLog.setChangeAmount(userLevel2.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//                userBeanLog.setChangeTime(new Date());
+//                userBeanLog.setRelationId(userTask.getId());
+//                userBeanLog.setRemark("关联任务ID");
+//                userBeanLog.setOldAmount(user.getCanuseBean());
+//                this.userBeanLogService.save(userBeanLog);
+//            } else {
+//                returnMap.put("taskId", userTaskOne.get(0).getId());
+//            }
         }
 
         response.data(returnMap);

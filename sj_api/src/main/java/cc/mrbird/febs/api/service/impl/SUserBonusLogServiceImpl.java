@@ -20,15 +20,15 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
 
         LambdaQueryWrapper<SUserBonusLog> queryWrapper = new LambdaQueryWrapper();
 
-        // 购买订单ID不为空的情况下
-        if (userBonusLog.getOrderId() != null) {
-            queryWrapper.eq(SUserBonusLog::getOrderId, userBonusLog.getOrderId());
-        }
-
-        // 任务ID不为空的情况下
-        if (userBonusLog.getTaskId() != null) {
-            queryWrapper.eq(SUserBonusLog::getTaskId, userBonusLog.getTaskId());
-        }
+//        // 购买订单ID不为空的情况下
+//        if (userBonusLog.getOrderId() != null) {
+//            queryWrapper.eq(SUserBonusLog::getOrderId, userBonusLog.getOrderId());
+//        }
+//
+//        // 任务ID不为空的情况下
+//        if (userBonusLog.getTaskId() != null) {
+//            queryWrapper.eq(SUserBonusLog::getTaskId, userBonusLog.getTaskId());
+//        }
 
         // 用户ID不为空的情况下
         if (userBonusLog.getUserId() != null) {

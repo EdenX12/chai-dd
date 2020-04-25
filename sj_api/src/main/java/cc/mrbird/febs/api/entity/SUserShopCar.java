@@ -33,9 +33,9 @@ public class SUserShopCar implements Serializable {
     private String userId;
 
     /**
-     * 商品ID
+     * 商品规格ID
      */
-    private String productId;
+    private String productSpecId;
 
     /**
      * 最初价格

@@ -11,10 +11,16 @@ import java.util.List;
 public interface ISProductTypeService extends IService<SProductType> {
 
     /**
-     * 通过产品分类状态查找所有分类
+     * 检索商品推荐分类
      *
-     * @param typeStatus 分类状态（0：不可用 :1：可用）
-     * @return SUser
+     * @return List<SProductType>
      */
-    List<SProductType> findByTypeStatus(int typeStatus);
+    List<SProductType> findRecommendProductTypeList();
+
+    /**
+     * 检索商品分类
+     *
+     * @return List<SProductType>
+     */
+    List<SProductType> findProductTypeList(SProductType productType);
 }

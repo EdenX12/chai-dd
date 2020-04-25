@@ -8,4 +8,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISOrderDetailService extends IService<SOrderDetail> {
 
+    /**
+     * 增加用户购买订单明细
+     *
+     * @param orderDetail SOrderDetail
+     */
+    SOrderDetail addOrderDetail(SOrderDetail orderDetail);
 }

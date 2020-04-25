@@ -7,9 +7,10 @@ import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.domain.QueryRequest;
-import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.WeChatPayUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author MrBird
@@ -40,6 +39,10 @@ public class SOrderController extends BaseController {
 
     @Autowired
     private ISProductService productService;
+
+    @Autowired
+    private ISProductSpecService productSpecService;
+
 
     @Autowired
     private ISUserTaskService userTaskService;
@@ -60,41 +63,296 @@ public class SOrderController extends BaseController {
     private ISUserMsgService userMsgService;
 
     /**
-     * 新增用户购买订单
+     * 确认订单
+     * 商品规格ID   productSpecId
+     * 数量         productNumber
      */
-    @Log("新增用户购买订单")
+    @Log("确认订单")
     @Transactional
-    @PostMapping("/addOrder")
-    public FebsResponse addOrder(HttpServletRequest request, @Valid SOrder order) {
+    @PostMapping("/confirmOrder")
+    public FebsResponse confirmOrder(HttpServletRequest request, List<Map> productSpecList) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try {
+
+            SUser user = FebsUtil.getCurrentUser();
+
+            List<Map<String, Object>> productList = new ArrayList<>();
+
+            for (Map productSpecMap : productSpecList) {
+
+                // 规格商品ID
+                String productSpecId = (String) productSpecMap.get("productSpecId");
+
+                // 商品数量
+                int productNumber = (Integer) productSpecMap.get("productNumber");
+
+                // 商品规格
+                SProductSpec productSpec = this.productSpecService.findProductSpec(productSpecId);
+
+                // 商品详情
+                SProduct product = new SProduct();
+                product.setId(productSpec.getProductId());
+                Map productDetail = this.productService.findProductDetail(product);
+
+                Map<String, Object> newProductDetail = new HashMap<>();
+
+                // 所属店铺ID
+                newProductDetail.put("shopId", productDetail.get("shopId"));
+
+                // 所属店铺名称
+                newProductDetail.put("shopName", productDetail.get("shopName"));
+
+                // 商品ID
+                newProductDetail.put("productId", productSpec.getProductId());
+
+                // 商品规格ID
+                newProductDetail.put("productSpecId", productSpec.getId());
+
+                // 商品名称
+                newProductDetail.put("productSpecName", productDetail.get("productSpecName"));
+
+                // 商品简介
+                newProductDetail.put("productDes", productDetail.get("productDes"));
+
+                // 商品图片
+                newProductDetail.put("productImg", productDetail.get("productImg"));
+
+                // 返还金额
+                newProductDetail.put("buyerReturnAmt", productDetail.get("buyerReturnAmt"));
+
+                // 快递邮费
+                newProductDetail.put("expressFee", productDetail.get("expressFee"));
+
+                // 商品规格
+                newProductDetail.put("productSpecName", productSpec.getProductSpecValueName());
+
+                // 商品规格价格
+                newProductDetail.put("productPrice", productSpec.getProductPrice());
+
+                // 商品规格划线价格
+                newProductDetail.put("scribingPrice", productSpec.getScribingPrice());
+
+                // 商品数量
+                newProductDetail.put("productNumber", productNumber);
+
+                productList.add(newProductDetail);
+            }
+
+            // 根据店铺ID 排序
+            Collections.sort(productList, new Comparator<Map<String, Object>>() {
+                public int compare(Map<String, Object> product1, Map<String, Object> product2) {
+                    return ((String)product1.get("shopId")).compareTo((String)product2.get("shopId"));
+                }
+            });
+
+            // 店铺ID
+            String shopId = "";
+            List<Map> orderList = new ArrayList();
+
+            Map<String, Object> orderMap = new HashMap<>();
+
+            List<Map> orderProductList = new ArrayList();
+
+            // 商品合计金额
+            BigDecimal totalProductAmt = new BigDecimal(0);
+
+            // 订单买家返还金额
+            BigDecimal orderReturnAmt = new BigDecimal(0);
+
+            // 买家总返还金额
+            BigDecimal totalReturnAmt = new BigDecimal(0);
+
+            // 订单快递费用
+            BigDecimal orderExpressAmt = new BigDecimal(0);
+
+            // 快递总费用
+            BigDecimal totalExpressAmt = new BigDecimal(0);
+
+            // 赠送拆豆总数
+            int totalBeanCnt = 0;
+
+            // 拆单显示（不同的商户 显示到不同的订单）
+            for (Map productMap : productList) {
+
+                // 根据顺序，店铺不同时
+                if (!shopId.equals(productMap.get("shopId"))) {
+
+                    if (!"".equals(shopId)) {
+                        // 商家订单商品列表
+                        orderMap.put("orderProduct", orderProductList);
+                        // 商家订单返还金额
+                        orderMap.put("orderReturnAmt", orderReturnAmt);
+                        // 商家订单快递费用
+                        orderMap.put("orderExpressAmt", orderExpressAmt);
+
+                        orderList.add(orderMap);
+                    }
+
+                    orderMap = new HashMap<>();
+                    orderMap.put("shopId", productMap.get("shopId"));
+                    orderMap.put("shopName", productMap.get("shopName"));
+
+                    orderProductList = new ArrayList();
+                    orderProductList.add(productMap);
+
+                    // 商家订单返还金额
+                    orderReturnAmt = (BigDecimal) productMap.get("buyerReturnAmt");
+                    // 商家订单快递费用
+                    orderExpressAmt = (BigDecimal) productMap.get("expressFee");
+
+                } else {
+
+                    // 商家订单返还金额
+                    orderReturnAmt = orderReturnAmt.add( ((BigDecimal) productMap.get("buyerReturnAmt")).multiply((BigDecimal) productMap.get("productNumber")) );
+                    // 商家订单快递费用
+                    orderExpressAmt = orderExpressAmt.add( ((BigDecimal) productMap.get("expressFee")).multiply((BigDecimal) productMap.get("productNumber")) );
+
+                    orderProductList.add(productMap);
+                }
+
+                // 店铺ID
+                shopId = (String) productMap.get("shopId");
+
+                // 商品合计金额
+                totalProductAmt = totalProductAmt.add( ((BigDecimal) productMap.get("productPrice")).multiply((BigDecimal) productMap.get("productNumber")) );
+
+                // 总订单返还金额
+                totalReturnAmt = totalReturnAmt.add( ((BigDecimal) productMap.get("buyerReturnAmt")).multiply((BigDecimal) productMap.get("productNumber")) );
+
+                // 总订单快递费用
+                totalExpressAmt = totalExpressAmt.add( ((BigDecimal) productMap.get("expressFee")).multiply((BigDecimal) productMap.get("productNumber")) );
+
+                // 赠送拆豆总数 (数量 * 8)
+                totalBeanCnt = totalBeanCnt +  (int) productMap.get("productNumber") * 8;
+            }
+            orderMap.put("orderProduct", orderProductList);
+            // 商家订单返还金额
+            orderMap.put("orderReturnAmt", orderReturnAmt);
+            // 商家订单快递费用
+            orderMap.put("orderExpressAmt", orderExpressAmt);
+            orderList.add(orderMap);
+
+            // {"confirmOrder": { { "shopId": "11", "shopName": "**店", "orderProduct": {  }  }}
+            // 确认订单列表
+            resultMap.put("shopOrder", orderList);
+
+            // 商品合计金额
+            resultMap.put("totalProductAmt", totalProductAmt);
+
+            // 总订单返还金额
+            resultMap.put("totalReturnAmt", totalReturnAmt);
+
+            // 总订单快递费用
+            resultMap.put("totalExpressAmt", totalExpressAmt);
+
+            // 赠送拆豆总数
+            resultMap.put("totalBeanCnt", totalBeanCnt);
+
+            response.data(resultMap);
+
+        } catch (Exception e) {
+            message = "用户确认订单失败";
+            response.put("code", 1);
+            response.message(message);
+            log.error(message, e);
+        }
+
+        return response;
+    }
+
+    /**
+     * 确认支付购买订单
+     */
+    @Log("确认支付购买订单")
+    @Transactional
+    @PostMapping("/payOrder")
+    public FebsResponse payOrder(HttpServletRequest request, String jsonString) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
         try {
 
-            SUser user = FebsUtil.getCurrentUser();
-            order.setUserId(user.getId());
+            JSONObject json = JSON.parseObject(jsonString);
 
-            SProduct product = productService.getById(order.getProductId());
+            // 收货地址
+            String addressId = json.getString("addressId");
 
-            order.setOrderStatus(0);
-            order.setCreateTime(new Date());
-            order.setPaymentType(1);
-            order.setPaymentState(0);
-            order.setOrderAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
-            order.setPayAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
+            // 支付方式  0 微信 1 支付宝 3 余额
+            String paymentType = json.getString("paymentType");
 
-            order = this.orderService.addOrder(order);
+            // 店铺ID
+            JSONArray confirmOrder = json.getJSONArray("shopOrder");
 
-            // 调起微信支付
-            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(order.getId()),
-                    product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber().longValue())).toString(),
-                    user.getOpenId(),
-                    request.getRemoteAddr(),
-                    "2",
-                    "购买商品");
+            // 生成批量订单表
 
-            response.data(jsonObject);
+
+
+            for(int i=0; i<confirmOrder.size(); i++){
+
+                JSONObject confirmOrderJson = confirmOrder.getJSONObject(i);
+
+                // 店铺ID
+                String shopId = confirmOrderJson.getString("shopId");
+
+                // 店铺订单
+                JSONArray orderProduct = confirmOrderJson.getJSONArray("orderProduct");
+
+                // 生成订单明细表
+
+                for(int j=0; j<orderProduct.size(); j++){
+
+                    JSONObject orderProductJson = orderProduct.getJSONObject(j);
+
+                    // 商品规格ID
+                    String productSpecId = orderProductJson.getString("productSpecId");
+
+
+
+                    // 生成订单产品表
+                }
+            }
+
+
+
+//            // 商品列表
+//            List<Map> confirmOrder = request.get
+//
+//
+//
+//
+//            SUser user = FebsUtil.getCurrentUser();
+//            order.setUserId(user.getId());
+
+
+
+
+
+//            SProduct product = productService.getById(order.getProductId());
+//
+//            order.setOrderStatus(0);
+//            order.setCreateTime(new Date());
+//            order.setPaymentType(1);
+//            order.setPaymentState(0);
+//            order.setOrderAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
+//            order.setPayAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
+//
+//            order = this.orderService.addOrder(order);
+//
+//            // 调起微信支付
+//            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(order.getId()),
+//                    product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber().longValue())).toString(),
+//                    user.getOpenId(),
+//                    request.getRemoteAddr(),
+//                    "2",
+//                    "购买商品");
+//
+//            response.data(jsonObject);
 
         } catch (Exception e) {
             message = "购买订单失败";
@@ -154,8 +412,8 @@ public class SOrderController extends BaseController {
      */
     @Log("用户确认收货")
     @Transactional
-    @PostMapping("/confirmOrder")
-    public FebsResponse confirmOrder(@Valid SOrder order) {
+    @PostMapping("/confirmFinishOrder")
+    public FebsResponse confirmFinishOrder(@Valid SOrder order) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -165,186 +423,186 @@ public class SOrderController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
             order.setUserId(user.getId());
 
-            order.setOrderStatus(3);
-            order = this.orderService.updateOrder(order);
+//            order.setOrderStatus(3);
+//            order = this.orderService.updateOrder(order);
+//
+//            if (order.getPaymentState() != 1) {
+//                message = "此订单还没有完成支付！";
+//                response.put("code", 1);
+//                response.message(message);
+//                return response;
+//            }
+//
+//            if (order.getOrderStatus() != 2) {
+//                message = "此订单还没有完成发货！";
+//                response.put("code", 1);
+//                response.message(message);
+//                return response;
+//            }
+//
+//            SProduct product = productService.getById(order.getProductId());
+//
+//            // 产品下所有已完结 任务金退还（冻结 - > 余额）  并且修改状态为佣金已入账
+//            SUserTask userTask = new SUserTask();
+//            userTask.setProductId(order.getProductId());
+//            userTask.setPayStatus(1);
+//            userTask.setStatus(3);
+//            List<SUserTask> userTaskList = userTaskService.findUserTaskList(userTask);
+//            for (SUserTask userTasked : userTaskList) {
+//
+//                // 佣金已入账 状态更新
+//                userTasked.setUpdateTime(new Date());
+//                userTasked.setStatus(4);
+//                this.userTaskService.updateById(userTasked);
+//            }
+//
+//            SUserBonusLog userBonusLog = new SUserBonusLog();
+//
+//            userBonusLog.setOrderId(order.getId());
+//
+//            List<SUserBonusLog> userBonusLogList = userBonusLogService.findUserBonusList(userBonusLog);
+//
+//            // 独赢用户
+//            String rewardUserName = "";
+//            // 独赢奖励
+//            BigDecimal successReward = null;
+//            // 躺赢人数
+//            int rewardCount = 0;
+//            // 躺赢奖励
+//            BigDecimal everyReward = null;
+//
+//            for (SUserBonusLog userBonus : userBonusLogList) {
+//
+//                if (userBonus.getBonusType() == 3) {
+//
+//                    // 独赢奖励 （余额+）
+//                    SUser user1 = this.userService.getById(userBonus.getUserId());
+//
+//                    // 金额流水插入
+//                    SUserAmountLog userAmountLog = new SUserAmountLog();
+//                    userAmountLog.setUserId(user1.getId());
+//                    userAmountLog.setChangeType(3);
+//                    userAmountLog.setChangeAmount(userBonus.getBonusAmount());
+//                    userAmountLog.setChangeTime(new Date());
+//                    userAmountLog.setRelationId(userBonus.getTaskId());
+//                    userAmountLog.setRemark("关联任务ID");
+//                    userAmountLog.setOldAmount(user1.getTotalAmount());
+//                    this.userAmountLogService.save(userAmountLog);
+//
+//                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
+//                    this.userService.updateById(user1);
+//
+//                    SUserMsg userMsg = new SUserMsg();
+//                    userMsg.setUserId(user1.getId());
+//                    userMsg.setMsgTime(new Date());
+//                    userMsg.setMsgType(1);
+//                    userMsg.setStatus(0);
+//                    userMsg.setMsgTitle("恭喜您获得独赢奖励" + userBonus.getBonusAmount() + "元。");
+//                    userMsg.setMsgInfo("恭喜您获得独赢奖励" + userBonus.getBonusAmount() + "元。");
+//
+//                    userMsgService.save(userMsg);
+//
+//                    rewardUserName = user1.getNickName();
+//                    successReward = userBonus.getBonusAmount();
+//
+//                } else if (userBonus.getBonusType() == 4) {
+//
+//                    rewardCount = rewardCount + 1;
+//
+//                    // 躺赢奖励（余额+）
+//                    SUser user1 = this.userService.getById(userBonus.getUserId());
+//
+//                    // 躺赢金额流水插入
+//                    SUserAmountLog userAmountLog = new SUserAmountLog();
+//                    userAmountLog = new SUserAmountLog();
+//                    userAmountLog.setUserId(user1.getId());
+//                    userAmountLog.setChangeType(4);
+//                    userAmountLog.setChangeAmount(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber())));
+//                    userAmountLog.setChangeTime(new Date());
+//                    userAmountLog.setRelationId(userBonus.getTaskId());
+//                    userAmountLog.setRemark("关联任务ID");
+//                    userAmountLog.setOldAmount(user1.getTotalAmount());
+//                    this.userAmountLogService.save(userAmountLog);
+//
+//                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
+//                    this.userService.updateById(user1);
+//
+//                    SUserMsg userMsg = new SUserMsg();
+//                    userMsg.setUserId(user1.getId());
+//                    userMsg.setMsgTime(new Date());
+//                    userMsg.setMsgType(2);
+//                    userMsg.setStatus(0);
+//                    userMsg.setMsgTitle("恭喜您获得躺赢奖励" + userBonus.getBonusAmount() + "元。");
+//                    userMsg.setMsgInfo("恭喜您获得躺赢奖励" + userBonus.getBonusAmount() + "元。");
+//
+//                    userMsgService.save(userMsg);
+//
+//                    everyReward = userBonus.getBonusAmount();
+//
+//                } else if (userBonus.getBonusType() == 5) {
+//
+//                    // 下级奖励（余额+）
+//                    SUser user1 = this.userService.getById(userBonus.getUserId());
+//
+//                    // 躺赢金额流水插入
+//                    SUserAmountLog userAmountLog = new SUserAmountLog();
+//                    userAmountLog = new SUserAmountLog();
+//                    userAmountLog.setUserId(user1.getId());
+//                    userAmountLog.setChangeType(5);
+//                    userAmountLog.setChangeAmount(userBonus.getBonusAmount());
+//                    userAmountLog.setChangeTime(new Date());
+//                    userAmountLog.setRelationId(userBonus.getTaskId());
+//                    userAmountLog.setRemark("关联任务ID");
+//                    userAmountLog.setOldAmount(user1.getTotalAmount());
+//                    this.userAmountLogService.save(userAmountLog);
+//
+//                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
+//                    this.userService.updateById(user1);
+//
+//                    SUserMsg userMsg = new SUserMsg();
+//                    userMsg.setUserId(user1.getId());
+//                    userMsg.setMsgTime(new Date());
+//                    userMsg.setMsgType(3);
+//                    userMsg.setStatus(0);
+//                    userMsg.setMsgTitle("恭喜您获得下级奖励" + userBonus.getBonusAmount() + "元。");
+//                    userMsg.setMsgInfo("恭喜您获得下级奖励" + userBonus.getBonusAmount() + "元。");
+//
+//                    userMsgService.save(userMsg);
+//
+//                } else if (userBonus.getBonusType() == 9) {
+//
+//                    // 任务金奖励（余额+ 冻结-）
+//                    SUser user1 = this.userService.getById(userBonus.getUserId());
+//
+//                    // 冻结-
+//                    user1.setLockAmount(user1.getLockAmount().subtract(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
+//                    // 余额+
+//                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
+//
+//                    this.userService.updateById(user1);
+//
+//                    // 任务解冻金额流水插入
+//                    SUserAmountLog userAmountLog = new SUserAmountLog();
+//                    userAmountLog.setUserId(user1.getId());
+//                    userAmountLog.setChangeType(9);
+//                    userAmountLog.setChangeAmount(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber())));
+//                    userAmountLog.setChangeTime(new Date());
+//                    userAmountLog.setRelationId(userBonus.getTaskId());
+//                    userAmountLog.setRemark("关联任务ID");
+//                    userAmountLog.setOldAmount(user1.getTotalAmount());
+//                    this.userAmountLogService.save(userAmountLog);
+//                }
+//            }
 
-            if (order.getPaymentState() != 1) {
-                message = "此订单还没有完成支付！";
-                response.put("code", 1);
-                response.message(message);
-                return response;
-            }
-
-            if (order.getOrderStatus() != 2) {
-                message = "此订单还没有完成发货！";
-                response.put("code", 1);
-                response.message(message);
-                return response;
-            }
-
-            SProduct product = productService.getById(order.getProductId());
-
-            // 产品下所有已完结 任务金退还（冻结 - > 余额）  并且修改状态为佣金已入账
-            SUserTask userTask = new SUserTask();
-            userTask.setProductId(order.getProductId());
-            userTask.setPayStatus(1);
-            userTask.setStatus(3);
-            List<SUserTask> userTaskList = userTaskService.findUserTaskList(userTask);
-            for (SUserTask userTasked : userTaskList) {
-
-                // 佣金已入账 状态更新
-                userTasked.setUpdateTime(new Date());
-                userTasked.setStatus(4);
-                this.userTaskService.updateById(userTasked);
-            }
-
-            SUserBonusLog userBonusLog = new SUserBonusLog();
-
-            userBonusLog.setOrderId(order.getId());
-
-            List<SUserBonusLog> userBonusLogList = userBonusLogService.findUserBonusList(userBonusLog);
-
-            // 独赢用户
-            String rewardUserName = "";
-            // 独赢奖励
-            BigDecimal successReward = null;
-            // 躺赢人数
-            int rewardCount = 0;
-            // 躺赢奖励
-            BigDecimal everyReward = null;
-
-            for (SUserBonusLog userBonus : userBonusLogList) {
-
-                if (userBonus.getBonusType() == 3) {
-
-                    // 独赢奖励 （余额+）
-                    SUser user1 = this.userService.getById(userBonus.getUserId());
-
-                    // 金额流水插入
-                    SUserAmountLog userAmountLog = new SUserAmountLog();
-                    userAmountLog.setUserId(user1.getId());
-                    userAmountLog.setChangeType(3);
-                    userAmountLog.setChangeAmount(userBonus.getBonusAmount());
-                    userAmountLog.setChangeTime(new Date());
-                    userAmountLog.setRelationId(userBonus.getTaskId());
-                    userAmountLog.setRemark("关联任务ID");
-                    userAmountLog.setOldAmount(user1.getTotalAmount());
-                    this.userAmountLogService.save(userAmountLog);
-
-                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
-                    this.userService.updateById(user1);
-
-                    SUserMsg userMsg = new SUserMsg();
-                    userMsg.setUserId(user1.getId());
-                    userMsg.setMsgTime(new Date());
-                    userMsg.setMsgType(1);
-                    userMsg.setStatus(0);
-                    userMsg.setMsgTitle("恭喜您获得独赢奖励" + userBonus.getBonusAmount() + "元。");
-                    userMsg.setMsgInfo("恭喜您获得独赢奖励" + userBonus.getBonusAmount() + "元。");
-
-                    userMsgService.save(userMsg);
-
-                    rewardUserName = user1.getNickName();
-                    successReward = userBonus.getBonusAmount();
-
-                } else if (userBonus.getBonusType() == 4) {
-
-                    rewardCount = rewardCount + 1;
-
-                    // 躺赢奖励（余额+）
-                    SUser user1 = this.userService.getById(userBonus.getUserId());
-
-                    // 躺赢金额流水插入
-                    SUserAmountLog userAmountLog = new SUserAmountLog();
-                    userAmountLog = new SUserAmountLog();
-                    userAmountLog.setUserId(user1.getId());
-                    userAmountLog.setChangeType(4);
-                    userAmountLog.setChangeAmount(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber())));
-                    userAmountLog.setChangeTime(new Date());
-                    userAmountLog.setRelationId(userBonus.getTaskId());
-                    userAmountLog.setRemark("关联任务ID");
-                    userAmountLog.setOldAmount(user1.getTotalAmount());
-                    this.userAmountLogService.save(userAmountLog);
-
-                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
-                    this.userService.updateById(user1);
-
-                    SUserMsg userMsg = new SUserMsg();
-                    userMsg.setUserId(user1.getId());
-                    userMsg.setMsgTime(new Date());
-                    userMsg.setMsgType(2);
-                    userMsg.setStatus(0);
-                    userMsg.setMsgTitle("恭喜您获得躺赢奖励" + userBonus.getBonusAmount() + "元。");
-                    userMsg.setMsgInfo("恭喜您获得躺赢奖励" + userBonus.getBonusAmount() + "元。");
-
-                    userMsgService.save(userMsg);
-
-                    everyReward = userBonus.getBonusAmount();
-
-                } else if (userBonus.getBonusType() == 5) {
-
-                    // 下级奖励（余额+）
-                    SUser user1 = this.userService.getById(userBonus.getUserId());
-
-                    // 躺赢金额流水插入
-                    SUserAmountLog userAmountLog = new SUserAmountLog();
-                    userAmountLog = new SUserAmountLog();
-                    userAmountLog.setUserId(user1.getId());
-                    userAmountLog.setChangeType(5);
-                    userAmountLog.setChangeAmount(userBonus.getBonusAmount());
-                    userAmountLog.setChangeTime(new Date());
-                    userAmountLog.setRelationId(userBonus.getTaskId());
-                    userAmountLog.setRemark("关联任务ID");
-                    userAmountLog.setOldAmount(user1.getTotalAmount());
-                    this.userAmountLogService.save(userAmountLog);
-
-                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount()));
-                    this.userService.updateById(user1);
-
-                    SUserMsg userMsg = new SUserMsg();
-                    userMsg.setUserId(user1.getId());
-                    userMsg.setMsgTime(new Date());
-                    userMsg.setMsgType(3);
-                    userMsg.setStatus(0);
-                    userMsg.setMsgTitle("恭喜您获得下级奖励" + userBonus.getBonusAmount() + "元。");
-                    userMsg.setMsgInfo("恭喜您获得下级奖励" + userBonus.getBonusAmount() + "元。");
-
-                    userMsgService.save(userMsg);
-
-                } else if (userBonus.getBonusType() == 9) {
-
-                    // 任务金奖励（余额+ 冻结-）
-                    SUser user1 = this.userService.getById(userBonus.getUserId());
-
-                    // 冻结-
-                    user1.setLockAmount(user1.getLockAmount().subtract(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
-                    // 余额+
-                    user1.setTotalAmount(user1.getTotalAmount().add(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber()))));
-
-                    this.userService.updateById(user1);
-
-                    // 任务解冻金额流水插入
-                    SUserAmountLog userAmountLog = new SUserAmountLog();
-                    userAmountLog.setUserId(user1.getId());
-                    userAmountLog.setChangeType(9);
-                    userAmountLog.setChangeAmount(userBonus.getBonusAmount().multiply(BigDecimal.valueOf(userBonus.getTaskNumber())));
-                    userAmountLog.setChangeTime(new Date());
-                    userAmountLog.setRelationId(userBonus.getTaskId());
-                    userAmountLog.setRemark("关联任务ID");
-                    userAmountLog.setOldAmount(user1.getTotalAmount());
-                    this.userAmountLogService.save(userAmountLog);
-                }
-            }
-
-            SUserMsg userMsg = new SUserMsg();
-            userMsg.setUserId(null);
-            userMsg.setMsgTime(new Date());
-            userMsg.setMsgType(0);
-            userMsg.setStatus(0);
-            userMsg.setMsgTitle("恭喜" + rewardUserName + "独赢" + successReward + "元，其他" + rewardCount + "人分配躺赢奖金" + everyReward.multiply(BigDecimal.valueOf(rewardCount))+ "元。");
-            userMsg.setMsgInfo("恭喜" + rewardUserName + "独赢" + successReward + "元，其他" + rewardCount + "人分配躺赢奖金" + everyReward.multiply(BigDecimal.valueOf(rewardCount))+ "元。");
-
-            userMsgService.save(userMsg);
+//            SUserMsg userMsg = new SUserMsg();
+//            userMsg.setUserId(null);
+//            userMsg.setMsgTime(new Date());
+//            userMsg.setMsgType(0);
+//            userMsg.setStatus(0);
+//            userMsg.setMsgTitle("恭喜" + rewardUserName + "独赢" + successReward + "元，其他" + rewardCount + "人分配躺赢奖金" + everyReward.multiply(BigDecimal.valueOf(rewardCount))+ "元。");
+//            userMsg.setMsgInfo("恭喜" + rewardUserName + "独赢" + successReward + "元，其他" + rewardCount + "人分配躺赢奖金" + everyReward.multiply(BigDecimal.valueOf(rewardCount))+ "元。");
+//
+//            userMsgService.save(userMsg);
 
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";

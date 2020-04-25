@@ -45,10 +45,7 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
             queryWrapper.eq(SUserTask::getPayStatus, userTask.getPayStatus());
         }
 
-        // 状态
-        if (userTask.getStatus() != null) {
-            queryWrapper.eq(SUserTask::getStatus, userTask.getStatus());
-        }
+
 
         return this.baseMapper.selectList(queryWrapper);
     }
@@ -72,7 +69,6 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
         status.add(0);
         status.add(1);
         status.add(3);
-        queryWrapper.in(SUserTask::getStatus, status);
 
         List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
 

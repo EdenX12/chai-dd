@@ -137,7 +137,7 @@ public class SOfferPriceController extends BaseController {
 
             // 用户任务表状态更新（转让中 -> 转让成功）
             SUserTask userTaskOld = this.userTaskService.getById(taskOrder.getTaskId());
-            userTaskOld.setStatus(2);
+//            userTaskOld.setStatus(2);
             userTaskOld.setUpdateTime(new Date());
             this.userTaskService.updateById(userTaskOld);
 
@@ -147,9 +147,9 @@ public class SOfferPriceController extends BaseController {
             userTaskNew.setProductId(userTaskOld.getProductId());
 
             userTaskNew.setPayStatus(userTaskOld.getPayStatus());
-            userTaskNew.setTaskNumber(userTaskOld.getTaskNumber());
-            userTaskNew.setStatus(0);
-            userTaskNew.setShareFlag(0);
+//            userTaskNew.setTaskNumber(userTaskOld.getTaskNumber());
+//            userTaskNew.setStatus(0);
+//            userTaskNew.setShareFlag(0);
             userTaskNew.setCreateTime(new Date());
             userTaskNew.setUpdateTime(new Date());
             this.userTaskService.createUserTask(userTaskNew);

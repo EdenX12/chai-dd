@@ -12,5 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SOrderDetailServiceImpl extends ServiceImpl<SOrderDetailMapper, SOrderDetail> implements ISOrderDetailService {
 
+    @Override
+    public SOrderDetail addOrderDetail(SOrderDetail orderDetail) {
+
+        this.baseMapper.insert(orderDetail);
+
+        return orderDetail;
+    }
 
 }

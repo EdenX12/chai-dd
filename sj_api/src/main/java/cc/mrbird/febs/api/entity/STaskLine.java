@@ -47,6 +47,11 @@ public class STaskLine implements Serializable {
     private Integer lineStatus;
 
     /**
+     * 排序
+     */
+    private Integer lineOrder;
+
+    /**
      * 创建日期
      */
     private Date createTime;

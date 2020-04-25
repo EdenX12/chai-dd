@@ -63,6 +63,11 @@ public class SProductSpec implements Serializable {
     private BigDecimal scribingPrice;
 
     /**
+     * 删除标识：0未删除 1已删除
+     */
+    private Integer deleteFlag;
+
+    /**
      * 创建日期
      */
     private Date createTime;

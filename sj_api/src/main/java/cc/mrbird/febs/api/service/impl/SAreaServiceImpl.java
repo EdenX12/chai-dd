@@ -17,8 +17,15 @@ public class SAreaServiceImpl extends ServiceImpl<SAreaMapper, SArea> implements
 
     @Override
     public List<SArea> findAreaList(SArea area) {
-    	
-        return baseMapper.selectList(new LambdaQueryWrapper<SArea>().eq(SArea::getAreaParentId, area.getAreaParentId()).eq(SArea::getIsDel, 0).orderByAsc(SArea::getAreaSort));
+
+        LambdaQueryWrapper<SArea> queryWrapper = new LambdaQueryWrapper();
+
+        queryWrapper.eq(SArea::getAreaParentId, area.getAreaParentId());
+        queryWrapper.eq(SArea::getIsDel, 0);
+
+        queryWrapper.orderByAsc(SArea::getAreaSort);
+
+        return this.baseMapper.selectList(queryWrapper);
     }
 
 }

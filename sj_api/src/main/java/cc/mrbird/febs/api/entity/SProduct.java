@@ -28,6 +28,11 @@ public class SProduct implements Serializable {
     private String id;
 
     /**
+     * 所属店铺ID
+     */
+    private String shopId;
+
+    /**
      * 商品分类
      */
     private String typeId;
@@ -71,6 +76,11 @@ public class SProduct implements Serializable {
      * 划线价格
      */
     private BigDecimal scribingPrice;
+
+    /**
+     * 快递费（0元 包邮）
+     */
+    private BigDecimal expressFee;
 
     /**
      * 总佣金（单位元）

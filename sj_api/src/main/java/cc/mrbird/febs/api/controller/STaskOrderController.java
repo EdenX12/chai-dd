@@ -83,63 +83,63 @@ public class STaskOrderController extends BaseController {
                 return response;
             }
 
-            if (taskOrder.getTaskNumber() > userTask.getTaskNumber()) {
-                message = "转让份数不能超过已有任务份数！";
-                response.put("code", 1);
-                response.message(message);
-                return response;
-            }
-
-            if (userTask.getStatus() != 0) {
-                message = "您现在的任务不能转让！";
-                response.put("code", 1);
-                response.message(message);
-                return response;
-            }
-
-            // 转让份数小于任务份数的情况下，在原有的任务上更新转让数量 变为转让中  追加一条剩余转让数量的任务
-            // 转让份数等于任务份数的情况下 直接修改为转让中
-            if (taskOrder.getTaskNumber() < userTask.getTaskNumber()) {
-
-                // 更新原任务的任务数量
-                userTask.setTaskNumber(taskOrder.getTaskNumber());
-                userTask.setPayAmount(userTask.getPayAmount().multiply( BigDecimal.valueOf(taskOrder.getTaskNumber() / userTask.getTaskNumber())));
-                userTask.setStatus(1);
-                this.userTaskService.updateUserTask(userTask);
-
-                // 追加新的用户任务
-                userTask.setTaskNumber(userTask.getTaskNumber() - taskOrder.getTaskNumber());
-                userTask.setPayAmount(userTask.getPayAmount().multiply( BigDecimal.valueOf((userTask.getTaskNumber() - taskOrder.getTaskNumber()) / userTask.getTaskNumber())));
-                userTask.setStatus(0);
-                this.userTaskService.createUserTask(userTask);
-
-            } else {
-
-                userTask.setStatus(1);
-                this.userTaskService.updateUserTask(userTask);
-            }
-
-            SUser user = FebsUtil.getCurrentUser();
-            taskOrder.setUserId(user.getId());
-
-            taskOrder.setCreateTime(new Date());
-            taskOrder = this.taskOrderService.createTaskOrder(taskOrder);
-
-            // 每参与一次任务转出 猎豆追加 10颗  * 猎人等级倍数
-            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-            user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-            this.userService.updateById(user);
-
-            // 猎豆流水插入
-            SUserBeanLog userBeanLog = new SUserBeanLog();
-            userBeanLog.setUserId(user.getId());
-            userBeanLog.setChangeType(5);
-            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
-            userBeanLog.setChangeTime(new Date());
-            userBeanLog.setRelationId(taskOrder.getId());
-            userBeanLog.setRemark("关联任务转出ID");
-            userBeanLog.setOldAmount(user.getCanuseBean());
-            this.userBeanLogService.save(userBeanLog);
+//            if (taskOrder.getTaskNumber() > userTask.getTaskNumber()) {
+//                message = "转让份数不能超过已有任务份数！";
+//                response.put("code", 1);
+//                response.message(message);
+//                return response;
+//            }
+//
+//            if (userTask.getStatus() != 0) {
+//                message = "您现在的任务不能转让！";
+//                response.put("code", 1);
+//                response.message(message);
+//                return response;
+//            }
+//
+//            // 转让份数小于任务份数的情况下，在原有的任务上更新转让数量 变为转让中  追加一条剩余转让数量的任务
+//            // 转让份数等于任务份数的情况下 直接修改为转让中
+//            if (taskOrder.getTaskNumber() < userTask.getTaskNumber()) {
+//
+//                // 更新原任务的任务数量
+//                userTask.setTaskNumber(taskOrder.getTaskNumber());
+//                userTask.setPayAmount(userTask.getPayAmount().multiply( BigDecimal.valueOf(taskOrder.getTaskNumber() / userTask.getTaskNumber())));
+//                userTask.setStatus(1);
+//                this.userTaskService.updateUserTask(userTask);
+//
+//                // 追加新的用户任务
+//                userTask.setTaskNumber(userTask.getTaskNumber() - taskOrder.getTaskNumber());
+//                userTask.setPayAmount(userTask.getPayAmount().multiply( BigDecimal.valueOf((userTask.getTaskNumber() - taskOrder.getTaskNumber()) / userTask.getTaskNumber())));
+//                userTask.setStatus(0);
+//                this.userTaskService.createUserTask(userTask);
+//
+//            } else {
+//
+//                userTask.setStatus(1);
+//                this.userTaskService.updateUserTask(userTask);
+//            }
+//
+//            SUser user = FebsUtil.getCurrentUser();
+//            taskOrder.setUserId(user.getId());
+//
+//            taskOrder.setCreateTime(new Date());
+//            taskOrder = this.taskOrderService.createTaskOrder(taskOrder);
+//
+//            // 每参与一次任务转出 猎豆追加 10颗  * 猎人等级倍数
+//            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+//            user.setCanuseBean(user.getCanuseBean() + userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//            this.userService.updateById(user);
+//
+//            // 猎豆流水插入
+//            SUserBeanLog userBeanLog = new SUserBeanLog();
+//            userBeanLog.setUserId(user.getId());
+//            userBeanLog.setChangeType(5);
+//            userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(10)).intValue());
+//            userBeanLog.setChangeTime(new Date());
+//            userBeanLog.setRelationId(taskOrder.getId());
+//            userBeanLog.setRemark("关联任务转出ID");
+//            userBeanLog.setOldAmount(user.getCanuseBean());
+//            this.userBeanLogService.save(userBeanLog);
 
         } catch (Exception e) {
             message = "新增任务转让失败";
@@ -214,7 +214,7 @@ public class STaskOrderController extends BaseController {
             // 用户任务状态 （转让中 -> 已接任务）
             SUserTask userTask = new SUserTask();
             userTask.setId(taskOrderOut.getTaskId());
-            userTask.setStatus(0);
+//            userTask.setStatus(0);
             this.userTaskService.updateById(userTask);
 
         } catch (Exception e) {

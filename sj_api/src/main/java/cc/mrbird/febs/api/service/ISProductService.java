@@ -5,19 +5,30 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Map;
+
 /**
  * @author MrBird
  */
 public interface ISProductService extends IService<SProduct> {
 
     /**
-     * 查询商品详情列表，包括关注数量 已领任务数量
+     * 根据商品大分类查询商品列表
      *
      * @param product SProduct
      * @param queryRequest queryRequest
      * @return IPage
      */
-    IPage<SProduct> findProductList(SProduct product, QueryRequest queryRequest);
+    IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest queryRequest);
+
+    /**
+     * 根据商品小分类查询商品列表
+     *
+     * @param product SProduct
+     * @param queryRequest queryRequest
+     * @return IPage
+     */
+    IPage<Map> findProductListBySmallTypeId(SProduct product, QueryRequest queryRequest);
 
     /**
      * 查询商品详情，包括关注数量 已领任务数量
@@ -25,5 +36,5 @@ public interface ISProductService extends IService<SProduct> {
      * @param product SProduct
      * @return SProduct
      */
-    SProduct findProductDetail(SProduct product);
+    Map findProductDetail(SProduct product);
 }

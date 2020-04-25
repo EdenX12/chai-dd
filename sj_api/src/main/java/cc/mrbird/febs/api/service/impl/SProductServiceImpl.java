@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 /**
  * @author MrBird
  */
@@ -22,12 +24,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> implements ISProductService {
 
     @Override
-    public IPage<SProduct> findProductList(SProduct product, QueryRequest request) {
+    public IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest request) {
+
         try {
+
             Page<SProduct> page = new Page<>();
+
             SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
-            return this.baseMapper.findProductDetail(page, product);
+            return this.baseMapper.findProductDetailByBigTypeId(page, product);
+
         } catch (Exception e) {
             log.error("查询全部商品异常", e);
             return null;
@@ -35,7 +41,25 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
     }
 
     @Override
-    public SProduct findProductDetail(SProduct product) {
+    public IPage<Map> findProductListBySmallTypeId(SProduct product, QueryRequest request) {
+
+        try {
+
+            Page<SProduct> page = new Page<>();
+
+            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+
+            return this.baseMapper.findProductDetailBySmallTypeId(page, product);
+
+        } catch (Exception e) {
+            log.error("查询全部商品异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Map findProductDetail(SProduct product) {
+
         try {
 
             return this.baseMapper.findProductDetail(product);

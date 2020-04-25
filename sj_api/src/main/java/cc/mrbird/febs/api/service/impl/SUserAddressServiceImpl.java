@@ -93,14 +93,16 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
         queryWrapper.eq(SUserAddress::getUserId, userAddress.getUserId());
 
         // 用户地址ID
-        if (userAddress.getId()!=null) {
+        if (userAddress.getId() != null) {
             queryWrapper.eq(SUserAddress::getId, userAddress.getId());
-        } 
+        }
+
         queryWrapper.orderByDesc(SUserAddress::getIsDefault);
-        List<SUserAddress> list= this.baseMapper.selectList(queryWrapper);
-        if(list!=null&&list.size()>0) {
+
+        List<SUserAddress> list = this.baseMapper.selectList(queryWrapper);
+        if (list != null && list.size() > 0) {
         	return list.get(0);
-        }else {
+        } else {
         	return null;
         }
     }

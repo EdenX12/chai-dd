@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ISOrderService extends IService<SOrder> {
 
     /**
-     * 增加用户购买订单
+     * 增加用户购买批量订单
      *
      * @param order SOrder
      */
