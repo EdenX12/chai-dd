@@ -99,9 +99,13 @@
             op.product_name productName,
             op.product_img productImg,
             op.product_spec_value_name  psvName,
-            op.product_price as productPirce
+            op.product_price as productPirce,
+            s.shop_name as shopName
         from
-            s_order_product op where op.order_detail_id=#{orderDetailId}
+            s_order_product op
+            INNER JOIN s_product p on p.id=op.product_id
+            INNER JOIN s_shop s on s.id = p.shop_id
+             where op.order_detail_id=#{orderDetailId}
     </select>
 
     <!--<select id="queryDetail" resultType="java.util.Map">
