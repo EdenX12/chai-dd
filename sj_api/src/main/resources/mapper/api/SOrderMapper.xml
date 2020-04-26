@@ -100,7 +100,8 @@
             op.product_img productImg,
             op.product_spec_value_name  psvName,
             op.product_price as productPirce,
-            s.shop_name as shopName
+            s.shop_name as shopName,
+            op.product_number as productNumber
         from
             s_order_product op
             INNER JOIN s_product p on p.id=op.product_id
