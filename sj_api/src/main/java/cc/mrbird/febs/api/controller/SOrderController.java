@@ -122,7 +122,7 @@ public class SOrderController extends BaseController {
                 newProductDetail.put("productSpecId", productSpec.getId());
 
                 // 商品名称
-                newProductDetail.put("productSpecName", productDetail.get("productSpecName"));
+                newProductDetail.put("productName", productDetail.get("productName"));
 
                 // 商品简介
                 newProductDetail.put("productDes", productDetail.get("productDes"));
