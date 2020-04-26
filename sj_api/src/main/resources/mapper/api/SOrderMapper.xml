@@ -63,8 +63,8 @@
 
     <select id="queryPage" resultType="java.util.Map">
         SELECT
-            o.id orderId,
-            s.shop_name shopName,
+        od.order_id id,
+        od.id orderDetailId,
         case
         when od.order_status = 0 then '待付款'
         when od.order_status = 1 then '待发货'
@@ -72,10 +72,6 @@
         when od.order_status = 4 then '退换货'
         when od.order_status in('4','3','-1','5')	 then '已完成'
         else  ''  end as orderStatus,
-        op.product_name productName,
-        op.product_img productImg,
-        op.product_spec_value_name  psvName,
-        op.product_price as productPirce,
         case
         when od.order_status in(1,2) then 1
         else  0  end as applyRefund,
@@ -83,29 +79,34 @@
         when od.order_status !=0 then 1
         else  0  end as anotherOne
         FROM
-            s_order_product op
-        LEFT JOIN  s_order_detail od ON od.id = op.order_detail_id
-        LEFT JOIN s_product p ON p.id = op.product_id
-        LEFT JOIN s_order o ON o.id = od.order_id
-        LEFT JOIN s_shop s on s.id=p.shop_id
-
+        s_order_detail od
+        LEFT JOIN s_order o on o.id=od.order_id
         WHERE
             1 = 1
         and o.user_id = #{userId}
-
-        <if test="status != null and sOrder.orderStatus != '' and  status ！= '5'">
-            AND o.order_status=#{status}
+        <if test="status != null and status != '' and  status != '5'">
+            AND od.order_status=#{status}
         </if>
         <if test="status == '5'">
-            AND o.order_status  in('4','3','-1','5')
+            AND od.order_status  in('4','3','-1','5')
         </if>
         ORDER BY
-            o.create_time DESC
+        od.create_time DESC,od.order_id desc
     </select>
 
-    <select id="queryDetail" resultType="java.util.Map">
-
-
+    <select id="queryDetailId" resultType="java.util.Map">
+        select
+            op.product_name productName,
+            op.product_img productImg,
+            op.product_spec_value_name  psvName,
+            op.product_price as productPirce
+        from
+            s_order_product op where op.order_detail_id=#{orderDetailId}
     </select>
+
+    <!--<select id="queryDetail" resultType="java.util.Map">
+
+
+    </select>-->
     
 </mapper>

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,4 +26,11 @@ public interface SOrderMapper extends BaseMapper<SOrder> {
      * @return
      */
     IPage <Map> queryPage(Page page, @Param("status")String status, @Param("userId")String userId);
+
+    /**
+     * 根据商品订单表id查询商品
+     * @param orderDetailId
+     * @return
+     */
+    List<Map> queryDetailId(@Param("orderDetailId")String orderDetailId);
 }

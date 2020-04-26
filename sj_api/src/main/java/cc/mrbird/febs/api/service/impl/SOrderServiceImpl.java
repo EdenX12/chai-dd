@@ -41,9 +41,10 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
             List<Map> list = returnPage.getRecords();
             if(list != null){
                 for(int i = 0; i < list.size(); i++){
-                    String id =String.valueOf(list.get(i).get("orderId"));
-                    if(i != list.size()-1 &&  id.equals(list.get(i+1).get("orderId").toString())){
-                        list.get(i+1).put("isMultiple","1");//标记该订单是多个商品订单
+                    String orderDetailId =String.valueOf(list.get(i).get("orderDetailId"));
+                    if(StringUtils.isNotBlank(orderDetailId)){
+                        List<Map> productList = this.baseMapper.queryDetailId(orderDetailId);
+                        list.get(i).put("productList",productList);
                     }
                 }
                 returnPage.setRecords(list);
