@@ -92,17 +92,9 @@
         WHERE
             1 = 1
         and o.user_id = #{userId}
-        <if test="status == '0'">
-            AND o.order_status=0
-        </if>
-        <if test="status == '1'">
-            AND o.order_status=1
-        </if>
-        <if test="status == '2'">
-            AND o.order_status=2
-        </if>
-        <if test="status == '4'">
-            AND o.order_status=4
+
+        <if test="status != null and sOrder.orderStatus != '' and  status ！= '5'">
+            AND o.order_status=#{status}
         </if>
         <if test="status == '5'">
             AND o.order_status  in('4','3','-1','5')
