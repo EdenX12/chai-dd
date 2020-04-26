@@ -12,4 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SUserShopCarServiceImpl extends ServiceImpl<SUserShopCarMapper, SUserShopCar> implements ISUserShopCarService {
 
+    @Override
+    public SUserShopCar addUserShopCar(SUserShopCar userShopCar) {
+
+        this.baseMapper.insert(userShopCar);
+
+        return userShopCar;
+    }
 }

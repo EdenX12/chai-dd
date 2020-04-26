@@ -63,11 +63,6 @@ public class SOrderProduct implements Serializable {
     private BigDecimal scribingPrice;
 
     /**
-     * 单位 只 座
-     */
-    private String priceUnit;
-
-    /**
      * 商品名称
      */
     private String productName;

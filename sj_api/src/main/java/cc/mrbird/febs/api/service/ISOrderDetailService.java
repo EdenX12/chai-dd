@@ -14,4 +14,11 @@ public interface ISOrderDetailService extends IService<SOrderDetail> {
      * @param orderDetail SOrderDetail
      */
     SOrderDetail addOrderDetail(SOrderDetail orderDetail);
+
+    /**
+     * 更新订单状态
+     *
+     * @param orderDetail SOrderDetail
+     */
+    void updateOrderDetail(SOrderDetail orderDetail);
 }

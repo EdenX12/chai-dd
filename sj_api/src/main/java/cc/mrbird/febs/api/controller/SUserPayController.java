@@ -48,6 +48,9 @@ public class SUserPayController extends BaseController {
     private ISOrderService orderService;
 
     @Autowired
+    private ISOrderDetailService orderDetailService;
+
+    @Autowired
     private ISProductService productService;
 
     @Autowired
@@ -129,6 +132,65 @@ public class SUserPayController extends BaseController {
 
         // 返回值转xml
         Map<String,Object> map = XmlUtil.xmltoMap(sb.toString());
+
+        // 订单号
+        String paySn = map.get("out_trade_no").toString();
+
+        // 支付流水号
+        String transSn = map.get("transaction_id").toString();
+
+        // 关联ID
+        String relationId = map.get("attach").toString();
+
+        // 支付金额
+        String total_fee = map.get("total_fee").toString();
+        BigDecimal total = new BigDecimal(total_fee).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
+
+        // openId
+        String openid = map.get("openid").toString();
+
+        // 支付成功时更新订单状态
+        if (map.get("return_code").equals("SUCCESS")) {
+
+            String strPayType = paySn.substring(0, 1);
+
+            // 用户支付表插入
+            SUserPay userPay = new SUserPay();
+            userPay.setCreateTime(new Date());
+            userPay.setPayAmount(total);
+            userPay.setTotalAmount(total);
+            userPay.setPaySn(paySn);
+            userPay.setPayStatus(1);
+            userPay.setPayTime(new Date());
+            userPay.setRelationId(relationId);
+            userPay.setTransSn(transSn);
+            userPay.setPayType(1);
+
+            if ("O".equals(strPayType)) {
+
+                // 支付购买订单成功
+                SOrder order = this.orderService.getById(relationId);
+                userPay.setUserId(order.getUserId());
+                this.userPayService.save(userPay);
+
+                // 变更批量订单状态 已付款
+                order.setPaymentState(1);
+                order.setPaymentState(1);
+                order.setPaymentTime(new Date());
+                this.orderService.updateOrder(order);
+
+                // 变更订单明细状态 已付款
+                SOrderDetail orderDetail = new SOrderDetail();
+                orderDetail.setUserId(order.getUserId());
+                orderDetail.setOrderId(order.getId());
+                orderDetail.setOrderStatus(1);
+                orderDetail.setPaymentState(1);
+                orderDetail.setPaymentTime(new Date());
+
+                this.orderDetailService.updateOrderDetail(orderDetail);
+            }
+        }
+
 
 //        // 订单号
 //        String paySn = map.get("out_trade_no").toString();

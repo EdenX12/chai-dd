@@ -38,11 +38,19 @@ public class SOrderController extends BaseController {
     private ISOrderService orderService;
 
     @Autowired
+    private ISOrderDetailService orderDetailService;
+
+    @Autowired
+    private ISOrderProductService orderProductService;
+
+    @Autowired
     private ISProductService productService;
 
     @Autowired
     private ISProductSpecService productSpecService;
 
+    @Autowired
+    private ISUserAddressService userAddressService;
 
     @Autowired
     private ISUserTaskService userTaskService;
@@ -278,20 +286,36 @@ public class SOrderController extends BaseController {
 
         try {
 
+            SUser user = FebsUtil.getCurrentUser();
+
             JSONObject json = JSON.parseObject(jsonString);
 
             // 收货地址
             String addressId = json.getString("addressId");
+            SUserAddress userAddress = new SUserAddress();
+            userAddress.setUserId(user.getId());
+            userAddress.setId(addressId);
+            userAddress = this.userAddressService.findUserAddress(userAddress);
 
             // 支付方式  0 微信 1 支付宝 3 余额
-            String paymentType = json.getString("paymentType");
+            int paymentType = json.getIntValue("paymentType");
 
             // 店铺ID
             JSONArray confirmOrder = json.getJSONArray("shopOrder");
 
             // 生成批量订单表
+            SOrder order = new SOrder();
+            order.setUserId(user.getId());
+            order.setCreateTime(new Date());
+            order.setPaymentState(0);
+            order.setPaymentTime(new Date());
+            // 实付金额
+            order.setPayAmount(null);
+            order.setPaymentType(paymentType);
+            order.setChannel(2);
+            order = this.orderService.addOrder(order);
 
-
+            BigDecimal totalPayAmount = new BigDecimal(0);
 
             for(int i=0; i<confirmOrder.size(); i++){
 
@@ -303,56 +327,95 @@ public class SOrderController extends BaseController {
                 // 店铺订单
                 JSONArray orderProduct = confirmOrderJson.getJSONArray("orderProduct");
 
+                // 订单留言
+                String orderMessage = confirmOrderJson.getString("orderMessage");
+
                 // 生成订单明细表
+                SOrderDetail orderDetail = new SOrderDetail();
+                orderDetail.setOrderId(order.getId());
+                orderDetail.setShopId(shopId);
+                orderDetail.setUserId(user.getId());
+                orderDetail.setOrderSn("O" + System.currentTimeMillis());
+                orderDetail.setPaymentType(paymentType);
+                orderDetail.setPaymentState(0);
+                orderDetail.setPaymentTime(new Date());
+                orderDetail.setAddressId(addressId);
+                orderDetail.setOrderMessage(orderMessage);
+                orderDetail.setOrderStatus(0);
+                orderDetail.setAddressName(userAddress.getTrueName());
+                orderDetail.setAddressPhone(userAddress.getTelPhone());
+                orderDetail.setAddressDetail(userAddress.getProvinceName() + userAddress.getCityName() + userAddress.getAreaName() + userAddress.getAreaInfo());
+                orderDetail.setChannel(2);
+                orderDetail.setCreateTime(new Date());
+
+                orderDetail = this.orderDetailService.addOrderDetail(orderDetail);
+
+                BigDecimal orderAmount = new BigDecimal(0);
+                BigDecimal shippingFee = new BigDecimal(0);
+                BigDecimal payAmount = new BigDecimal(0);
 
                 for(int j=0; j<orderProduct.size(); j++){
 
                     JSONObject orderProductJson = orderProduct.getJSONObject(j);
 
+                    // 商品数量
+                    int productNumber = orderProductJson.getIntValue("productNumber");
+
                     // 商品规格ID
                     String productSpecId = orderProductJson.getString("productSpecId");
 
+                    SProductSpec productSpec = this.productSpecService.findProductSpec(productSpecId);
 
+                    SProduct product = this.productService.getById(productSpec.getProductId());
 
                     // 生成订单产品表
+                    SOrderProduct orderProductInsert = new SOrderProduct();
+
+                    orderProductInsert.setUserId(user.getId());
+                    orderProductInsert.setOrderDetailId(orderDetail.getId());
+                    orderProductInsert.setProductId(productSpec.getProductId());
+                    orderProductInsert.setProductSpecValueName(productSpec.getProductSpecValueName());
+                    orderProductInsert.setProductNumber(productNumber);
+                    orderProductInsert.setProductPrice(productSpec.getProductPrice());
+                    orderProductInsert.setScribingPrice(productSpec.getScribingPrice());
+                    orderProductInsert.setProductName(product.getProductName());
+                    orderProductInsert.setProductImg(product.getProductImg());
+                    orderProductInsert.setProductDes(product.getProductDes());
+                    orderProductInsert.setProductDetail(product.getProductDetail());
+                    orderProductInsert.setCreateTime(new Date());
+
+                    this.orderProductService.addOrderProduct(orderProductInsert);
+
+                    orderAmount = orderAmount.add( productSpec.getProductPrice().multiply(new BigDecimal(productNumber)));
+                    shippingFee = shippingFee.add(product.getExpressFee());
+                    payAmount = payAmount.add(orderAmount.subtract(shippingFee));
                 }
+
+                // 应付金额
+                orderDetail.setOrderAmount(orderAmount);
+                // 运费
+                orderDetail.setShippingFee(shippingFee);
+                // 实付金额
+                orderDetail.setPayAmount(payAmount);
+
+                this.orderDetailService.saveOrUpdate(orderDetail);
+
+                totalPayAmount = totalPayAmount.add(payAmount);
             }
 
+            // 实付金额
+            order.setPayAmount(totalPayAmount);
+            this.orderService.saveOrUpdate(order);
 
+            // 调起微信支付
+            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(order.getId()),
+                    totalPayAmount.toString(),
+                    user.getOpenId(),
+                    request.getRemoteAddr(),
+                    "2",
+                    "购买商品");
 
-//            // 商品列表
-//            List<Map> confirmOrder = request.get
-//
-//
-//
-//
-//            SUser user = FebsUtil.getCurrentUser();
-//            order.setUserId(user.getId());
-
-
-
-
-
-//            SProduct product = productService.getById(order.getProductId());
-//
-//            order.setOrderStatus(0);
-//            order.setCreateTime(new Date());
-//            order.setPaymentType(1);
-//            order.setPaymentState(0);
-//            order.setOrderAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
-//            order.setPayAmount(product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber())));
-//
-//            order = this.orderService.addOrder(order);
-//
-//            // 调起微信支付
-//            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(order.getId()),
-//                    product.getProductPrice().multiply(BigDecimal.valueOf(order.getProductNumber().longValue())).toString(),
-//                    user.getOpenId(),
-//                    request.getRemoteAddr(),
-//                    "2",
-//                    "购买商品");
-//
-//            response.data(jsonObject);
+            response.data(jsonObject);
 
         } catch (Exception e) {
             message = "购买订单失败";
