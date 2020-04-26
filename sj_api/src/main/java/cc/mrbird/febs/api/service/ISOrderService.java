@@ -5,6 +5,8 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Map;
+
 /**
  * @author MrBird
  */
@@ -20,19 +22,17 @@ public interface ISOrderService extends IService<SOrder> {
     /**
      * 查询用户购买订单列表
      *
-     * @param order SOrder
      * @param queryRequest queryRequest
      * @return IPage
      */
-    IPage<SOrder> findOrderList(SOrder order, QueryRequest queryRequest);
+    IPage<Map> queryPage(QueryRequest queryRequest, String userId, String status);
 
     /**
-     * 查询用户购买订单详情
-     *
-     * @param order SOrder
-     * @return SOrder
+     * 查询详情
+     * @param orderId
+     * @return
      */
-    SOrder findOrderDetail(SOrder order);
+    Map<String,Object> queryDetail(Integer orderId);
 
     /**
      * 更新用户购买订单状态

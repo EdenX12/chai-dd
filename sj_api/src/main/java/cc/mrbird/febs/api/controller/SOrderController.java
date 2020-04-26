@@ -12,7 +12,9 @@ import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import freemarker.template.utility.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -433,18 +435,19 @@ public class SOrderController extends BaseController {
      */
     @PostMapping("/getOrderList")
     @Limit(key = "getOrderList", period = 60, count = 20, name = "检索我的购买订单接口", prefix = "limit")
-    public FebsResponse getOrderList(QueryRequest queryRequest, SOrder order) {
+    public FebsResponse getOrderList(QueryRequest queryRequest, String status) {
 
         FebsResponse response = new FebsResponse();
 
         SUser user = FebsUtil.getCurrentUser();
-        order.setUserId(user.getId());
-
-        Map<String, Object> orderPageList = getDataTable(orderService.findOrderList(order, queryRequest));
-
+        if(user == null || StringUtils.isBlank(user.getId())){
+            response.put("code", 1);
+            response.message("用户已过期！请重新登录");
+            return response;
+        }
+        Map<String, Object> orderPageList = getDataTable(orderService.queryPage(queryRequest,user.getId(),status));
         response.put("code", 0);
         response.data(orderPageList);
-
         return response;
     }
 
@@ -458,13 +461,13 @@ public class SOrderController extends BaseController {
 
         FebsResponse response = new FebsResponse();
 
-        SUser user = FebsUtil.getCurrentUser();
+        /*SUser user = FebsUtil.getCurrentUser();
         order.setUserId(user.getId());
 
         SOrder orderDetail = orderService.findOrderDetail(order);
 
         response.put("code", 0);
-        response.data(orderDetail);
+        response.data(orderDetail);*/
 
         return response;
     }
