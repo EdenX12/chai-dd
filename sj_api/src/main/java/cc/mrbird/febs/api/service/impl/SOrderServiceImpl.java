@@ -41,15 +41,14 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
             List<Map> list = returnPage.getRecords();
             if(list != null){
                 for(int i = 0; i < list.size(); i++){
-                    String orderDetailId =String.valueOf(list.get(i).get("orderDetailId"));
-                    if(StringUtils.isNotBlank(orderDetailId)){
-                        List<Map> productList = this.baseMapper.queryDetailId(orderDetailId);
+                    Integer orderDetailId =Integer.valueOf(list.get(i).get("orderDetailId").toString());
+                    if(orderDetailId != null){
+                        List<Map> productList = this.baseMapper.queryProductDetailId(orderDetailId);
                         list.get(i).put("productList",productList);
                     }
                 }
                 returnPage.setRecords(list);
             }
-
             return returnPage;
         } catch (Exception e) {
             log.error("查询用户购买订单异常", e);
@@ -58,8 +57,16 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     }
 
     @Override
-    public Map<String, Object> queryDetail(Integer orderId) {
-        return null;
+    public Map<String, Object> queryOrderDetail(Integer orderDetailId) {
+        if(orderDetailId == null){
+            return null;
+        }
+        Map<String,Object> result = this.baseMapper.queryOrderDetail(orderDetailId);
+        if(result != null){
+            List<Map> productList = this.baseMapper.queryProductDetailId(orderDetailId);
+            result.put("productList",productList);
+        }
+        return  result;
     }
 
     /*@Override

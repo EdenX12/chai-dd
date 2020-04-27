@@ -457,18 +457,11 @@ public class SOrderController extends BaseController {
      */
     @PostMapping("/getOrderDetail")
     @Limit(key = "getOrderDetail", period = 60, count = 20, name = "检索用户购买订单详情接口", prefix = "limit")
-    public FebsResponse getOrderDetail(SOrder order) {
-
+    public FebsResponse getOrderDetail(Integer orderDetailId) {
         FebsResponse response = new FebsResponse();
-
-        /*SUser user = FebsUtil.getCurrentUser();
-        order.setUserId(user.getId());
-
-        SOrder orderDetail = orderService.findOrderDetail(order);
-
+        Map<String,Object> orderDetail = orderService.queryOrderDetail(orderDetailId);
         response.put("code", 0);
-        response.data(orderDetail);*/
-
+        response.data(orderDetail);
         return response;
     }
 
@@ -679,4 +672,6 @@ public class SOrderController extends BaseController {
 
         return response;
     }
+
+
 }

@@ -32,5 +32,11 @@ public interface SOrderMapper extends BaseMapper<SOrder> {
      * @param orderDetailId
      * @return
      */
-    List<Map> queryDetailId(@Param("orderDetailId")String orderDetailId);
+    List<Map> queryProductDetailId(@Param("orderDetailId")Integer orderDetailId);
+
+    /**
+     * 根据订单id查商品详情
+     * @param orderDetailId
+     */
+    Map<String,Object>queryOrderDetail(@Param("orderDetailId")Integer orderDetailId);
 }

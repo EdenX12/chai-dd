@@ -29,10 +29,10 @@ public interface ISOrderService extends IService<SOrder> {
 
     /**
      * 查询详情
-     * @param orderId
+     * @param orderDetailId
      * @return
      */
-    Map<String,Object> queryDetail(Integer orderId);
+    Map<String,Object> queryOrderDetail(Integer orderDetailId);
 
     /**
      * 更新用户购买订单状态
@@ -40,4 +40,5 @@ public interface ISOrderService extends IService<SOrder> {
      * @param order SOrder
      */
     SOrder updateOrder(SOrder order);
+
 }

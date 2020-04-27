@@ -69,8 +69,8 @@
         when od.order_status = 0 then '待付款'
         when od.order_status = 1 then '待发货'
         when od.order_status = 2 then '待收货'
-        when od.order_status = 4 then '退换货'
-        when od.order_status in('4','3','-1','5')	 then '已完成'
+       /* when od.order_status = 4 then '退换货'*/
+        when od.order_status in('3','-1')	 then '已完成'
         else  ''  end as orderStatus,
         case
         when od.order_status in(1,2) then 1
@@ -83,35 +83,53 @@
         LEFT JOIN s_order o on o.id=od.order_id
         WHERE
             1 = 1
-        and o.user_id = #{userId}
+        and o.user_id = #{userId} and od.order_status != 4 and od.order_status != 5
         <if test="status != null and status != '' and  status != '5'">
             AND od.order_status=#{status}
         </if>
         <if test="status == '5'">
-            AND od.order_status  in('4','3','-1','5')
+            AND od.order_status  in('3','-1',)
         </if>
         ORDER BY
         od.create_time DESC,od.order_id desc
     </select>
 
-    <select id="queryDetailId" resultType="java.util.Map">
+    <select id="queryProductDetailId" resultType="java.util.Map">
         select
             op.product_name productName,
             op.product_img productImg,
             op.product_spec_value_name  psvName,
             op.product_price as productPirce,
             s.shop_name as shopName,
-            op.product_number as productNumber
+            op.product_number as productNumber,
+            op.product_number*8 as totalBeanCnt
         from
             s_order_product op
             INNER JOIN s_product p on p.id=op.product_id
             INNER JOIN s_shop s on s.id = p.shop_id
              where op.order_detail_id=#{orderDetailId}
     </select>
-
-    <!--<select id="queryDetail" resultType="java.util.Map">
-
-
-    </select>-->
-    
+    <select id="queryOrderDetail" resultType="java.util.Map">
+        SELECT
+            o.payment_time 'paymentTime',
+            case
+            when od.order_status = 0 then '等待买家付款'
+            when od.order_status = 1 then '买家已付款'
+            when od.order_status = 2 then '卖家已发货'
+            when od.order_status = 4 then '退换货'
+            when od.order_status in('4','3','-1','5')	 then '已完成'
+            else  ''  end as orderStatus,
+            od.address_name as addressName,
+            CONCAT(LEFT(od.address_phone,3), '*****' ,RIGHT(od.address_phone,4)) as adddressPhone,
+            od.address_detail addressDetail,
+            od.pay_amount payAmount,
+            o.create_time as createTime,
+            od.order_sn as orderSn,
+            od.shipping_code as shippingCode,
+            7 - DATEDIFF(NOW(),od.shipping_time) as remainDate
+            FROM
+                s_order_detail od
+            LEFT JOIN s_order o on o.id=od.order_id
+            where od.id=#{orderDetailId}
+    </select>
 </mapper>

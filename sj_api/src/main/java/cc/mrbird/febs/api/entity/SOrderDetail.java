@@ -40,7 +40,7 @@ public class SOrderDetail implements Serializable {
     /**
      * 订单编号
      */
-    private String orderSn;
+        private String orderSn;
 
     /**
      * 用户ID
