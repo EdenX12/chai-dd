@@ -32,7 +32,7 @@ public interface ISOrderService extends IService<SOrder> {
      * @param orderDetailId
      * @return
      */
-    Map<String,Object> queryOrderDetail(Integer orderDetailId);
+    Map<String, Object> queryOrderDetail(String orderDetailId);
 
     /**
      * 更新用户购买订单状态

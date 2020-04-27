@@ -440,12 +440,9 @@ public class SOrderController extends BaseController {
         FebsResponse response = new FebsResponse();
 
         SUser user = FebsUtil.getCurrentUser();
-        if(user == null || StringUtils.isBlank(user.getId())){
-            response.put("code", 1);
-            response.message("用户已过期！请重新登录");
-            return response;
-        }
-        Map<String, Object> orderPageList = getDataTable(orderService.queryPage(queryRequest,user.getId(),status));
+
+        Map<String, Object> orderPageList = getDataTable(this.orderService.queryPage(queryRequest, user.getId(), status));
+
         response.put("code", 0);
         response.data(orderPageList);
         return response;
@@ -457,9 +454,19 @@ public class SOrderController extends BaseController {
      */
     @PostMapping("/getOrderDetail")
     @Limit(key = "getOrderDetail", period = 60, count = 20, name = "检索用户购买订单详情接口", prefix = "limit")
-    public FebsResponse getOrderDetail(Integer orderDetailId) {
+    public FebsResponse getOrderDetail(String orderDetailId) {
+
         FebsResponse response = new FebsResponse();
-        Map<String,Object> orderDetail = orderService.queryOrderDetail(orderDetailId);
+
+        if (orderDetailId == null) {
+            message = "请指定订单！";
+            response.put("code", 1);
+            response.message(message);
+            return response;
+        }
+
+        Map<String, Object> orderDetail = this.orderService.queryOrderDetail(orderDetailId);
+
         response.put("code", 0);
         response.data(orderDetail);
         return response;
