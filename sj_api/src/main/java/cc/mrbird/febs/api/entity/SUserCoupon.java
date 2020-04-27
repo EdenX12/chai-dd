@@ -43,24 +43,9 @@ public class SUserCoupon implements Serializable {
     private Integer couponType;
 
     /**
-     * 券可用数量
+     * 0-未使用 ；1-已使用；2-过期
      */
-    private Integer avaQuantity;
-
-    /**
-     * 券可用金额
-     */
-    private BigDecimal avaAmount;
-
-    /**
-     * 已用数量
-     */
-    private Integer usedQuantity;
-
-    /**
-     * 已用金额
-     */
-    private BigDecimal usedAmount;
+    private Integer couponStatus;
 
     /**
      * 创建日期
