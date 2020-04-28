@@ -130,8 +130,6 @@
         WHERE 1 = 1
         AND SP.id = #{sProduct.id}
         AND SP.delete_flag = 0
-        AND SP.product_status = 1
-
     </select>
     
 </mapper>
