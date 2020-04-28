@@ -68,6 +68,16 @@ public class SOrderDetail implements Serializable {
     private BigDecimal orderAmount;
 
     /**
+     * 优惠金额
+     */
+    private BigDecimal couponAmount;
+
+    /**
+     * 使用用户优惠券ID
+     */
+    private String userCouponId;
+
+    /**
      * 运费价格
      */
     private BigDecimal shippingFee;

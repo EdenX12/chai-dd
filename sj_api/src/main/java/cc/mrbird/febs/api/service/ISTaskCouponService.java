@@ -8,4 +8,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISTaskCouponService extends IService<STaskCoupon> {
 
+    STaskCoupon findReturnTaskCoupon();
 }

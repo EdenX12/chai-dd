@@ -33,6 +33,11 @@ public class SUserCoupon implements Serializable {
     private String userId;
 
     /**
+     * 商品id
+     */
+    private String productId;
+
+    /**
      * 券id
      */
     private String couponId;

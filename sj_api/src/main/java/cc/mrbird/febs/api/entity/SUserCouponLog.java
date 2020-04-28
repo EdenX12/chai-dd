@@ -38,6 +38,11 @@ public class SUserCouponLog implements Serializable {
     private String couponId;
 
     /**
+     * 用户券id
+     */
+    private String userCouponId;
+
+    /**
      * 券类型 0-任务金 1-商铺券
      */
     private Integer couponType;

@@ -28,6 +28,11 @@ public class STaskCoupon implements Serializable {
     private String id;
 
     /**
+     * 商品id
+     */
+    private String productId;
+
+    /**
      * 券名称
      */
     private String couponName;

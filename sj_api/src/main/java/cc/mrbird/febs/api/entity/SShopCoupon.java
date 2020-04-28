@@ -33,6 +33,11 @@ public class SShopCoupon implements Serializable {
     private String shopId;
 
     /**
+     * 商品id
+     */
+    private String productId;
+
+    /**
      * 券名称
      */
     private String couponName;

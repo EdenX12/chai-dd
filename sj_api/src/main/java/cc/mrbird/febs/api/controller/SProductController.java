@@ -1,12 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
-import cc.mrbird.febs.api.entity.SProduct;
-import cc.mrbird.febs.api.entity.SProductSpec;
-import cc.mrbird.febs.api.entity.SProductType;
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.service.ISProductService;
-import cc.mrbird.febs.api.service.ISProductSpecService;
-import cc.mrbird.febs.api.service.ISProductTypeService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
@@ -17,10 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author MrBird
@@ -37,6 +29,15 @@ public class SProductController extends BaseController {
 
     @Autowired
     private ISProductSpecService productSpecService;
+
+    @Autowired
+    private ISUserCouponService userCouponService;
+
+    @Autowired
+    private ISShopCouponService shopCouponService;
+
+    @Autowired
+    private ISTaskCouponService taskCouponService;
 
     /**
      * 取得所有商品分类信息
@@ -169,7 +170,7 @@ public class SProductController extends BaseController {
      */
     @PostMapping("/getProductDetail")
     @Limit(key = "getProductDetail", period = 60, count = 20, name = "检索商品详情接口", prefix = "limit")
-    public FebsResponse getProductDetail(QueryRequest queryRequest, String productId) {
+    public FebsResponse getProductDetail(String productId) {
 
         FebsResponse response = new FebsResponse();
 
@@ -184,15 +185,60 @@ public class SProductController extends BaseController {
         productDetail.put("productSpec", productSpecList);
 
         SUser user = FebsUtil.getCurrentUser();
+
+        List<Map> couponList = new ArrayList();
+
         if (user != null) {
 
-            // 用户优惠券
+            // 用户可用优惠券
+            List<SUserCoupon> userCouponList = this.userCouponService.findUserCouponList(user.getId(), productId, 0, null);
 
+            for (SUserCoupon userCoupon : userCouponList) {
+
+                Map<String, Object> couponMap = new HashMap<>();
+
+                // 券类型 0-任务金 1-商铺券
+                if (userCoupon.getCouponType() == 0) {
+                    STaskCoupon taskCoupon = this.taskCouponService.getById(userCoupon.getCouponId());
+
+                    // 券类型 0-任务金
+                    couponMap.put("couponType", userCoupon.getCouponType());
+                    // 券名称
+                    couponMap.put("couponName", taskCoupon.getCouponName());
+                    // 券面值
+                    couponMap.put("couponAmount", taskCoupon.getCouponAmount());
+                    // 券开始日期
+                    couponMap.put("startDate", taskCoupon.getStartDate());
+                    // 券截止日期
+                    couponMap.put("endDate", taskCoupon.getEndDate());
+                    // 使用条件 1-固定金额券 2-超级抵扣券 3-购买任务返任务金优惠券
+                    couponMap.put("useCon", taskCoupon.getUseCon());
+
+                    couponList.add(couponMap);
+
+                } else {
+                    SShopCoupon shopCoupon = this.shopCouponService.getById(userCoupon.getCouponId());
+
+                    // 券类型 1-商铺券
+                    couponMap.put("couponType", userCoupon.getCouponType());
+                    // 券名称
+                    couponMap.put("couponName", shopCoupon.getCouponName());
+                    // 券面值
+                    couponMap.put("couponAmount", shopCoupon.getCouponAmount());
+                    // 券开始日期
+                    couponMap.put("startDate", shopCoupon.getStartDate());
+                    // 券截止日期
+                    couponMap.put("endDate", shopCoupon.getEndDate());
+                    // 使用条件 0-立减 1-满减
+                    couponMap.put("useCon", shopCoupon.getUseCon());
+
+                    couponList.add(couponMap);
+                }
+            }
+
+            // 可用优惠券
+            productDetail.put("couponList", couponList);
         }
-
-        // 赠送拆豆
-
-        // 返优惠券
 
         response.put("code", 0);
         response.data(productDetail);

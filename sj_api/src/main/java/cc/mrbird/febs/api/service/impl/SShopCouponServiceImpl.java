@@ -12,5 +12,4 @@ import org.springframework.stereotype.Service;
 @Service
 public class SShopCouponServiceImpl extends ServiceImpl<SShopCouponMapper, SShopCoupon> implements ISShopCouponService {
 
-
 }

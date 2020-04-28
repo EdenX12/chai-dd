@@ -55,6 +55,16 @@ public class SOrderController extends BaseController {
     private ISUserAddressService userAddressService;
 
     @Autowired
+    private ISTaskCouponService taskCouponService;
+
+    @Autowired
+    private ISUserCouponService userCouponService;
+
+    @Autowired
+    private ISShopCouponService shopCouponService;
+
+
+    @Autowired
     private ISUserTaskService userTaskService;
 
     @Autowired
@@ -80,7 +90,7 @@ public class SOrderController extends BaseController {
     @Log("确认订单")
     @Transactional
     @PostMapping("/confirmOrder")
-    public FebsResponse confirmOrder(HttpServletRequest request, List<Map> productSpecList) {
+    public FebsResponse confirmOrder(List<Map> productSpecList) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -183,6 +193,9 @@ public class SOrderController extends BaseController {
             // 快递总费用
             BigDecimal totalExpressAmt = new BigDecimal(0);
 
+            // 订单赠送拆豆
+            int orderBeanCnt = 0;
+
             // 赠送拆豆总数
             int totalBeanCnt = 0;
 
@@ -199,6 +212,14 @@ public class SOrderController extends BaseController {
                         orderMap.put("orderReturnAmt", orderReturnAmt);
                         // 商家订单快递费用
                         orderMap.put("orderExpressAmt", orderExpressAmt);
+                        // 商家赠送拆豆数量
+                        orderMap.put("orderBeanCnt", orderBeanCnt);
+
+                        // 返优惠券名称
+                        STaskCoupon taskCoupon = this.taskCouponService.findReturnTaskCoupon();
+                        if (taskCoupon != null) {
+                            orderMap.put("couponReturnName", taskCoupon.getCouponName());
+                        }
 
                         orderList.add(orderMap);
                     }
@@ -214,6 +235,8 @@ public class SOrderController extends BaseController {
                     orderReturnAmt = (BigDecimal) productMap.get("buyerReturnAmt");
                     // 商家订单快递费用
                     orderExpressAmt = (BigDecimal) productMap.get("expressFee");
+                    // 商家订单赠送拆豆
+                    orderBeanCnt =  (int) productMap.get("productNumber") * 8;
 
                 } else {
 
@@ -221,6 +244,8 @@ public class SOrderController extends BaseController {
                     orderReturnAmt = orderReturnAmt.add( ((BigDecimal) productMap.get("buyerReturnAmt")).multiply((BigDecimal) productMap.get("productNumber")) );
                     // 商家订单快递费用
                     orderExpressAmt = orderExpressAmt.add( ((BigDecimal) productMap.get("expressFee")).multiply((BigDecimal) productMap.get("productNumber")) );
+                    // 商家订单赠送拆豆
+                    orderBeanCnt = orderBeanCnt + (int) productMap.get("productNumber") * 8;
 
                     orderProductList.add(productMap);
                 }
@@ -245,6 +270,14 @@ public class SOrderController extends BaseController {
             orderMap.put("orderReturnAmt", orderReturnAmt);
             // 商家订单快递费用
             orderMap.put("orderExpressAmt", orderExpressAmt);
+            // 商家赠送拆豆数量
+            orderMap.put("orderBeanCnt", orderBeanCnt);
+            // 返优惠券名称
+            STaskCoupon taskCoupon = this.taskCouponService.findReturnTaskCoupon();
+            if (taskCoupon != null) {
+                orderMap.put("couponReturnName", taskCoupon.getCouponName());
+            }
+
             orderList.add(orderMap);
 
             // {"confirmOrder": { { "shopId": "11", "shopName": "**店", "orderProduct": {  }  }}
@@ -262,6 +295,9 @@ public class SOrderController extends BaseController {
 
             // 赠送拆豆总数
             resultMap.put("totalBeanCnt", totalBeanCnt);
+
+            // 返优惠券（张）
+            resultMap.put("totalReturnCouponCnt", orderList.size());
 
             response.data(resultMap);
 
@@ -318,6 +354,8 @@ public class SOrderController extends BaseController {
             order = this.orderService.addOrder(order);
 
             BigDecimal totalPayAmount = new BigDecimal(0);
+            BigDecimal totalCouponAmount = new BigDecimal(0);
+            BigDecimal totalShippingFee = new BigDecimal(0);
 
             for(int i=0; i<confirmOrder.size(); i++){
 
@@ -355,6 +393,7 @@ public class SOrderController extends BaseController {
                 BigDecimal orderAmount = new BigDecimal(0);
                 BigDecimal shippingFee = new BigDecimal(0);
                 BigDecimal payAmount = new BigDecimal(0);
+                BigDecimal couponAmount = new BigDecimal(0);
 
                 for(int j=0; j<orderProduct.size(); j++){
 
@@ -390,11 +429,41 @@ public class SOrderController extends BaseController {
 
                     orderAmount = orderAmount.add( productSpec.getProductPrice().multiply(new BigDecimal(productNumber)));
                     shippingFee = shippingFee.add(product.getExpressFee());
-                    payAmount = payAmount.add(orderAmount.subtract(shippingFee));
+
+                }
+
+                // 用户选用优惠券ID
+                String userCouponId = confirmOrderJson.getString("userCouponId");
+
+                if (userCouponId != null && !userCouponId.equals("")) {
+                    SUserCoupon userCoupon = this.userCouponService.findUserCoupon(user.getId(), userCouponId);
+                    if (userCoupon != null) {
+                        SShopCoupon shopCoupon = this.shopCouponService.getById(userCoupon.getCouponId());
+
+                        // 优惠金额总计
+                        couponAmount = shopCoupon.getCouponAmount();
+
+                        // 满减条件判断
+                        if (shopCoupon.getUseCon() == 1) {
+                            if (orderAmount.compareTo(shopCoupon.getMinConsumeAmount()) < 0 ) {
+                                message = "没有达到最低消费金额，不能使用此优惠券！";
+                                response.put("code", 1);
+                                response.message(message);
+                                return response;
+                            }
+                        }
+                    }
                 }
 
                 // 应付金额
+                payAmount = orderAmount.subtract(shippingFee).subtract(couponAmount);
+
+                // 应付金额
                 orderDetail.setOrderAmount(orderAmount);
+                // 用户优惠券ID
+                orderDetail.setUserCouponId(userCouponId);
+                // 优惠金额
+                orderDetail.setCouponAmount(couponAmount);
                 // 运费
                 orderDetail.setShippingFee(shippingFee);
                 // 实付金额
@@ -403,6 +472,8 @@ public class SOrderController extends BaseController {
                 this.orderDetailService.saveOrUpdate(orderDetail);
 
                 totalPayAmount = totalPayAmount.add(payAmount);
+                totalCouponAmount = totalCouponAmount.add(couponAmount);
+                totalShippingFee = totalShippingFee.add(shippingFee);
             }
 
             // 实付金额
