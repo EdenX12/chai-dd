@@ -154,7 +154,7 @@
         SELECT  DISTINCT follow.product_id
         FROM s_user_follow follow
         where
-        follow.status = 1
+        follow.status = 1 and follow.follow_type = 0
         AND follow.user_id = #{userId}
         ORDER BY follow.create_time desc
     </select>
