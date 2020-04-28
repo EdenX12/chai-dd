@@ -377,15 +377,10 @@ public class SUserTaskController extends BaseController {
      */
     @PostMapping("/getUserTaskFollowList")
     @Limit(key = "getUserTaskFollowList", period = 60, count = 20, name = "检索我的任务【已关注】接口", prefix = "limit")
-    public FebsResponse getUserTaskFollowList(QueryRequest queryRequest, SUserTask userTask) {
-
+    public FebsResponse getUserTaskFollowList(QueryRequest queryRequest) {
         FebsResponse response = new FebsResponse();
-
         SUser user = FebsUtil.getCurrentUser();
-        userTask.setUserId(user.getId());
-
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskFollowList(userTask, queryRequest));
-
+        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskFollowList(queryRequest,user.getId()));
         response.put("code", 0);
         response.data(userTaskPageList);
 

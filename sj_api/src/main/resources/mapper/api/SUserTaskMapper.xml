@@ -150,70 +150,13 @@
     </select>
 
 
-<select id="findUserTaskFollowDetail" resultType="java.util.Map" parameterType="sUserTask">
-
-     SELECT
-
-        follow.follow_type,
-        follow.create_time createTime,
-
-        p.id,
-        p.product_name productName,
-        p.product_img productImg,
-        p.product_des productDes,
-        p.product_detail productDetail,
-        p.create_user createUser,
-        p.update_time updateTime,
-        p.update_user updateUser,
-        p.product_status productStatus,
-        p.task_number totalTaskNumber,
-        p.product_price productPrice,
-        p.total_reward totalReward,
-        p.task_price taskPrice,
-        p.price_unit priceUnit,
-        p.success_reward successReward,
-        p.every_reward everyReward,
-        p.product_type productType,
-
-        o.id taskOrderId,
-        o.task_number taskNumber,
-        o.price_type priceType,
-        o.order_price orderPrice,
-        o.end_time endTime,
-        o.status,
-
-        ifnull(op.offerCount, 0) offerCount,
-
-        frontOffer.amount frontAmount,
-        frontOffer.status frontStatus,
-        opu.user_name frontUserName,
-        opu.nick_name frontNickName,
-        opu.user_phone frontUserPhone,
-
-        ifnull(watchTask.watchCnt, 0) watchCnt,
-        ifnull(gotTask.hunterCnt, 0) hunterCnt,
-        datediff(now(), p.create_time) taskDays
-
-      FROM s_user_follow follow
-    LEFT JOIN s_product p ON p.id = follow.product_id
-    LEFT JOIN s_task_order o ON o.id = follow.task_order_id
-    LEFT JOIN s_user_task t ON t.id = o.task_id
-
-    LEFT JOIN (select product_id, count(*) watchCnt from s_user_task group by product_id) watchTask
-    ON watchTask.product_id = p.id
-
-    LEFT JOIN (select product_id, count(*) hunterCnt from s_user_task where pay_status =1 group by product_id) gotTask
-    ON gotTask.product_id = p.id
-
-    LEFT JOIN (SELECT task_order_id, count(*) offerCount FROM s_offer_price WHERE pay_status = 1 GROUP BY task_order_id) op
-    ON op.task_order_id = o.id
-
-    LEFT JOIN s_offer_price frontOffer ON frontOffer.task_order_id = o.id AND frontOffer.status IN (1, 3)
-    LEFT JOIN s_user opu ON opu.id = frontOffer.user_id
-
-    WHERE follow.status = 1
-      AND follow.user_id = #{sUserTask.userId}
-
+    <select id="findUserTaskFollowDetail" resultType="java.util.Map" >
+        SELECT  DISTINCT follow.product_id
+        FROM s_user_follow follow
+        where
+        follow.status = 1
+        AND follow.user_id = #{userId}
+        ORDER BY follow.create_time desc
     </select>
 
 

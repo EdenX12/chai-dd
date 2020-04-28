@@ -71,11 +71,11 @@ public interface ISUserTaskService extends IService<SUserTask> {
     /**
      * 查询我的任务【关注中】列表
      *
-     * @param userTask SUserTask
+     * @param userId userId
      * @param queryRequest queryRequest
      * @return IPage
      */
-    IPage<Map> findUserTaskFollowList(SUserTask userTask, QueryRequest queryRequest);
+    IPage<Map> findUserTaskFollowList(QueryRequest queryRequest,String userId);
 
     /**
      * 查询我的任务【已完成】列表
