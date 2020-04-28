@@ -70,4 +70,17 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
         }
     }
 
+    @Override
+    public Map findProductDetail(String productId) {
+        try {
+            SProduct product = new  SProduct();
+            product.setId(productId);
+            return this.baseMapper.findProductDetail(product);
+
+        } catch (Exception e) {
+            log.error("查询商品详情异常", e);
+            return null;
+        }
+    }
+
 }

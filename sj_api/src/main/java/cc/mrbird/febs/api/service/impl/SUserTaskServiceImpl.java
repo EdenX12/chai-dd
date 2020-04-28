@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.api.mapper.SUserTaskMapper;
+import cc.mrbird.febs.api.service.ISProductService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
@@ -10,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,6 +21,9 @@ import java.util.*;
  */
 @Service
 public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask> implements ISUserTaskService {
+
+    @Autowired
+    ISProductService productService;
 
     @Override
     public List<SUserTask> findUserTaskList(SUserTask userTask) {
@@ -115,11 +120,21 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
-    public IPage<Map> findUserTaskList(SUserTask userTask, QueryRequest request) {
+    public IPage<Map> findUserTaskingDetail( QueryRequest request,String userId) {
         try {
             Page<Map> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
-            return this.baseMapper.findUserTaskDetail(page, userTask);
+            SortUtil.handlePageSort(request, page, "newestTime", FebsConstant.ORDER_DESC, false);
+            IPage<Map> result = this.baseMapper.findUserTaskingDetail(page, userId);
+            List<Map> list = result == null ? null : result.getRecords();
+            if(list != null && list.size() > 0){
+                for(int i=0;i < list.size();i++){
+                    Map<String,Object> productInfo = productService.findProductDetail(list.get(i).get("productId").toString());
+                    list.get(i).put("productInfo",productInfo);
+                }
+            }
+            result.setRecords(list);
+            return result;
+
         } catch (Exception e) {
             log.error("查询我的任务异常", e);
             return null;

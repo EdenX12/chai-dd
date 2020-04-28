@@ -2,50 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserTaskMapper">
 
-    <select id="findUserTaskDetail" resultType="java.util.Map" parameterType="sUserTask">
-
-        SELECT
-            t.id taskId,
-            t.user_id userId,
-            t.product_id productId,
-            t.task_number taskNumber,
-            t.status status,
-            t.create_time createTime,
-            t.pay_time payTime,
-            datediff(now(), t.pay_time) taskDays,
-            p.product_name productName,
-            p.product_img productImg,
-            p.product_des productDes,
-            p.product_detail productDetail,
-            p.task_number totalTaskNumber,
-            t2.taskNumberOK taskNumberOK,
-            p.product_price productPrice,
-            p.total_reward totalReward,
-            p.task_price taskPrice,
-            p.price_unit priceUnit,
-            p.success_reward successReward,
-            p.every_reward everyReward,
-            ifnull(watchTask.watchCnt, 0) watchCnt,
-            ifnull(gotTask.hunterCnt, 0) hunterCnt
-
-          FROM s_user_task t
-        LEFT JOIN s_product p ON p.id = t.product_id
-        LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 AND status !=2 GROUP BY product_id) t2
-          ON t2.product_id = t.product_id
-
-        LEFT JOIN (select product_id, count(*) watchCnt from s_user_task group by product_id) watchTask
-        ON watchTask.product_id = t.product_id
-
-        LEFT JOIN (select product_id, count(*) hunterCnt from s_user_task where pay_status =1 group by product_id) gotTask
-        ON gotTask.product_id = t.product_id
-
-        WHERE t.pay_status = 1
-        AND t.user_id = #{sUserTask.userId}
-        AND t.status = 0
-
+    <select id="findUserTaskingDetail" resultType="java.util.Map" >
+          SELECT
+          SUTL1.product_id     productId,     -- 商品ID
+          SUTL1.totalTaskLine  taskingCnt,    -- 进行中任务线数量
+          SUTL2.totalTaskLine  totalTaskCnt,  -- 总任务线数量
+          SUTL1.newestTime  newestTime        -- 该用户最新下单的时间
+          FROM
+         (SELECT
+                  product_id,
+                  count(*) totalTaskLine,max(create_time) newestTime
+           FROM s_user_task_line
+           WHERE user_id = #{userId}
+            AND pay_status = 1
+            AND status = 0
+            GROUP BY  product_id) SUTL1
+        LEFT JOIN (SELECT  product_id, count(*) totalTaskLine FROM s_user_task_line where  user_id=#{userId}  GROUP BY  product_id) SUTL2
+        ON  SUTL2.product_id = SUTL1.product_id
     </select>
-
-
     <select id="findUserTaskOutDetail" resultType="java.util.Map" parameterType="sUserTask">
 
         SELECT

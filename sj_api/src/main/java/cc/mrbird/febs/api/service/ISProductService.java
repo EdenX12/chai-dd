@@ -37,4 +37,12 @@ public interface ISProductService extends IService<SProduct> {
      * @return SProduct
      */
     Map findProductDetail(SProduct product);
+
+    /**
+     * 查询商品详情，包括关注数量 已领任务数量
+     *
+     * @param product SProduct
+     * @return SProduct
+     */
+    Map findProductDetail(String  productId);
 }
