@@ -321,7 +321,7 @@ public class SUserTaskController extends BaseController {
 
         SUser user = FebsUtil.getCurrentUser();
 
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskingDetail(queryRequest,user.getId()));
+        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findTaskDetailByStatus(queryRequest,user.getId(),"0"));
 
         response.put("code", 0);
         response.data(userTaskPageList);
@@ -393,24 +393,37 @@ public class SUserTaskController extends BaseController {
      */
     @PostMapping("/getUserTaskEndList")
     @Limit(key = "getUserTaskEndList", period = 60, count = 20, name = "检索我的任务【已完成】接口", prefix = "limit")
-    public FebsResponse getUserTaskEndList(QueryRequest queryRequest, SUserTask userTask) {
+    public FebsResponse getUserTaskEndList(QueryRequest queryRequest) {
 
         FebsResponse response = new FebsResponse();
 
         SUser user = FebsUtil.getCurrentUser();
-        userTask.setUserId(user.getId());
 
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskEndList(userTask, queryRequest));
+        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findTaskDetailByStatus(queryRequest,user.getId(),"4"));
 
         response.put("code", 0);
         response.data(userTaskPageList);
 
         return response;
     }
-/**
- * 取得我的任务【结算中】列表信息
- * @return List<Map>
- */
-//TODO
+    /**
+     * 取得我的任务【结算中】列表信息
+     * @return List<Map>
+     */
+    @PostMapping("/getTaskSettlementList")
+    @Limit(key = "getTaskSettlementList", period = 60, count = 20, name = "检索我的任务【结算中】接口", prefix = "limit")
+    public FebsResponse getTaskSettlementList(QueryRequest queryRequest) {
+
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findTaskDetailByStatus(queryRequest,user.getId(),"3"));
+
+        response.put("code", 0);
+        response.data(userTaskPageList);
+
+        return response;
+    }
 
 }

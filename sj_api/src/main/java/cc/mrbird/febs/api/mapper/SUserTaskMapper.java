@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface SUserTaskMapper extends BaseMapper<SUserTask> {
 
-    IPage<Map> findUserTaskingDetail(Page page, @Param("userId") String userId);
+    IPage<Map> findTaskDetailByStatus(Page page, @Param("userId") String userId,@Param("status")String status);
 
     IPage<Map> findUserTaskOutDetail(Page page, @Param("sUserTask") SUserTask sUserTask);
 

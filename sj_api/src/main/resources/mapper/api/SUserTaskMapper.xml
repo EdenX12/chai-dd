@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserTaskMapper">
 
-    <select id="findUserTaskingDetail" resultType="java.util.Map" >
+    <select id="findTaskDetailByStatus" resultType="java.util.Map" >
           SELECT
           SUTL1.product_id     productId,     -- 商品ID
           SUTL1.totalTaskLine  taskingCnt,    -- 进行中任务线数量
@@ -15,7 +15,7 @@
            FROM s_user_task_line
            WHERE user_id = #{userId}
             AND pay_status = 1
-            AND status = 0
+            AND status = #{status}
             GROUP BY  product_id) SUTL1
         LEFT JOIN (SELECT  product_id, count(*) totalTaskLine FROM s_user_task_line where  user_id=#{userId}  GROUP BY  product_id) SUTL2
         ON  SUTL2.product_id = SUTL1.product_id

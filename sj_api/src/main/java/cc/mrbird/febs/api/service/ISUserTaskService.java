@@ -43,12 +43,12 @@ public interface ISUserTaskService extends IService<SUserTask> {
     Integer findProductCount(SUserTask userTask);
 
     /**
-     * 查询我的任务【进行中】列表
+     * 查询我的任务列表
      *
      * @param queryRequest queryRequest
      * @return IPage
      */
-    IPage<Map> findUserTaskingDetail(QueryRequest queryRequest,String userId);
+    IPage<Map> findTaskDetailByStatus(QueryRequest queryRequest,String userId,String status);
 
     /**
      * 查询我的任务【转让中】列表

@@ -120,11 +120,11 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
-    public IPage<Map> findUserTaskingDetail( QueryRequest request,String userId) {
+    public IPage<Map> findTaskDetailByStatus( QueryRequest request,String userId,String status) {
         try {
             Page<Map> page = new Page<>();
             SortUtil.handlePageSort(request, page, "newestTime", FebsConstant.ORDER_DESC, false);
-            IPage<Map> result = this.baseMapper.findUserTaskingDetail(page, userId);
+            IPage<Map> result = this.baseMapper.findTaskDetailByStatus(page, userId,status);
             List<Map> list = result == null ? null : result.getRecords();
             if(list != null && list.size() > 0){
                 for(int i=0;i < list.size();i++){
