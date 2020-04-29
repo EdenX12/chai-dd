@@ -22,9 +22,6 @@ import java.util.*;
 @Service
 public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask> implements ISUserTaskService {
 
-    @Autowired
-    ISProductService productService;
-
     @Override
     public List<SUserTask> findUserTaskList(SUserTask userTask) {
 
@@ -120,19 +117,14 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
-    public IPage<Map> findTaskDetailByStatus( QueryRequest request,String userId,String status) {
+    public IPage<Map> findTaskDetailByStatus( QueryRequest request, String userId, int status) {
+
         try {
+
             Page<Map> page = new Page<>();
             SortUtil.handlePageSort(request, page, "newestTime", FebsConstant.ORDER_DESC, false);
-            IPage<Map> result = this.baseMapper.findTaskDetailByStatus(page, userId,status);
-            List<Map> list = result == null ? null : result.getRecords();
-            if(list != null && list.size() > 0){
-                for(int i=0;i < list.size();i++){
-                    Map<String,Object> productInfo = productService.findProductDetail(list.get(i).get("productId").toString());
-                    list.get(i).put("productInfo",productInfo);
-                }
-            }
-            result.setRecords(list);
+            IPage<Map> result = this.baseMapper.findTaskDetailByStatus(page, userId, status);
+
             return result;
 
         } catch (Exception e) {
@@ -167,18 +159,13 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
 
     @Override
     public IPage<Map> findUserTaskFollowList( QueryRequest request,String userId) {
+
         try {
+
             Page<Map> page = new Page<>();
             SortUtil.handlePageSort(request, page, null, null, false);
             IPage<Map> result = this.baseMapper.findUserTaskFollowDetail(page, userId);
-            List<Map> list = result == null ? null : result.getRecords();
-            if(list != null && list.size() > 0){
-                for(int i=0;i < list.size();i++){
-                    Map<String,Object> productInfo = productService.findProductDetail(list.get(i).get("productId").toString());
-                    list.get(i).put("productInfo",productInfo);
-                }
-            }
-            result.setRecords(list);
+
             return result;
         } catch (Exception e) {
             log.error("查询我的关注任务列表异常", e);

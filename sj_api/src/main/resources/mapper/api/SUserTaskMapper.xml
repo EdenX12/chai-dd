@@ -7,19 +7,30 @@
           SUTL1.product_id     productId,     -- 商品ID
           SUTL1.totalTaskLine  taskingCnt,    -- 进行中任务线数量
           SUTL2.totalTaskLine  totalTaskCnt,  -- 总任务线数量
-          SUTL1.newestTime  newestTime        -- 该用户最新下单的时间
+          SUTL1.newestTime      newestTime    -- 该用户最新下单的时间
           FROM
          (SELECT
                   product_id,
-                  count(*) totalTaskLine,max(create_time) newestTime
+                  count(*) totalTaskLine,
+                  max(create_time) newestTime
            FROM s_user_task_line
            WHERE user_id = #{userId}
             AND pay_status = 1
             AND status = #{status}
             GROUP BY  product_id) SUTL1
-        LEFT JOIN (SELECT  product_id, count(*) totalTaskLine FROM s_user_task_line where  user_id=#{userId}  GROUP BY  product_id) SUTL2
+        LEFT JOIN (SELECT  product_id, count(*) totalTaskLine FROM s_user_task_line where  user_id=#{userId} AND pay_status = 1 GROUP BY  product_id) SUTL2
         ON  SUTL2.product_id = SUTL1.product_id
     </select>
+
+    <select id="findUserTaskFollowDetail" resultType="java.util.Map" >
+        SELECT DISTINCT product_id productId
+          FROM s_user_follow
+         WHERE status = 1
+           AND follow_type = 0
+           AND follow.user_id = #{userId}
+         ORDER BY create_time desc
+    </select>
+
     <select id="findUserTaskOutDetail" resultType="java.util.Map" parameterType="sUserTask">
 
         SELECT
@@ -150,14 +161,7 @@
     </select>
 
 
-    <select id="findUserTaskFollowDetail" resultType="java.util.Map" >
-        SELECT  DISTINCT follow.product_id
-        FROM s_user_follow follow
-        where
-        follow.status = 1 and follow.follow_type = 0
-        AND follow.user_id = #{userId}
-        ORDER BY follow.create_time desc
-    </select>
+
 
 
     <select id="findUserTaskEndDetail" resultType="java.util.Map" parameterType="sUserTask">

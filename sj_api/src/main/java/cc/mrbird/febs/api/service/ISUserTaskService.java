@@ -48,7 +48,7 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @param queryRequest queryRequest
      * @return IPage
      */
-    IPage<Map> findTaskDetailByStatus(QueryRequest queryRequest,String userId,String status);
+    IPage<Map> findTaskDetailByStatus(QueryRequest queryRequest, String userId, int status);
 
     /**
      * 查询我的任务【转让中】列表
@@ -75,7 +75,7 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @param queryRequest queryRequest
      * @return IPage
      */
-    IPage<Map> findUserTaskFollowList(QueryRequest queryRequest,String userId);
+    IPage<Map> findUserTaskFollowList(QueryRequest queryRequest, String userId);
 
     /**
      * 查询我的任务【已完成】列表

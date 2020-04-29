@@ -10,6 +10,7 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,80 +59,80 @@ public class SUserTaskController extends BaseController {
     private WeChatPayUtil weChatPayUtil;
 
     /**
-     * 新增用户任务
+     * 确认拆单
      */
-    @Log("新增用户任务")
+    @Log("确认拆单")
     @Transactional
-    @PostMapping("/addUserTask")
-    public FebsResponse addUserTask(HttpServletRequest request, @Valid SUserTask userTask) {
+    @PostMapping("/confirmUserTask")
+    public FebsResponse confirmUserTask(HttpServletRequest request, String productId, int taskNumber) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
         try {
 
-            SUser user = FebsUtil.getCurrentUser();
-            userTask.setUserId(user.getId());
-
-            // 每件商品最高领取任务线判断
-            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-
+//            SUser user = FebsUtil.getCurrentUser();
+//            userTask.setUserId(user.getId());
+//
+//            // 每件商品最高领取任务线判断
+//            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+//
 //            if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
 //                response.put("code", 1);
 //                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
 //                return response;
 //            }
 
-            // 新手只能购买新手标  其他只能购买正常标
-            SProduct product = this.productService.getById(userTask.getProductId());
-
-            if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
-                response.put("code", 1);
-                response.message("抱歉！您现在只能在新手区领取新手任务！");
-                return response;
-            }
-
-            if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
-                response.put("code", 1);
-                response.message("抱歉！您已经不能再次领取新手任务！");
-                return response;
-            }
-
-            // 最多并行商品件数
-            Integer productCount = this.userTaskService.findProductCount(userTask);
-
-            if (productCount >= userLevel.getProductNumber()) {
-                response.put("code", 1);
-                response.message("抱歉！您已超过领取商品件数的任务！");
-                return response;
-            }
-
-            if (userTask.getId() == null) {
-                userTask.setPayStatus(2);
-//                userTask.setStatus(0);
-//                userTask.setShareFlag(0);
-                userTask.setCreateTime(new Date());
-                userTask.setUpdateTime(new Date());
-
-                userTask = this.userTaskService.createUserTask(userTask);
-            } else {
-                userTask.setUpdateTime(new Date());
-
-                userTask = this.userTaskService.updateUserTask(userTask);
-            }
-
-//            // 调起微信支付
-//            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
-//                    product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
-//                    user.getOpenId(),
-//                    request.getRemoteAddr(),
-//                    "1",
-//                    "任务金");
-
-//            response.data(jsonObject);
+//            // 新手只能购买新手标  其他只能购买正常标
+//            SProduct product = this.productService.getById(userTask.getProductId());
+//
+//            if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
+//                response.put("code", 1);
+//                response.message("抱歉！您现在只能在新手区领取新手任务！");
+//                return response;
+//            }
+//
+//            if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
+//                response.put("code", 1);
+//                response.message("抱歉！您已经不能再次领取新手任务！");
+//                return response;
+//            }
+//
+//            // 最多并行商品件数
+//            Integer productCount = this.userTaskService.findProductCount(userTask);
+//
+//            if (productCount >= userLevel.getProductNumber()) {
+//                response.put("code", 1);
+//                response.message("抱歉！您已超过领取商品件数的任务！");
+//                return response;
+//            }
+//
+//            if (userTask.getId() == null) {
+//                userTask.setPayStatus(2);
+////                userTask.setStatus(0);
+////                userTask.setShareFlag(0);
+//                userTask.setCreateTime(new Date());
+//                userTask.setUpdateTime(new Date());
+//
+//                userTask = this.userTaskService.createUserTask(userTask);
+//            } else {
+//                userTask.setUpdateTime(new Date());
+//
+//                userTask = this.userTaskService.updateUserTask(userTask);
+//            }
+//
+////            // 调起微信支付
+////            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
+////                    product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
+////                    user.getOpenId(),
+////                    request.getRemoteAddr(),
+////                    "1",
+////                    "任务金");
+//
+////            response.data(jsonObject);
 
         } catch (Exception e) {
-            message = "领取任务失败！";
+            message = "确认拆单失败！";
             response.put("code", 1);
             response.message(message);
             log.error(message, e);
@@ -139,6 +140,24 @@ public class SUserTaskController extends BaseController {
 
         return response;
     }
+
+    /**
+     * 确认支付领取任务
+     */
+    @Log("确认支付领取任务")
+    @Transactional
+    @PostMapping("/payUserTask")
+    public FebsResponse payUserTask(HttpServletRequest request, String productId, int taskNumber, String userCouponId) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+
+
+
+        return response;
+    }
+
 
     /**
      * 任务分享成功之后调用
@@ -309,6 +328,7 @@ public class SUserTaskController extends BaseController {
         return response;
     }
 
+
     /**
      * 取得我的任务【进行中】列表信息
      * @return List<Map>
@@ -321,7 +341,129 @@ public class SUserTaskController extends BaseController {
 
         SUser user = FebsUtil.getCurrentUser();
 
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findTaskDetailByStatus(queryRequest,user.getId(),"0"));
+        // 我的进行中任务
+        IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
+                queryRequest, user.getId(),0);
+
+        if (result != null) {
+            List<Map> userTaskList = result.getRecords();
+            for (Map userTask : userTaskList) {
+                Map<String, Object> productDetail = this.productService.findProductDetail(
+                        userTask.get("productId").toString());
+
+                userTask.put("productDetail", productDetail);
+            }
+
+            result.setRecords(userTaskList);
+        }
+
+        Map<String, Object> userTaskPageList = getDataTable(result);
+
+        response.put("code", 0);
+        response.data(userTaskPageList);
+
+        return response;
+    }
+
+    /**
+     * 取得我的任务【已关注】列表信息
+     * @return List<Map>
+     */
+    @PostMapping("/getUserTaskFollowList")
+    @Limit(key = "getUserTaskFollowList", period = 60, count = 20, name = "检索我的任务【已关注】接口", prefix = "limit")
+    public FebsResponse getUserTaskFollowList(QueryRequest queryRequest) {
+
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        // 我的关注中任务
+        IPage<Map> result = this.userTaskService.findUserTaskFollowList(
+                queryRequest, user.getId());
+
+        if (result != null) {
+            List<Map> userTaskList = result.getRecords();
+            for (Map userTask : userTaskList) {
+                Map<String, Object> productDetail = this.productService.findProductDetail(userTask.get("productId").toString());
+
+                userTask.put("productDetail", productDetail);
+            }
+
+            result.setRecords(userTaskList);
+        }
+
+        Map<String, Object> userTaskPageList = getDataTable(result);
+
+        response.put("code", 0);
+        response.data(userTaskPageList);
+
+        return response;
+    }
+
+    /**
+     * 取得我的任务【已完成】列表信息
+     * @return List<Map>
+     */
+    @PostMapping("/getUserTaskEndList")
+    @Limit(key = "getUserTaskEndList", period = 60, count = 20, name = "检索我的任务【已完成】接口", prefix = "limit")
+    public FebsResponse getUserTaskEndList(QueryRequest queryRequest) {
+
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        // 我的完成中任务
+        IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
+                queryRequest, user.getId(),4);
+
+        if (result != null) {
+            List<Map> userTaskList = result.getRecords();
+            for (Map userTask : userTaskList) {
+                Map<String, Object> productDetail = this.productService.findProductDetail(userTask.get("productId").toString());
+
+                userTask.put("productDetail", productDetail);
+            }
+
+            result.setRecords(userTaskList);
+        }
+
+        Map<String, Object> userTaskPageList = getDataTable(result);
+
+        response.put("code", 0);
+        response.data(userTaskPageList);
+
+        return response;
+    }
+
+    /**
+     * 取得我的任务【结算中】列表信息
+     * @return List<Map>
+     */
+    @PostMapping("/getTaskSettlementList")
+    @Limit(key = "getTaskSettlementList", period = 60, count = 20, name = "检索我的任务【结算中】接口", prefix = "limit")
+    public FebsResponse getTaskSettlementList(QueryRequest queryRequest) {
+
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        // 我的结算中任务
+        IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
+                queryRequest, user.getId(),3);
+
+        if (result != null) {
+            List<Map> userTaskList = result.getRecords();
+            for (Map userTask : userTaskList) {
+                Map<String, Object> productDetail = this.productService.findProductDetail(
+                        userTask.get("productId").toString());
+
+                userTask.put("productDetail", productDetail);
+            }
+
+            result.setRecords(userTaskList);
+        }
+
+        Map<String, Object> userTaskPageList = getDataTable(result);
 
         response.put("code", 0);
         response.data(userTaskPageList);
@@ -363,67 +505,12 @@ public class SUserTaskController extends BaseController {
         SUser user = FebsUtil.getCurrentUser();
         userTask.setUserId(user.getId());
 
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskOfferList(userTask, queryRequest));
+        Map<String, Object> userTaskPageList = getDataTable(
+                this.userTaskService.findUserTaskOfferList(userTask, queryRequest));
 
         response.put("code", 0);
         response.data(userTaskPageList);
 
         return response;
     }
-
-    /**
-     * 取得我的任务【已关注】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskFollowList")
-    @Limit(key = "getUserTaskFollowList", period = 60, count = 20, name = "检索我的任务【已关注】接口", prefix = "limit")
-    public FebsResponse getUserTaskFollowList(QueryRequest queryRequest) {
-        FebsResponse response = new FebsResponse();
-        SUser user = FebsUtil.getCurrentUser();
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskFollowList(queryRequest,user.getId()));
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
-    /**
-     * 取得我的任务【已完成】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskEndList")
-    @Limit(key = "getUserTaskEndList", period = 60, count = 20, name = "检索我的任务【已完成】接口", prefix = "limit")
-    public FebsResponse getUserTaskEndList(QueryRequest queryRequest) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findTaskDetailByStatus(queryRequest,user.getId(),"4"));
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-    /**
-     * 取得我的任务【结算中】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getTaskSettlementList")
-    @Limit(key = "getTaskSettlementList", period = 60, count = 20, name = "检索我的任务【结算中】接口", prefix = "limit")
-    public FebsResponse getTaskSettlementList(QueryRequest queryRequest) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findTaskDetailByStatus(queryRequest,user.getId(),"3"));
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
 }
