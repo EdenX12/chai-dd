@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import cc.mrbird.febs.api.entity.SUserLevel;
 import cc.mrbird.febs.api.entity.SUserMsg;
+import cc.mrbird.febs.api.entity.SUserWechat;
 import cc.mrbird.febs.api.service.ISUserLevelService;
 import cc.mrbird.febs.api.service.ISUserMsgService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
+import cc.mrbird.febs.api.service.ISUserWechatService;
 import cc.mrbird.febs.api.service.ITokenService;
 import cc.mrbird.febs.common.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vdurmont.emoji.EmojiParser;
@@ -79,6 +85,8 @@ public class SUserController extends BaseController {
 
 	@Autowired
 	private ISUserService userService;
+	@Autowired
+	private ISUserWechatService sUserWechatService;
 
     @Autowired
     private ISUserLevelService userLevelService;
@@ -113,6 +121,62 @@ public class SUserController extends BaseController {
     public ModelAndView forshare(String id) {
     	ModelAndView mav=new ModelAndView("redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx84e3a803bae71f3a&redirect_uri=http%3a%2f%2fwww.person-info.com%2fweb%2fapi%2fs-user%2fcustomer%3ftId%3d"+id+"&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect");
 		return mav;
+    }
+    /**
+     * 小程序登录
+     * @param request
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/wxLogin")
+    @Limit(key = "wxLogin", period = 60, count = 20, name = "登录接口", prefix = "limit")
+    public FebsResponse wxLogin(HttpServletRequest request, String code) throws Exception {
+    	String info=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/jscode2session?appid="+appId+"&secret="+appSecret+"&js_code="+code+"&grant_type=authorization_code" , "utf-8");
+		JSONObject userInfo=JSONObject.parseObject(info);
+		String unionid="123456";
+		String openId=userInfo.getString("openid");
+		String sessionKey=userInfo.getString("session_key");
+		if(userInfo.containsKey("unionid")) {
+			//按理说应该都有 因为暂时没绑定 先临时加个判断
+		 unionid=userInfo.getString("unionid");
+		}
+		LambdaQueryWrapper<SUser> queryWrapper=new LambdaQueryWrapper<SUser>();
+		//先根据unionid判断用户是不是存在
+		queryWrapper.eq(SUser::getUnionId, unionid);
+		queryWrapper.last("limit 1");
+		SUser suer=userService.getOne(queryWrapper);
+		if(suer==null) {
+			//判断wechat里有没有数据
+			LambdaQueryWrapper<SUserWechat> quser=new LambdaQueryWrapper<>();
+			quser.eq(SUserWechat::getUnionId, unionid);
+			quser.last("limit 1");
+			SUserWechat suerWechat=sUserWechatService.getOne(quser);
+			if(suerWechat==null) {
+				//保存
+				suerWechat=new SUserWechat();
+				suerWechat.setOpenId(openId);
+				suerWechat.setUnionId(unionid);
+				suerWechat.setCreateTime(new Date());
+				suerWechat.setLastLogin(new Date());
+				sUserWechatService.save(suerWechat);		
+			}
+			//union保存好了 但是没有执行登录 期待补充手机号码
+			return new FebsResponse().warn("用户没有手机号码").data(suerWechat);
+			
+		}else {
+			//做登录操作
+			String password = MD5Util.encrypt(openId, "123456");
+	        String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
+	        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
+	        String expireTimeStr = DateUtil.formatFullTime(expireTime);
+	        JWTToken jwtToken = new JWTToken(token, expireTimeStr);
+	        this.saveTokenToRedis(suer, jwtToken, request);
+
+            Map<String, Object> returnInfo = this.generateUserInfo(jwtToken, suer);
+            return new FebsResponse().message("操作成功").data(returnInfo);
+
+		}
     }
 
     /**
