@@ -37,10 +37,9 @@ public interface ISUserTaskService extends IService<SUserTask> {
     /**
      * 检索进行中+结算中 并行商品数量
      *
-     * @param userTask SUserTask
      @return 商品数量
      */
-    Integer findProductCount(SUserTask userTask);
+    Integer findProductCount(String userId,String productId);
 
     /**
      * 查询我的任务列表
@@ -93,4 +92,11 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @return List
      */
     List<String> findUserIdsByParent(String userId);
+
+    /**
+     * 当前用户的并行商品数量
+     * @param userId
+     * @return
+     */
+    Integer queryProductCount(String userId);
 }

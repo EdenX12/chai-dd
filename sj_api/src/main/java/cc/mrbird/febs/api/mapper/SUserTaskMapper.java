@@ -23,4 +23,6 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
     IPage<Map> findUserTaskFollowDetail(Page page, @Param("userId") String userId);
 
     IPage<Map> findUserTaskEndDetail(Page page, @Param("sUserTask") SUserTask sUserTask);
+
+   Integer queryProductCount(@Param("userId") String userId);
 }

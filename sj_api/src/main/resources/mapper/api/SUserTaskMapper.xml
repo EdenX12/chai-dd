@@ -220,5 +220,8 @@
 
     </select>
 
-
+    <select id="queryProductCount" resultType="java.lang.Integer">
+    select count(DISTINCT product_id)  from s_user_task_line
+    where user_id=#{userId} and  status =1 or status =3
+    </select>
 </mapper>

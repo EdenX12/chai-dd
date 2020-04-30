@@ -53,25 +53,25 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     }
 
     @Override
-    public Integer findProductCount(SUserTask userTask) {
+    public Integer findProductCount(String userId,String productId) {
 
         LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
 
         // 用户ID
-        queryWrapper.eq(SUserTask::getUserId, userTask.getUserId());
+        queryWrapper.eq(SUserTask::getUserId, userId);
 
         // 商品ID
-        queryWrapper.eq(SUserTask::getProductId, userTask.getProductId());
+        queryWrapper.eq(SUserTask::getProductId, productId);
 
         // 支付状态
         queryWrapper.eq(SUserTask::getPayStatus, 1);
 
         // 状态  0 已接任务  1 转让中 3 任务完结  进行中+结算中
-        List status = new ArrayList();
+       /* List status = new ArrayList();
         status.add(0);
         status.add(1);
         status.add(3);
-
+*/
         List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
 
         List<String> productIdList = new ArrayList();
@@ -214,6 +214,11 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
         userIds.addAll(set);
 
         return userIds;
+    }
+
+    @Override
+    public Integer queryProductCount(String userId) {
+        return this.baseMapper.queryProductCount(userId);
     }
 
 }

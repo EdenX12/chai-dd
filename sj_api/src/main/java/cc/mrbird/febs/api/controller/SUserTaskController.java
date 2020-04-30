@@ -1,5 +1,6 @@
 package cc.mrbird.febs.api.controller;
 
+import cc.mrbird.febs.api.dto.PayUserTaskDto;
 import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
@@ -11,6 +12,8 @@ import cc.mrbird.febs.common.utils.FebsUtil;
 import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.google.common.collect.Lists;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,79 +62,91 @@ public class SUserTaskController extends BaseController {
     @Autowired
     private WeChatPayUtil weChatPayUtil;
 
+    @Autowired
+    private ISParamsService paramsService;
+
     /**
      * 确认拆单
      */
     @Log("确认拆单")
-    @Transactional
     @PostMapping("/confirmUserTask")
-    public FebsResponse confirmUserTask(HttpServletRequest request, String productId, int taskNumber) {
+    public FebsResponse confirmUserTask(HttpServletRequest request, @NotNull(message="商品ID不可谓空") String productId, @NotNull(message="商品ID不可谓空")Integer taskNumber) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
         try {
+            if(taskNumber <= 0){
+                response.put("code", 1);
+                response.message("请重新选择数量！");
+                return response;
+            }
 
-//            SUser user = FebsUtil.getCurrentUser();
-//            userTask.setUserId(user.getId());
-//
-//            // 每件商品最高领取任务线判断
-//            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-//
-//            if (userTask.getTaskNumber() > userLevel.getBuyNumber()) {
-//                response.put("code", 1);
-//                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
-//                return response;
-//            }
+            SUser user = FebsUtil.getCurrentUser();
 
-//            // 新手只能购买新手标  其他只能购买正常标
-//            SProduct product = this.productService.getById(userTask.getProductId());
-//
-//            if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
-//                response.put("code", 1);
-//                response.message("抱歉！您现在只能在新手区领取新手任务！");
-//                return response;
-//            }
-//
-//            if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
-//                response.put("code", 1);
-//                response.message("抱歉！您已经不能再次领取新手任务！");
-//                return response;
-//            }
-//
-//            // 最多并行商品件数
-//            Integer productCount = this.userTaskService.findProductCount(userTask);
-//
-//            if (productCount >= userLevel.getProductNumber()) {
-//                response.put("code", 1);
-//                response.message("抱歉！您已超过领取商品件数的任务！");
-//                return response;
-//            }
-//
-//            if (userTask.getId() == null) {
-//                userTask.setPayStatus(2);
-////                userTask.setStatus(0);
-////                userTask.setShareFlag(0);
-//                userTask.setCreateTime(new Date());
-//                userTask.setUpdateTime(new Date());
-//
-//                userTask = this.userTaskService.createUserTask(userTask);
-//            } else {
-//                userTask.setUpdateTime(new Date());
-//
-//                userTask = this.userTaskService.updateUserTask(userTask);
-//            }
-//
-////            // 调起微信支付
-////            JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
-////                    product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
-////                    user.getOpenId(),
-////                    request.getRemoteAddr(),
-////                    "1",
-////                    "任务金");
-//
-////            response.data(jsonObject);
+            if(user == null){
+                response.put("code", 1);
+                response.message("请重新登陆！");
+                return response;
+            }
+            String userId  = user.getId();
 
+            // 每件商品最高领取任务线判断
+            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+
+            if (taskNumber > userLevel.getBuyNumber()) {
+                response.put("code", 1);
+                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
+                return response;
+            }
+
+            // 新手只能购买新手标  其他只能购买正常标
+            SProduct product = this.productService.getById(productId);
+
+            if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
+                response.put("code", 1);
+                response.message("抱歉！您现在只能在新手区领取新手任务！");
+                return response;
+            }
+
+            if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
+                response.put("code", 1);
+                response.message("抱歉！您已经不能再次领取新手任务！");
+                return response;
+            }
+
+            // 最多并行商品件数
+            Integer productCount = this.userTaskService.queryProductCount(userId);
+
+            if (productCount != null && productCount >= userLevel.getProductNumber()) {
+                response.put("code", 1);
+                response.message("抱歉！您已超过领取商品件数的任务！");
+                return response;
+            }
+
+            Map<String,Object> resultData = new HashMap();
+            //优惠券
+            BigDecimal couponAmt = BigDecimal.ZERO;
+            resultData.put("couponAmt",couponAmt);
+
+            //任务金合计
+            BigDecimal  totalAmt = (product.getTaskPrice() .multiply( new BigDecimal(taskNumber))).subtract(couponAmt);
+            if(totalAmt .compareTo(BigDecimal.ZERO) <= 0){
+                response.put("code", 1);
+                response.message("请重新选择优惠券！");
+            }
+            resultData.put("totalAmt",totalAmt);
+
+            //TODO  待确认
+           //赠送拆豆
+            Integer orderBeanCnt = 0;
+            SParams params = paramsService.queryBykeyForOne("order_bean_cnt");
+            if(params != null){
+                orderBeanCnt = Integer.valueOf(params.getPValue());
+            }
+            resultData.put("orderBeanCnt",orderBeanCnt);
+            response.put("code", 0);
+            response.data(resultData);
         } catch (Exception e) {
             message = "确认拆单失败！";
             response.put("code", 1);
@@ -147,13 +163,29 @@ public class SUserTaskController extends BaseController {
     @Log("确认支付领取任务")
     @Transactional
     @PostMapping("/payUserTask")
-    public FebsResponse payUserTask(HttpServletRequest request, String productId, int taskNumber, String userCouponId) {
+    public FebsResponse payUserTask(HttpServletRequest request,PayUserTaskDto dto) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
+        //step1 验证产品和金额
+        //生成任务信息
+        //生成任务线信息
+        //生成用户、任务、任务线关联信息
+        //维护任务线的状态
 
 
+
+
+        // 调起微信支付
+        /*JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
+                product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
+                user.getOpenId(),
+                request.getRemoteAddr(),
+                "1",
+                "任务金");
+
+//            response.data(jsonObject);*/
 
         return response;
     }
