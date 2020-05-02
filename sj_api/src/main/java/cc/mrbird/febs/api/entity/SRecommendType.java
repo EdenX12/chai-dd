@@ -29,7 +29,7 @@ public class SRecommendType implements Serializable {
     /**
      * 推荐title
      */
-    private String recommend_title;
+    private String recommendTitle;
 
     /**
      * 状态 0-创建 1-发布 2-下架 3-删除
