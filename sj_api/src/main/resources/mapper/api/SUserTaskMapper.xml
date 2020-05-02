@@ -228,7 +228,7 @@
     <!--查询已经领取的和锁定的总任务-->
     <select id="queryReCount" resultType="java.lang.Integer">
         select count(*)  from s_user_task_line where
-        pay_status =1 or pay_status=0 and  status =0
+        (pay_status =1 or pay_status=0 )and  status =0
         and product_id=#{productId} and and task_line_id=#{taskLineId}
 
     </select>
