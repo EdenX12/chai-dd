@@ -233,8 +233,8 @@ public class SUserPayController extends BaseController {
 
                 this.orderDetailService.updateOrderDetail(orderDetail);
 
-
-                // 根据订单明细中的商品 然后从任务线表(s_task_line)中按顺序选中 结算状态未完成 作为结算任务线 修改为 结算中 并把orderDetailId 更新进去
+                // 根据订单明细中的商品 然后从任务线表(s_task_line)中按顺序选中 结算状态未完成 作为结算任务线 修改为 结算中
+                // 订单商品表中的任务线ID 更新
 
                 // 上面任务线表中的所有 转让中的任务终止动作 （暂不做）
                 // 1.转让任务表状态更新 （转让中 - > 未成交流标）

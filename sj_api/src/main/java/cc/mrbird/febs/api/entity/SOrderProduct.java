@@ -43,6 +43,11 @@ public class SOrderProduct implements Serializable {
     private String productId;
 
     /**
+     * 任务线ID
+     */
+    private String taskLineId;
+
+    /**
      * 商品规格名称（下划线连接多个）
      */
     private String productSpecValueName;
