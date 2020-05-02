@@ -2,6 +2,11 @@ package cc.mrbird.febs.api.controller;
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import cc.mrbird.febs.api.entity.SUserLevel;
@@ -23,10 +34,12 @@ import cc.mrbird.febs.api.service.ITokenService;
 import cc.mrbird.febs.common.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -131,9 +144,13 @@ public class SUserController extends BaseController {
      */
     @PostMapping("/wxLogin")
     @Limit(key = "wxLogin", period = 60, count = 20, name = "登录接口", prefix = "limit")
-    public FebsResponse wxLogin(HttpServletRequest request, String code) throws Exception {
-    	String info=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/jscode2session?appid="+appId+"&secret="+appSecret+"&js_code="+code+"&grant_type=authorization_code" , "utf-8");
-		JSONObject userInfo=JSONObject.parseObject(info);
+    public FebsResponse wxLogin(HttpServletRequest request, String wxcode,String nickName,String avatarUrl,String sex) throws Exception {
+    	System.out.println(wxcode);
+    	System.out.println(appId);
+    	System.out.println(appSecret);
+    	String info=HttpRequestWechatUtil.postData("https://api.weixin.qq.com/sns/jscode2session?appid="+appId+"&secret="+appSecret+"&js_code="+wxcode+"&grant_type=authorization_code" , "utf-8");
+		System.out.println(info);
+    	JSONObject userInfo=JSONObject.parseObject(info);
 		String unionid="123456";
 		String openId=userInfo.getString("openid");
 		String sessionKey=userInfo.getString("session_key");
@@ -158,9 +175,13 @@ public class SUserController extends BaseController {
 				suerWechat.setOpenId(openId);
 				suerWechat.setUnionId(unionid);
 				suerWechat.setCreateTime(new Date());
+				suerWechat.setNickName(nickName);
+				suerWechat.setUserImg(avatarUrl);
 				suerWechat.setLastLogin(new Date());
 				sUserWechatService.save(suerWechat);		
 			}
+			System.out.println(sessionKey);
+			suerWechat.setSessionKey(sessionKey);
 			//union保存好了 但是没有执行登录 期待补充手机号码
 			return new FebsResponse().warn("用户没有手机号码").data(suerWechat);
 			
@@ -174,11 +195,73 @@ public class SUserController extends BaseController {
 	        this.saveTokenToRedis(suer, jwtToken, request);
 
             Map<String, Object> returnInfo = this.generateUserInfo(jwtToken, suer);
+            returnInfo.put("sessionKey", sessionKey);
             return new FebsResponse().message("操作成功").data(returnInfo);
 
 		}
     }
+    /**
+     * 解析手机号码
+     * @param encryptedData
+     * @param iv
+     * @param sessionKey
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/updateTelePhone")
+    @ResponseBody
+    public FebsResponse updateTelePhone(HttpServletRequest request,String unionid,String encryptedData, String iv,String sessionKey )throws Exception{
+    	String info=this.decryptWeChatRunInfo(sessionKey, encryptedData, iv);
+    	JSONObject jo=JSONObject.parseObject(info);
+    	String phone=jo.getString("purePhoneNumber");
+    	//先再次判断下用户是不是有user信息了
+    	LambdaQueryWrapper<SUser> queryWrapper=new LambdaQueryWrapper<SUser>();
+		//先根据unionid判断用户是不是存在
+    	//从微信信息表里拿数据出来 插入到user表里
+    	//登录 返回token
+		queryWrapper.eq(SUser::getUnionId, unionid);
+		queryWrapper.last("limit 1");
+		SUser suer=userService.getOne(queryWrapper);
+		if(suer==null) {
+			LambdaQueryWrapper<SUserWechat> quser=new LambdaQueryWrapper<>();
+			quser.eq(SUserWechat::getUnionId, unionid);
+			quser.last("limit 1");
+			SUserWechat suerWechat=sUserWechatService.getOne(quser);
+			//新增userInfo信息
+			suer=new SUser();
+			suer.setCanuseBean(0);
+			suer.setCreateTime(new Date());
+			suer.setLastLogin(new Date());
+			suer.setLockAmount(BigDecimal.ZERO);
+			suer.setNickName(suerWechat.getNickName());
+			suer.setOpenId(suerWechat.getOpenId());
+			suer.setRewardBean(0);
+			suer.setTaskCount(0);
+			suer.setTotalAmount(BigDecimal.ZERO);
+			suer.setUnionId(unionid);
+			suer.setUserImg(suerWechat.getUserImg());
+			suer.setUserLevelType(0);
+			suer.setUserName(phone);
+			suer.setUserPhone(phone);
+			suer.setUserStatus(0);
+			suer.setUserType(1);
+			userService.save(suer);
+			//更新下微信信息里的手机号
+			suerWechat.setUserPhone(phone);
+			sUserWechatService.updateById(suerWechat);
+		}
+    	//模拟登录 
+		//返回token
+		String password = MD5Util.encrypt(suer.getOpenId(), "123456");
+        String token = FebsUtil.encryptToken(JWTUtil.sign(suer.getOpenId(), password));
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
+        String expireTimeStr = DateUtil.formatFullTime(expireTime);
+        JWTToken jwtToken = new JWTToken(token, expireTimeStr);
+        this.saveTokenToRedis(suer, jwtToken, request);
 
+        Map<String, Object> returnInfo = this.generateUserInfo(jwtToken, suer);
+        return new FebsResponse().message("操作成功").data(returnInfo);
+    }
     /**
      * 用户登录
      * @return SUser
@@ -411,5 +494,42 @@ public class SUserController extends BaseController {
 
         userInfo.put("user", user);
         return userInfo;
+    }
+    /**
+     * 微信解密运动步数
+     *
+     * @param sessionKey
+     * @param encryptedData
+     * @param iv
+     * @return
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws InvalidKeyException 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws NoSuchProviderException 
+     */
+    public static String decryptWeChatRunInfo(String sessionKey, String encryptedData, String iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException {
+        String result = null;
+        byte[] encrypData = Base64.decodeBase64(encryptedData);
+        byte[] ivData = Base64.decodeBase64(iv);
+        byte[] sessionKeyB = Base64.decodeBase64(sessionKey);
+        try {
+            AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivData);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec keySpec = new SecretKeySpec(sessionKeyB, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            byte[] doFinal = cipher.doFinal(encrypData);
+            result = new String(doFinal);
+        }catch (Exception e){
+        	 AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivData);
+             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding","BC");
+             SecretKeySpec keySpec = new SecretKeySpec(sessionKeyB, "AES");
+             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+             byte[] doFinal = cipher.doFinal(encrypData);
+             result = new String(doFinal);
+        }
+        return result;
     }
 }
