@@ -228,7 +228,11 @@ public class SUserTaskController extends BaseController {
                String taskLineId =  taskLineService.queryIdByLineOrder(productId,minLineOrder+i);
                STaskLine taskLine  = taskLineService.getById(taskLineId);
                if(taskLine != null){
-                   taskLine.setReceivedTask(taskLine.getReceivedTask()+1);
+                   if(totalAmt.compareTo(BigDecimal.ZERO) > 0){
+                       taskLine.setReceivedTask(taskLine.getReceivedTask()+1);
+                   }else{
+                       taskLine.setLockTask(taskLine.getLockTask()+1);
+                   }
                    updateTaskLineList.add(taskLine);
                }
                 SUserTaskLine utLine = new SUserTaskLine();
