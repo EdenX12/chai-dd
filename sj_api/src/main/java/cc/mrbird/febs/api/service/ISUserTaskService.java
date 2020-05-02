@@ -4,6 +4,7 @@ import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -99,4 +100,14 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @return
      */
     Integer queryProductCount(String userId);
+
+
+    /**
+     * 查询已经领取的和锁定的总任务
+     * @param productId
+     * @param taskLineId
+     * @return
+     */
+
+    Integer queryReCount (@Param("productId") String productId,String taskLineId);
 }

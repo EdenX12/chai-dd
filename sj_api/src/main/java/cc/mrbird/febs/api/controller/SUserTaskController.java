@@ -13,6 +13,7 @@ import cc.mrbird.febs.common.utils.WeChatPayUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.Lists;
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,111 +71,77 @@ public class SUserTaskController extends BaseController {
     @Autowired
     private ISParamsService paramsService;
 
+    @Autowired
+    private ISTaskLineService taskLineService;
+
+    @Autowired
+    private ISUserCouponService userCouponService;
+
+    @Autowired
+    private ISTaskCouponService taskCouponService;
+
     /**
      * 确认拆单
      */
     @Log("确认拆单")
     @PostMapping("/confirmUserTask")
-    public FebsResponse confirmUserTask(HttpServletRequest request, @NotNull(message="商品ID不可谓空") String productId, @NotNull(message="商品ID不可谓空")Integer taskNumber) {
-
+    public FebsResponse confirmUserTask(HttpServletRequest request, @NotNull(message="商品ID不可谓空") String productId,
+                                        @NotNull(message="商品ID不可谓空")Integer taskNumber,Integer couponId) {
+        Map<String, Object> resultData = new HashMap();
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
-
         try {
+            String errorMessage = validateTask(productId, taskNumber);
+            if (StringUtils.isNotBlank(errorMessage)) {
+                response.put("code", 1);
+                response.message(errorMessage);
+                return response;
+            }
 
             SUser user = FebsUtil.getCurrentUser();
-            String userId  = user.getId();
-
-            // 判断任务数量（输入数量必须大于0）
-
-            // 根据用户等级判断一次最高可以领取任务数
-
-            // 判断任务线上是否有足够任务
-                // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
-                // 上面抽出数据count(*) 必须小于等于任务数量
-
-            // 新手只能购买新手商品
-
-            // 根据等级判断一个用户最多可以并行在多少件商品上领取任务
+            String userId = user.getId();
 
             // 商品信息取得
-
+            Map<String, Object> productInfo = productService.findProductDetail(productId);
+            resultData.put("productInfo", productInfo);
+            SProduct product = productService.getById(productId);
             // 用户在此商品的所有优惠券列表取得
+            List<SUserCoupon> userCouponList = userCouponService.findUserCouponList(userId, productId, 0, 0);
+            resultData.put("userCouponList", userCouponList);
+            // 前端页面选择的优惠券
+            BigDecimal couponAmt = new BigDecimal(0);
+            if (couponId != null) {
+                STaskCoupon coupon = taskCouponService.getById(couponId);
+                couponAmt = coupon.getCouponAmount();
+            }
+            resultData.put("couponAmt", couponAmt);//优惠券
 
             // 赠送拆豆取得
-
-            // 任务金合计、 默认实付金额
-
-            if(taskNumber <= 0){
-                response.put("code", 1);
-                response.message("请重新选择数量！");
-                return response;
-            }
-
-            // 每件商品最高领取任务线判断
-            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
-
-            if (taskNumber > userLevel.getBuyNumber()) {
-                response.put("code", 1);
-                response.message("您已超过此商品领取任务上限" + userLevel.getBuyNumber() + "份！");
-                return response;
-            }
-
-            // 新手只能购买新手标  其他只能购买正常标
-            SProduct product = this.productService.getById(productId);
-
-            if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
-                response.put("code", 1);
-                response.message("抱歉！您现在只能在新手区领取新手任务！");
-                return response;
-            }
-
-            if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
-                response.put("code", 1);
-                response.message("抱歉！您已经不能再次领取新手任务！");
-                return response;
-            }
-
-            // 最多并行商品件数
-            Integer productCount = this.userTaskService.queryProductCount(userId);
-
-            if (productCount != null && productCount >= userLevel.getProductNumber()) {
-                response.put("code", 1);
-                response.message("抱歉！您已超过领取商品件数的任务！");
-                return response;
-            }
-
-            Map<String,Object> resultData = new HashMap();
-            //优惠券
-            BigDecimal couponAmt = BigDecimal.ZERO;
-            resultData.put("couponAmt",couponAmt);
-
-            //任务金合计
-            BigDecimal  totalAmt = (product.getTaskPrice() .multiply( new BigDecimal(taskNumber))).subtract(couponAmt);
-            if(totalAmt .compareTo(BigDecimal.ZERO) <= 0){
-                response.put("code", 1);
-                response.message("请重新选择优惠券！");
-            }
-            resultData.put("totalAmt",totalAmt);
-
-            //TODO  待确认
-           //赠送拆豆
             Integer orderBeanCnt = 0;
             SParams params = paramsService.queryBykeyForOne("order_bean_cnt");
-            if(params != null){
+            if (params != null) {
                 orderBeanCnt = Integer.valueOf(params.getPValue());
-            }
-            resultData.put("orderBeanCnt",orderBeanCnt);
-            response.put("code", 0);
-            response.data(resultData);
-        } catch (Exception e) {
-            message = "确认拆单失败！";
-            response.put("code", 1);
-            response.message(message);
-            log.error(message, e);
-        }
+                // 任务金合计、 默认实付金额
+                //任务金合计
+                BigDecimal totalAmt = (product.getTaskPrice().multiply(new BigDecimal(taskNumber))).subtract(couponAmt);
+                if (totalAmt.compareTo(BigDecimal.ZERO) <= 0) {
+                    response.put("code", 1);
+                    response.message("请重新选择优惠券！");
+                }
+                resultData.put("totalAmt", totalAmt);
 
-        return response;
+                resultData.put("orderBeanCnt", orderBeanCnt);
+                response.put("code", 0);
+                response.data(resultData);
+            }
+            } catch(Exception e){
+                message = "确认拆单失败！";
+                response.put("code", 1);
+                response.message(message);
+                log.error(message, e);
+            }
+
+            return response;
     }
 
     /**
@@ -619,5 +586,69 @@ public class SUserTaskController extends BaseController {
         response.data(userTaskPageList);
 
         return response;
+    }
+
+    private String validateTask(String productId,Integer taskNumber){
+
+        // 判断任务数量（输入数量必须大于0）
+        if(taskNumber == null || taskNumber <= 0){
+            return "请重新选择数量！";
+        }
+        SUser user = FebsUtil.getCurrentUser();
+
+        if(user == null){
+            return  "请重新登陆！" ;
+        }
+        String userId  = user.getId();
+
+        // 每件商品最高领取任务线判断
+        SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+
+        if (taskNumber > userLevel.getBuyNumber()) {
+            return "您已超过此商品领取任务上限!";
+        }
+
+        // 新手只能购买新手标  其他只能购买正常标
+        SProduct product = this.productService.getById(productId);
+        if(StringUtils.isBlank(productId) || product == null || !"1".equals(product.getProductStatus())){
+            return "抱歉！该商品状态不可购买，请重新选择商品！";
+        }
+
+        if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
+            return "抱歉！您现在只能在新手区领取新手任务！";
+        }
+
+        if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
+            return "抱歉！您已经不能再次领取新手任务！";
+        }
+
+        // 判断任务线上是否有足够任务
+
+        String taskLineId = taskLineService.currentTaskLine(productId);
+        if(taskLineId == null){
+            return "抱歉！您购买的商品任务已领完，请选择其他商品！";
+        }
+        STaskLine taskLine  = taskLineService.getById(taskLineId);
+        if(taskLine == null){
+            return "抱歉！您购买的商品任务已领完，请选择其他商品！";
+        }
+
+        //已满任务不能再买  根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
+        // 上面抽出数据count(*) 必须小于等于任务数量
+        Integer rereiveTaskCount = userTaskService.queryReCount(productId,taskLineId);
+        rereiveTaskCount = rereiveTaskCount == null ? 0 : rereiveTaskCount;
+        if(rereiveTaskCount >= taskLine.getTotalTask()){
+            return "抱歉！您购买的商品任务已领完，请选择其他商品！";
+        }
+
+        // 根据等级判断一个用户最多可以并行在多少件商品上领取任务
+        // 最多并行商品件数
+        Integer productCount = this.userTaskService.queryProductCount(userId);
+
+        if (productCount != null && productCount >= userLevel.getProductNumber()) {
+            return "抱歉！您已超过领取商品件数的任务！";
+        }
+        //TODO 根据 couponId 判断优惠券是否可用
+        return null;
     }
 }
