@@ -79,7 +79,7 @@
         s_order_detail od
         LEFT JOIN s_shop ss on ss.id = od.shop_id
         WHERE 1 = 1
-        AND o.user_id = #{userId}
+        AND od.user_id = #{userId}
 
         <!--  0未付款  1已付款待发货  2已发货  4 申请退货退款 -->
         <if test="status != null and status != '' and  status != '5'">
