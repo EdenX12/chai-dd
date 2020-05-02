@@ -23,5 +23,12 @@ public interface STaskLineMapper extends BaseMapper<STaskLine> {
      */
     Integer  queryMinLineOrder(@Param("productId") String productId);
 
+    /**
+     * 查询排序查询任务线Id
+     * @param productId
+     * @return
+     */
+    String  queryIdByLineOrder(@Param("productId") String productId,@Param("lineOrder")Integer lineOrder);
+
 
 }

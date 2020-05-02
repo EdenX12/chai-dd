@@ -12,4 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SUserShareServiceImpl extends ServiceImpl<SUserShareMapper, SUserShare> implements ISUserShareService {
 
+    @Override
+    public String getCurrentShareId(String productId, String userId) {
+        return this.baseMapper.getCurrentShareId(productId,userId);
+    }
 }

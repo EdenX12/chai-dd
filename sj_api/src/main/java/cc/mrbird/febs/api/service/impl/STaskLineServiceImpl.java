@@ -28,4 +28,9 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
         }
         return this.baseMapper.queryMinLineOrder(productId);
     }
+
+    @Override
+    public String queryIdByLineOrder(String productId, Integer lineOrder) {
+        return this.baseMapper.queryIdByLineOrder(productId,lineOrder);
+    }
 }

@@ -20,6 +20,12 @@ public interface ISTaskLineService extends IService<STaskLine> {
      * @param productId
      * @return
      */
-    Integer  queryMinLineOrder(@Param("productId") String productId);
+    Integer  queryMinLineOrder( String productId);
+    /**
+     * 查询排序查询任务线Id
+     * @param productId
+     * @return
+     */
+     String  queryIdByLineOrder(String productId,Integer lineOrder);
 
 }

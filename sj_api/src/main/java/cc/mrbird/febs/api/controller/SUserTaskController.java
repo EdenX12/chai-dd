@@ -80,13 +80,22 @@ public class SUserTaskController extends BaseController {
     @Autowired
     private ISTaskCouponService taskCouponService;
 
+    @Autowired
+    private ISUserTaskLineService userTaskLineService;
+
+    @Autowired
+    private ISUserCouponLogService userCouponLogService;
+
+    @Autowired
+    private ISUserShareService userShareService;
+
     /**
      * 确认拆单
      */
     @Log("确认拆单")
     @PostMapping("/confirmUserTask")
-    public FebsResponse confirmUserTask(HttpServletRequest request, @NotNull(message="商品ID不可谓空") String productId,
-                                        @NotNull(message="商品ID不可谓空")Integer taskNumber,Integer couponId) {
+    public FebsResponse confirmUserTask(HttpServletRequest request, @NotNull(message="商品ID不可空") String productId,
+                                        @NotNull(message="商品ID不可空")Integer taskNumber,String userCouponId) {
         Map<String, Object> resultData = new HashMap();
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -108,32 +117,9 @@ public class SUserTaskController extends BaseController {
             // 用户在此商品的所有优惠券列表取得
             List<SUserCoupon> userCouponList = userCouponService.findUserCouponList(userId, productId, 0, 0);
             resultData.put("userCouponList", userCouponList);
-            // 前端页面选择的优惠券
-            BigDecimal couponAmt = new BigDecimal(0);
-            if (couponId != null) {
-                STaskCoupon coupon = taskCouponService.getById(couponId);
-                couponAmt = coupon.getCouponAmount();
-            }
-            resultData.put("couponAmt", couponAmt);//优惠券
-
-            // 赠送拆豆取得
-            Integer orderBeanCnt = 0;
-            SParams params = paramsService.queryBykeyForOne("order_bean_cnt");
-            if (params != null) {
-                orderBeanCnt = Integer.valueOf(params.getPValue());
-                // 任务金合计、 默认实付金额
-                //任务金合计
-                BigDecimal totalAmt = (product.getTaskPrice().multiply(new BigDecimal(taskNumber))).subtract(couponAmt);
-                if (totalAmt.compareTo(BigDecimal.ZERO) <= 0) {
-                    response.put("code", 1);
-                    response.message("请重新选择优惠券！");
-                }
-                resultData.put("totalAmt", totalAmt);
-
-                resultData.put("orderBeanCnt", orderBeanCnt);
-                response.put("code", 0);
-                response.data(resultData);
-            }
+            cluTaskAmt( productId,taskNumber,userCouponId,resultData,product.getTaskPrice());//计算各值
+            response.put("code", 0);
+            response.data(resultData);
             } catch(Exception e){
                 message = "确认拆单失败！";
                 response.put("code", 1);
@@ -144,6 +130,41 @@ public class SUserTaskController extends BaseController {
             return response;
     }
 
+    private void  cluTaskAmt (String productId,Integer taskNumber,String userCouponId,
+                                             Map<String, Object> resultData,BigDecimal taskPrice){
+        //任务金合计
+        BigDecimal totalAmt ;
+        boolean totalAmtFlag = false;
+        // 前端页面选择的优惠券
+        BigDecimal couponAmt = new BigDecimal(0);
+        if (userCouponId != null) {
+            SUserCoupon userCoupon = userCouponService.getById(userCouponId);
+            if(userCoupon != null && userCoupon.getCouponId() != null){
+                STaskCoupon coupon = taskCouponService.getById(userCoupon.getCouponId());
+                couponAmt = coupon.getCouponAmount();
+                if("2".equals(coupon.getUseCon())){
+                    totalAmtFlag = true;//超级优惠券
+                }
+            }
+        }
+        resultData.put("couponAmt", couponAmt);//优惠券
+        // 任务金合计、 默认实付金额
+        totalAmt = (taskPrice.multiply(new BigDecimal(taskNumber))).subtract(couponAmt);
+
+        if(totalAmtFlag){
+            totalAmt = BigDecimal.ZERO;
+        }
+
+        resultData.put("totalAmt", totalAmt);
+        // 赠送拆豆取得
+        Integer orderBeanCnt = 0;
+        SParams params = paramsService.queryBykeyForOne("order_bean_cnt");
+        if (params != null) {
+            orderBeanCnt = Integer.valueOf(params.getPValue());
+            resultData.put("orderBeanCnt", orderBeanCnt);
+        }
+    }
+
     /**
      * 确认支付领取任务
      */
@@ -151,68 +172,141 @@ public class SUserTaskController extends BaseController {
     @Transactional
     @PostMapping("/payUserTask")
     public FebsResponse payUserTask(HttpServletRequest request, String productId, Integer taskNumber, String userCouponId) {
-
+        SUser user = FebsUtil.getCurrentUser();
+        String userId = user.getId();
+        Map<String, Object> taskAmtMap = new HashMap();//支付金额等详细额度
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
+        try {
 
-        // 和确认拆单一样逻辑 判断任务线上是否有足够任务
-        // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
-        // 上面抽出数据count(*) 必须小于等于任务数量
+            SProduct product = productService.getById(productId);
 
-
-        // 根据商品ID从商品表取得 任务金 * 任务数量 = 总任务金
-
-
-        // 根据用户优惠券ID 从 s_user_coupon 得到 coupon_id
+            // 和确认拆单一样逻辑 判断任务线上是否有足够任务
+            // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
+            // 上面抽出数据count(*) 必须小于等于任务数量
+            String errorMessage = validateTask(productId, taskNumber);
+            if (StringUtils.isNotBlank(errorMessage)) {
+                response.put("code", 1);
+                response.message(errorMessage);
+                return response;
+            }
+            // 根据商品ID从商品表取得 任务金 * 任务数量 = 总任务金
+            // 根据用户优惠券ID 从 s_user_coupon 得到 coupon_id
             // 再根据coupon_id 从s_task_coupon取得 use_con 和 coupon_amount
-
+            // 前端页面选择的优惠券
             // 如果是use_con=2-超级抵扣券的情况下，实付金额==0）
+            cluTaskAmt( productId,taskNumber,userCouponId,taskAmtMap ,product.getTaskPrice());
 
-                // 生成s_user_task一条数据（支付状态：已支付）
-                // 根据商品ID、任务数从s_task_line表中分配N条任务线
-                // 根据（商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数）此条件 取得N条数据
-                // 在上记N条数据上 已领任务数+1
-                // 根据上记N条数据 然后在s_user_task_line表上生成N条数据 支付状态：已支付
+            BigDecimal totalAmt = new BigDecimal((String) taskAmtMap.get("totalAmt"));
+            BigDecimal couponAmt = taskAmtMap.get("couponAmt") == null ? BigDecimal.ZERO :  new BigDecimal((String) taskAmtMap.get("couponAmt"));
+            Integer orderBeanCnt = taskAmtMap.get("orderBeanCnt") == null ? 0 :  new Integer((String) taskAmtMap.get("orderBeanCnt"));
+            // 生成s_user_task一条数据（支付状态：已支付）
+            SUserTask userTask = new SUserTask();
+            userTask.setChannel(2);//1-微信公众号,2-小程序'
+            userTask.setPayTime(new Date());
+            userTask.setPayAmount(totalAmt);
+            if(totalAmt.compareTo(BigDecimal.ZERO) > 0){
+                userTask.setPayStatus(0);//应该是锁定啊
+            }else{
+                userTask.setPayStatus(1);//已支付
+            }
+            userTask.setUserId(userId);
+            userTask.setUserCouponId(userCouponId);
+            userTask.setCreateTime(new Date());
+            userTask.setUpdateTime(new Date());
+            userTaskService.save(userTask);
+            // 根据商品ID、任务数从s_task_line表中分配N条任务线
+            // 根据（商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数）此条件 取得N条数据
+            // 在上记N条数据上 已领任务数+1
+            // 根据上记N条数据 然后在s_user_task_line表上生成N条数据 支付状态：已支付
+            Integer  minLineOrder = taskLineService.queryMinLineOrder(productId);
+            minLineOrder = minLineOrder == null ? 0 : minLineOrder;
 
-                // 优惠券状态(已使用)修改 及 流水记录(s_user_coupon_log)追加
+            List<STaskLine> updateTaskLineList = Lists.newArrayList();
+            List<SUserTaskLine> userTaskLineList = Lists.newArrayList();
+            for(int i=0;i < taskNumber;i++){
+               String taskLineId =  taskLineService.queryIdByLineOrder(productId,minLineOrder+i);
+               STaskLine taskLine  = taskLineService.getById(taskLineId);
+               if(taskLine != null){
+                   taskLine.setReceivedTask(taskLine.getReceivedTask()+1);
+                   updateTaskLineList.add(taskLine);
+               }
+                SUserTaskLine utLine = new SUserTaskLine();
+                utLine.setCreateTime(new Date());
+                utLine.setUpdateTime(new Date());
+                utLine.setPayAmount(totalAmt);
+                if(totalAmt.compareTo(BigDecimal.ZERO) > 0){
+                    utLine.setPayStatus(0);//应该是锁定啊
+                }else{
+                    utLine.setPayStatus(1);//已支付
+                }
+                utLine.setPayTime(new Date());
+                utLine.setProductId(productId);
+                //TODO 待重写save 方法，让其返回id
+                // utLine.setTaskId()
+                utLine.setStatus(0);
+                utLine.setTaskLineId(taskLineId);
+                utLine.setUserId(userId);
+                userTaskLineList.add(utLine);
 
-                // 拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
-//                SUserBeanLog userBeanLog = new SUserBeanLog();
-//                userBeanLog.setUserId(user.getId());
-//                userBeanLog.setChangeType(1);
-//                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
-//                userBeanLog.setChangeTime(new Date());
-//                userBeanLog.setRelationId(userTask.getId());
-//                userBeanLog.setRemark("领取任务ID");
-//                userBeanLog.setOldAmount(user.getCanuseBean());
-//                this.userBeanLogService.save(userBeanLog);
+            }
+            taskLineService.updateBatchById(updateTaskLineList);
+            userTaskLineService.saveBatch(userTaskLineList);
+            // 优惠券状态(已使用)修改 及 流水记录(s_user_coupon_log)追加
+            if(StringUtils.isNotBlank(userCouponId)){
+                SUserCoupon userCoupon = userCouponService.getById(userCouponId);
+                if(userCoupon != null){
+                    userCoupon.setCouponStatus(1);
+                    userCoupon.setUpdateTime(new Date());
+                    userCouponService.updateById(userCoupon);
+                    SUserCouponLog couponLog = new SUserCouponLog();
+                    couponLog.setCreateTime(new Date());
+                    couponLog.setUpdateTime(new Date());
+                    couponLog.setCouponType(0);//券类型 0-任务金 1-商铺券
+                    couponLog.setCouponId(userCoupon.getCouponId());
+                    couponLog.setUserId(userId);
+                    userCouponLogService.save(couponLog);
+                }
+            }
 
-                // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
-                //if (user.getParentId() == null) {
-                // 根据user_id、productId 到s_user_browser表中 找到shareId
+            // 拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
+            SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+            SUserBeanLog userBeanLog = new SUserBeanLog();
+            userBeanLog.setUserId(user.getId());
+            userBeanLog.setChangeType(1);
+            userBeanLog.setChangeAmount(orderBeanCnt);
+            userBeanLog.setChangeTime(new Date());
+            userBeanLog.setRelationId(userTask.getId());
+            userBeanLog.setRemark("领取任务ID");
+            userBeanLog.setOldAmount(user.getCanuseBean());
+            this.userBeanLogService.save(userBeanLog);
 
-                // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
-
-                //}
-
-
-            // 如果是use_con !=2 的情况下，实付金额=总任务金-优惠券金额coupon_amount）
-
-                // 生成s_user_task一条数据（支付状态：锁定）
-                // 根据商品ID、任务数从s_task_line表中分配N条任务线
-                // 根据（商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数）此条件 取得N条数据
-                // 在上记N条数据上 锁定任务数+1
-                // 根据上记N条数据 然后在s_user_task_line表上生成N条数据 支付状态：锁定
-
-//                // 调起微信支付
-//                JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
-//                        product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
-//                        user.getOpenId(),
-//                        request.getRemoteAddr(),
-//                        "1",
-//                        "任务金");
-//            response.data(jsonObject);
-
+            // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
+            //if (user.getParentId() == null) {
+            // 根据user_id、productId 到s_user_browser表中 找到shareId
+            String userShareId = userShareService.getCurrentShareId(productId,userId);
+            // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
+            if(userShareId != null){
+                SUserShare userShare = userShareService.getById(userShareId);
+                if(userShare != null){
+                    user.setParentId(userShare.getUserId());
+                    userService.updateById(user);
+                }
+            }
+           //调起微信支付
+            if(totalAmt.compareTo(BigDecimal.ZERO) >0){
+                JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
+                        product.getTaskPrice().multiply(totalAmt).toString(),
+                        user.getOpenId(),
+                        request.getRemoteAddr(),
+                        "1",
+                        "任务金");
+            }
+        }catch (Exception e){
+            response.put("code", 1);
+            response.message("确认支付领取任务!");
+            log.error(message, e);
+        }
         return response;
     }
 
