@@ -16,6 +16,9 @@ import com.google.common.collect.Lists;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +39,8 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
+@Configuration
+@EnableScheduling
 @RequestMapping("/api/s-user-task")
 public class SUserTaskController extends BaseController {
 
@@ -76,20 +81,35 @@ public class SUserTaskController extends BaseController {
         response.put("code", 0);
 
         try {
+
+            SUser user = FebsUtil.getCurrentUser();
+            String userId  = user.getId();
+
+            // 判断任务数量（输入数量必须大于0）
+
+            // 根据用户等级判断一次最高可以领取任务数
+
+            // 判断任务线上是否有足够任务
+                // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
+                // 上面抽出数据count(*) 必须小于等于任务数量
+
+            // 新手只能购买新手商品
+
+            // 根据等级判断一个用户最多可以并行在多少件商品上领取任务
+
+            // 商品信息取得
+
+            // 用户在此商品的所有优惠券列表取得
+
+            // 赠送拆豆取得
+
+            // 任务金合计、 默认实付金额
+
             if(taskNumber <= 0){
                 response.put("code", 1);
                 response.message("请重新选择数量！");
                 return response;
             }
-
-            SUser user = FebsUtil.getCurrentUser();
-
-            if(user == null){
-                response.put("code", 1);
-                response.message("请重新登陆！");
-                return response;
-            }
-            String userId  = user.getId();
 
             // 每件商品最高领取任务线判断
             SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
@@ -163,33 +183,88 @@ public class SUserTaskController extends BaseController {
     @Log("确认支付领取任务")
     @Transactional
     @PostMapping("/payUserTask")
-    public FebsResponse payUserTask(HttpServletRequest request,PayUserTaskDto dto) {
+    public FebsResponse payUserTask(HttpServletRequest request, String productId, Integer taskNumber, String userCouponId) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
-        //step1 验证产品和金额
-        //生成任务信息
-        //生成任务线信息
-        //生成用户、任务、任务线关联信息
-        //维护任务线的状态
+        // 和确认拆单一样逻辑 判断任务线上是否有足够任务
+        // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
+        // 上面抽出数据count(*) 必须小于等于任务数量
 
 
+        // 根据商品ID从商品表取得 任务金 * 任务数量 = 总任务金
 
 
-        // 调起微信支付
-        /*JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
-                product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
-                user.getOpenId(),
-                request.getRemoteAddr(),
-                "1",
-                "任务金");
+        // 根据用户优惠券ID 从 s_user_coupon 得到 coupon_id
+            // 再根据coupon_id 从s_task_coupon取得 use_con 和 coupon_amount
 
-//            response.data(jsonObject);*/
+            // 如果是use_con=2-超级抵扣券的情况下，实付金额==0）
+
+                // 生成s_user_task一条数据（支付状态：已支付）
+                // 根据商品ID、任务数从s_task_line表中分配N条任务线
+                // 根据（商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数）此条件 取得N条数据
+                // 在上记N条数据上 已领任务数+1
+                // 根据上记N条数据 然后在s_user_task_line表上生成N条数据 支付状态：已支付
+
+                // 优惠券状态(已使用)修改 及 流水记录(s_user_coupon_log)追加
+
+                // 拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
+//                SUserBeanLog userBeanLog = new SUserBeanLog();
+//                userBeanLog.setUserId(user.getId());
+//                userBeanLog.setChangeType(1);
+//                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
+//                userBeanLog.setChangeTime(new Date());
+//                userBeanLog.setRelationId(userTask.getId());
+//                userBeanLog.setRemark("领取任务ID");
+//                userBeanLog.setOldAmount(user.getCanuseBean());
+//                this.userBeanLogService.save(userBeanLog);
+
+                // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
+                //if (user.getParentId() == null) {
+                // 根据user_id、productId 到s_user_browser表中 找到shareId
+
+                // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
+
+                //}
+
+
+            // 如果是use_con !=2 的情况下，实付金额=总任务金-优惠券金额coupon_amount）
+
+                // 生成s_user_task一条数据（支付状态：锁定）
+                // 根据商品ID、任务数从s_task_line表中分配N条任务线
+                // 根据（商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数）此条件 取得N条数据
+                // 在上记N条数据上 锁定任务数+1
+                // 根据上记N条数据 然后在s_user_task_line表上生成N条数据 支付状态：锁定
+
+//                // 调起微信支付
+//                JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
+//                        product.getTaskPrice().multiply(BigDecimal.valueOf(userTask.getTaskNumber().longValue())).toString(),
+//                        user.getOpenId(),
+//                        request.getRemoteAddr(),
+//                        "1",
+//                        "任务金");
+//            response.data(jsonObject);
 
         return response;
     }
 
+    /**
+     * 任务支付失败时 锁定去除 修改状态为未支付 并且修改任务线 锁定任务数
+     * 2分钟执行一次 (支付失败时间超过5分钟的任务处理)
+     */
+    @Scheduled(cron = "0 0/2 0 * * ?")
+    public void unLockPayFailTask() {
+
+        // 抽取s_user_task中 支付状态（锁定） 支付时间大于5分钟的 数据
+
+            // 修改状态为 未支付
+
+            // 同时把s_user_task_line中的相关数据也同样修改为 未支付
+
+            // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
+
+    }
 
     /**
      * 任务分享成功之后调用

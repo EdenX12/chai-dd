@@ -63,6 +63,11 @@ public class SProduct implements Serializable {
     private Integer totalNumber;
 
     /**
+     * 商品库存数量
+     */
+    private Integer stockNumber;
+
+    /**
      * 总任务份数
      */
     private Integer taskNumber;

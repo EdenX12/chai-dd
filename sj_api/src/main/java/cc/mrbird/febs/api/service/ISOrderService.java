@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,4 +42,10 @@ public interface ISOrderService extends IService<SOrder> {
      */
     SOrder updateOrder(SOrder order);
 
+    /**
+     * 检索已付款未结算订单
+     *
+     * @return  List<SOrder>
+     */
+    List<SOrder> findOrderPaySuccessList();
 }

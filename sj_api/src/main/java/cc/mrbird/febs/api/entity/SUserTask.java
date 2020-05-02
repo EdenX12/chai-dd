@@ -38,9 +38,14 @@ public class SUserTask implements Serializable {
     private String productId;
 
     /**
-     * 状态 1 已支付 2 不支付
+     * 状态 1 已支付 2 未支付 0 锁定
      */
     private Integer payStatus;
+
+    /**
+     * 用户优惠券id
+     */
+    private String userCouponId;
 
     /**
      * 支付金额

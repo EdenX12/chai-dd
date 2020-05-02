@@ -1,5 +1,6 @@
 package cc.mrbird.febs.api.service.impl;
 
+import cc.mrbird.febs.api.entity.SActivity;
 import cc.mrbird.febs.api.entity.SOrder;
 import cc.mrbird.febs.api.mapper.SOrderMapper;
 import cc.mrbird.febs.api.service.ISOrderService;
@@ -13,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -77,27 +79,16 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
         return  result;
     }
 
-    /*@Override
-    public IPage<SOrder> findOrderList(SOrder order, QueryRequest request) {
-        try {
-            Page<SOrder> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
-            return this.baseMapper.findOrderDetail(page, order);
-        } catch (Exception e) {
-            log.error("查询用户全部购买订单异常", e);
-            return null;
-        }
-    }
-
     @Override
-    public SOrder findOrderDetail(SOrder order) {
-        try {
-            return this.baseMapper.findOrderDetail(order);
-        } catch (Exception e) {
-            log.error("查询用户购买订单详情异常", e);
-            return null;
-        }
-    }*/
+    public List<SOrder> findOrderPaySuccessList() {
+
+        LambdaQueryWrapper<SOrder> queryWrapper = new LambdaQueryWrapper();
+
+        // 付款状态:0:未付款;1:已付款 2:已结算到冻结
+        queryWrapper.eq(SOrder::getPaymentState, 1);
+
+        return this.baseMapper.selectList(queryWrapper);
+    }
 
     @Override
     public SOrder updateOrder(SOrder order) {

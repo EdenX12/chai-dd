@@ -60,7 +60,7 @@ public class SUserPay implements Serializable {
     /**
      * 券id
      */
-    private String couponId;
+    private String userCouponId;
 
     /**
      * 状态 0 未支付 1 已支付

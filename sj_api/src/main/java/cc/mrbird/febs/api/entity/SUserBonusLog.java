@@ -48,7 +48,7 @@ public class SUserBonusLog implements Serializable {
     private Integer taskNumber;
 
     /**
-     * 类型 3 独赢奖励 4 躺赢奖励 5 下级奖励
+     * 类型 1-独赢（买家立返）;2-任务躺赢;3-横向躺赢;4-纵向躺赢;5-平台返回任务金;6-已转出;7-已收购;
      */
     private Integer bonusType;
 
@@ -68,7 +68,7 @@ public class SUserBonusLog implements Serializable {
     private String remark;
 
     /**
-     * 暂时不用  0 正常1 异常
+     * 0-冻结 1-结算完成 2-取消结算(商品购买者退货)
      */
     private Integer status;
 

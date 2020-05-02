@@ -53,6 +53,11 @@ public class SProductSpec implements Serializable {
     private Integer productNumber;
 
     /**
+     * 商品库存数量
+     */
+    private Integer stockNumber;
+
+    /**
      * 商品价格（单位元）
      */
     private BigDecimal productPrice;

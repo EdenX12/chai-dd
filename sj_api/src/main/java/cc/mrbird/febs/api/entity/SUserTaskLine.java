@@ -48,7 +48,7 @@ public class SUserTaskLine implements Serializable {
     private String taskLineId;
 
     /**
-     * 状态 1 已支付 2 不支付
+     * 状态 1 已支付 2 未支付 0 锁定
      */
     private Integer payStatus;
 

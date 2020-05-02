@@ -42,14 +42,29 @@ public class STaskLine implements Serializable {
     private Integer receivedTask;
 
     /**
-     * 0-未满 1-已满 2-已分润
+     * 该条任务线已锁定待支付完成的任务数
+     */
+    private Integer lockTask;
+
+    /**
+     * 0-未满 1-已满
      */
     private Integer lineStatus;
+
+    /**
+     * 结算状态  0：未完成  1：结算中  2： 已分润
+     */
+    private Integer settleStatus;
 
     /**
      * 排序
      */
     private Integer lineOrder;
+
+    /**
+     * 订单ID
+     */
+    private String orderDetailId;
 
     /**
      * 创建日期
