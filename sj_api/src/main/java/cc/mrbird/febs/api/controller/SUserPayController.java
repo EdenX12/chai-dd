@@ -71,6 +71,12 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISUserBonusLogService userBonusLogService;
 
+    @Autowired
+    private ISUserTaskLineService userTaskLineService;
+
+    @Autowired
+    private ISTaskLineService taskLineService;
+
     /**
      * 新增用户支付
      */
@@ -183,23 +189,33 @@ public class SUserPayController extends BaseController {
 
                 // 修改s_user_task_line 支付状态 已支付
 
+                String   userTaskLineId = userTaskLineService.queryIdByTask(userTask.getId());
+                SUserTaskLine userTaskLine = userTaskLineService.getById(userTaskLineId);
+                userTaskLine.setPayStatus(1);
+                userTaskLine.setUpdateTime(new Date());
+                userTaskLineService.updateById(userTaskLine);
+
                 // 修改s_task_line 锁定任务数量-1  已领取任务数量+1
+                STaskLine taskLine = taskLineService.getById(userTaskLine.getTaskLineId());
+                taskLine.setLockTask(taskLine.getLockTask()-1);
+                taskLine.setReceivedTask(taskLine.getReceivedTask()+1);
+                // todo 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
 
-                // 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
 
+                // todo  拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
+                //目前的逻辑在下单里已经生成了，支付成功不需要了
+                /*SUserBeanLog userBeanLog = new SUserBeanLog();
+                userBeanLog.setUserId(user.getId());
+                userBeanLog.setChangeType(1);
+                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
+                userBeanLog.setChangeTime(new Date());
+                userBeanLog.setRelationId(userTask.getId());
+                userBeanLog.setRemark("领取任务ID");
+                userBeanLog.setOldAmount(user.getCanuseBean());
+                this.userBeanLogService.save(userBeanLog);*/
 
-                // 拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
-//                SUserBeanLog userBeanLog = new SUserBeanLog();
-//                userBeanLog.setUserId(user.getId());
-//                userBeanLog.setChangeType(1);
-//                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
-//                userBeanLog.setChangeTime(new Date());
-//                userBeanLog.setRelationId(userTask.getId());
-//                userBeanLog.setRemark("领取任务ID");
-//                userBeanLog.setOldAmount(user.getCanuseBean());
-//                this.userBeanLogService.save(userBeanLog);
-
-                // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
+                //TODO 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
+                //目前的逻辑在下单里已经生成了，支付成功不需要了
                 //if (user.getParentId() == null) {
                     // 根据user_id、productId 到s_user_browser表中 找到shareId
 

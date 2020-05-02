@@ -141,9 +141,11 @@ public class SUserTaskController extends BaseController {
             SUserCoupon userCoupon = userCouponService.getById(userCouponId);
             if(userCoupon != null && userCoupon.getCouponId() != null){
                 STaskCoupon coupon = taskCouponService.getById(userCoupon.getCouponId());
-                couponAmt = coupon.getCouponAmount();
-                if("2".equals(coupon.getUseCon())){
-                    totalAmtFlag = true;//超级优惠券
+                if(coupon != null){
+                    couponAmt = coupon.getCouponAmount();
+                    if("2".equals(coupon.getUseCon())){
+                        totalAmtFlag = true;//超级优惠券
+                    }
                 }
             }
         }
@@ -284,19 +286,24 @@ public class SUserTaskController extends BaseController {
             userBeanLog.setRemark("领取任务ID");
             userBeanLog.setOldAmount(user.getCanuseBean());
             this.userBeanLogService.save(userBeanLog);
+            if(orderBeanCnt != null && orderBeanCnt > 0){
+                user.setRewardBean(user.getRewardBean()+orderBeanCnt);
 
+            }
             // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
             //if (user.getParentId() == null) {
             // 根据user_id、productId 到s_user_browser表中 找到shareId
-            String userShareId = userShareService.getCurrentShareId(productId,userId);
-            // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
-            if(userShareId != null){
-                SUserShare userShare = userShareService.getById(userShareId);
-                if(userShare != null){
-                    user.setParentId(userShare.getUserId());
-                    userService.updateById(user);
+            if (user.getParentId() == null) {
+                String userShareId = userShareService.getCurrentShareId(productId,userId);
+                // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
+                if(userShareId != null){
+                    SUserShare userShare = userShareService.getById(userShareId);
+                    if(userShare != null){
+                        user.setParentId(userShare.getUserId());
+                    }
                 }
             }
+            userService.updateById(user);
            //调起微信支付
             if(totalAmt.compareTo(BigDecimal.ZERO) >0){
                 JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
@@ -323,11 +330,16 @@ public class SUserTaskController extends BaseController {
 
         // 抽取s_user_task中 支付状态（锁定） 支付时间大于5分钟的 数据
 
-            // 修改状态为 未支付
+        // 修改状态为 未支付
 
-            // 同时把s_user_task_line中的相关数据也同样修改为 未支付
+        // 同时把s_user_task_line中的相关数据也同样修改为 未支付
 
-            // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
+        // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
+
+        //TODO 退优惠券
+        //TODO 退猎豆
+
+
 
     }
 
