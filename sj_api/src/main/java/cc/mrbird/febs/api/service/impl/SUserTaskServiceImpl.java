@@ -20,7 +20,7 @@ import java.util.*;
  * @author MrBird
  */
 @Service
-public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask> implements ISUserTaskService {
+public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask> implements ISUserTaskService {
 
     @Override
     public List<SUserTask> findUserTaskList(SUserTask userTask) {
@@ -219,6 +219,11 @@ public class SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTask
     @Override
     public Integer queryProductCount(String userId) {
         return this.baseMapper.queryProductCount(userId);
+    }
+
+    @Override
+    public Integer queryReCount(String productId, String taskLineId) {
+        return this.baseMapper.queryReCount(productId,taskLineId);
     }
 
 }

@@ -24,5 +24,7 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
 
     IPage<Map> findUserTaskEndDetail(Page page, @Param("sUserTask") SUserTask sUserTask);
 
-   Integer queryProductCount(@Param("userId") String userId);
+    Integer queryProductCount(@Param("userId") String userId);
+
+    Integer queryReCount (@Param("productId") String productId,@Param("taskLineId") String taskLineId);
 }
