@@ -786,7 +786,7 @@ public class SOrderController extends BaseController {
 
                 // 变更订单明细状态 （2:已结算到冻结）
 
-                // 根据订单ID检索 任务线表（s_task_line）
+                // 根据订单商品中的任务线ID检索 任务线表（s_task_line）
 
                 // 根据任务线ID 检索 用户任务线 变更用户任务线表状态（3 -> 4 佣金结算完成待入账）
 
@@ -798,6 +798,7 @@ public class SOrderController extends BaseController {
 
                 // 纵向躺赢 从买家的捆绑关系朝上查，上三级3个人按（8-5-2）分15%  若无上级 找预备队 5%
 
+                // 平台返回任务金
 
             }
         }
