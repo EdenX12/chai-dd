@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,4 +28,16 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
     Integer queryProductCount(@Param("userId") String userId);
 
     Integer queryReCount (@Param("productId") String productId,@Param("taskLineId") String taskLineId);
+
+
+    List<String> getUnLockPayUserTaskLines();
+
+    List<String> getUnLockPayTaskLines();
+
+    void updateUserTaskLineBatch(List<String> list);
+
+    void updateTaskLineBatch(List<String> list);
+
+
+    void updateTaskForUnLock();
 }

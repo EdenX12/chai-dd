@@ -336,11 +336,17 @@ public class SUserTaskController extends BaseController {
 
         // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
 
+        List<String> unLockTaskLineIds = userTaskService.getUnLockPayTaskLines();
+        List<String>  unLockUserTaskLineIds = userTaskService.getUnLockPayUserTaskLines();
+        userTaskService.updateTaskForUnLock();
+        if(unLockTaskLineIds != null && unLockTaskLineIds.size() >0){
+            userTaskService.updateTaskLineBatch(unLockTaskLineIds);
+        }
+        if(unLockUserTaskLineIds != null && unLockUserTaskLineIds.size() > 0){
+            userTaskService.updateUserTaskLineBatch(unLockUserTaskLineIds);
+        }
         //TODO 退优惠券
         //TODO 退猎豆
-
-
-
     }
 
     /**

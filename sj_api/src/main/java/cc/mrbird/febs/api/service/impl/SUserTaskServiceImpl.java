@@ -226,4 +226,29 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
         return this.baseMapper.queryReCount(productId,taskLineId);
     }
 
+    @Override
+    public void updateTaskForUnLock() {
+         this.baseMapper.updateTaskForUnLock();
+    }
+
+    @Override
+    public List<String> getUnLockPayUserTaskLines() {
+         return this.baseMapper.getUnLockPayUserTaskLines();
+    }
+
+    @Override
+    public List<String> getUnLockPayTaskLines() {
+         return this.baseMapper.getUnLockPayTaskLines();
+    }
+
+    @Override
+    public void updateUserTaskLineBatch(List<String> list) {
+         this.baseMapper.updateUserTaskLineBatch(list);
+    }
+
+    @Override
+    public void updateTaskLineBatch(List<String> list) {
+         this.baseMapper.updateTaskLineBatch(list);
+    }
+
 }

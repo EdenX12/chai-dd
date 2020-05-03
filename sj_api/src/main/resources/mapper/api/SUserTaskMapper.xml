@@ -232,4 +232,37 @@
         and product_id=#{productId} and and task_line_id=#{taskLineId}
 
     </select>
+
+    <select id="getUnLockPayTaskLines" resultType="java.lang.String">
+    select DISTINCT  tl.id  from s_task_line tl
+    INNER JOIN s_user_task_line  utl  on tl.id=utl.task_line_id
+    INNER JOIN s_user_task  t on (TIMESTAMPDIFF(MINUTE,t.pay_time,NOW()) >= 5  and t.pay_status=0 and t.id=utl.task_id)
+    </select>
+
+    <select id="getUnLockPayUserTaskLines" resultType="java.lang.String">
+    select DISTINCT utl.id  from s_user_task_line  utl
+    inner JOIN s_user_task  t on (TIMESTAMPDIFF(MINUTE,t.pay_time,NOW()) >= 5  and t.pay_status=0 and t.id=utl.task_id)
+    </select>
+
+    <update id="updateTaskForUnLock">
+        update  s_user_task set pay_status=2 where TIMESTAMPDIFF(MINUTE,pay_time,NOW()) >= 5  and pay_status=0
+    </update>
+
+    <update id="updateTaskLineBatch" parameterType="java.util.List">
+        update s_task_line set lock_task = lock_task-1 where id in
+        (
+        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
+            #{item}
+        </foreach>
+        )
+    </update>
+
+    <update id="updateUserTaskLineBatch" parameterType="java.util.List">
+        update s_user_task_line set pay_status=2 where id in
+        (
+        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
+            #{item}
+        </foreach>
+        )
+    </update>
 </mapper>

@@ -200,8 +200,6 @@ public class SUserPayController extends BaseController {
                 taskLine.setLockTask(taskLine.getLockTask()-1);
                 taskLine.setReceivedTask(taskLine.getReceivedTask()+1);
                 // todo 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
-
-
                 // todo  拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
                 //目前的逻辑在下单里已经生成了，支付成功不需要了
                 /*SUserBeanLog userBeanLog = new SUserBeanLog();
@@ -222,10 +220,7 @@ public class SUserPayController extends BaseController {
                     // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
 
                 //}
-
             }
-
-
             if ("O".equals(strPayType)) {
 
                 // 支付购买订单成功

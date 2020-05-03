@@ -110,4 +110,33 @@ public interface ISUserTaskService extends IService<SUserTask> {
      */
 
     Integer queryReCount (@Param("productId") String productId,String taskLineId);
+
+    /**
+     * 支付失败更新任务线的已锁定的任务状态
+     */
+    void updateTaskForUnLock();
+
+    /**
+     * 支付失败，查询已锁定的用户任务线关联表ID
+     * @return
+     */
+    List<String> getUnLockPayUserTaskLines();
+
+    /**
+     * 支付失败，查询锁定的任务线的ID
+     * @return
+     */
+    List<String> getUnLockPayTaskLines();
+
+    /**
+     * 根据id集合批量更新支付状态为未支付
+     * @param list
+     */
+    void updateUserTaskLineBatch(List<String> list);
+
+    /**
+     * 根据id集合批量更新任务线锁定数量
+     * @param list
+     */
+    void updateTaskLineBatch(List<String> list);
 }
