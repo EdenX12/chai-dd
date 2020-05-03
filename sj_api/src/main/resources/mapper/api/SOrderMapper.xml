@@ -125,7 +125,7 @@
             od.address_name addressName,                        <!-- 收件人信息 -->
             CONCAT(LEFT(od.address_phone,3), '*****' , RIGHT(od.address_phone,4)) adddressPhone,
             od.address_detail addressDetail,
-            od.orderAmount orderAmount,                         <!-- 订单金额 -->
+            od.order_amount orderAmount,                        <!-- 订单金额 -->
             od.shipping_fee shippingFee,                        <!-- 运费（0：包邮） -->
             od.pay_amount payAmount,                            <!-- 实付金额 -->
             od.order_sn orderSn,                                <!-- 订单编号 -->
