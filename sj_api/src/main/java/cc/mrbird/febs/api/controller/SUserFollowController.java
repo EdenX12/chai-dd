@@ -1,11 +1,12 @@
 package cc.mrbird.febs.api.controller;
 
+import cc.mrbird.febs.api.entity.SParams;
 import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.api.entity.SUserBeanLog;
 import cc.mrbird.febs.api.entity.SUserFollow;
+import cc.mrbird.febs.api.service.ISParamsService;
 import cc.mrbird.febs.api.service.ISUserBeanLogService;
 import cc.mrbird.febs.api.service.ISUserFollowService;
-import cc.mrbird.febs.api.service.ISUserLevelService;
 import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -36,13 +37,13 @@ public class SUserFollowController extends BaseController {
     private ISUserFollowService userFollowService;
 
     @Autowired
-    private ISUserLevelService userLevelService;
-
-    @Autowired
     private ISUserService userService;
 
     @Autowired
     private ISUserBeanLogService userBeanLogService;
+
+    @Autowired
+    private ISParamsService paramsService;
 
     /**
      * 新增关注 （任务可不传）
@@ -63,11 +64,17 @@ public class SUserFollowController extends BaseController {
 
             userFollow = this.userFollowService.createUserFollow(userFollow);
 
+            Integer followBeanCnt = 0;
+            SParams params = this.paramsService.queryBykeyForOne("follow_bean_cnt");
+            if (params != null) {
+                followBeanCnt = Integer.valueOf(params.getPValue());
+            }
+
             // 猎豆流水插入
             SUserBeanLog userBeanLog = new SUserBeanLog();
             userBeanLog.setUserId(user.getId());
             userBeanLog.setChangeType(3);
-            userBeanLog.setChangeAmount(1);
+            userBeanLog.setChangeAmount(followBeanCnt);
             userBeanLog.setChangeTime(new Date());
             userBeanLog.setRelationId(userFollow.getId());
             userBeanLog.setRemark("关联用户关注ID");
@@ -75,7 +82,7 @@ public class SUserFollowController extends BaseController {
             this.userBeanLogService.save(userBeanLog);
 
             // 每关注一个任务（任务广场，转让中心），（+拆豆1颗）
-            user.setCanuseBean(user.getCanuseBean() + 1);
+            user.setCanuseBean(user.getCanuseBean() + followBeanCnt);
             this.userService.updateById(user);
 
         } catch (Exception e) {
@@ -107,11 +114,17 @@ public class SUserFollowController extends BaseController {
 
             userFollow = this.userFollowService.updateUserFollow(userFollow);
 
+            Integer followBeanCnt = 0;
+            SParams params = this.paramsService.queryBykeyForOne("follow_bean_cnt");
+            if (params != null) {
+                followBeanCnt = Integer.valueOf(params.getPValue());
+            }
+
             // 猎豆流水插入
             SUserBeanLog userBeanLog = new SUserBeanLog();
             userBeanLog.setUserId(user.getId());
-            userBeanLog.setChangeType(3);
-            userBeanLog.setChangeAmount(-1);
+            userBeanLog.setChangeType(4);
+            userBeanLog.setChangeAmount(followBeanCnt * (-1));
             userBeanLog.setChangeTime(new Date());
             userBeanLog.setRelationId(userFollow.getId());
             userBeanLog.setRemark("关联用户关注ID");
@@ -119,7 +132,7 @@ public class SUserFollowController extends BaseController {
             this.userBeanLogService.save(userBeanLog);
 
             // 每取消一个任务（任务广场，转让中心），（-1颗）
-            user.setCanuseBean(user.getCanuseBean() - 1);
+            user.setCanuseBean(user.getCanuseBean() - followBeanCnt);
             this.userService.updateById(user);
 
         } catch (Exception e) {

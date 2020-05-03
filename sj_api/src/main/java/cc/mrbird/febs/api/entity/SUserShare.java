@@ -37,6 +37,11 @@ public class SUserShare implements Serializable {
     private String productId;
 
     /**
+     * 上级分享ID
+     */
+    private String parentId;
+
+    /**
      * 分享状态 0-待分享；1-分享成功；2-分享失败
      */
     private Integer shareStatus;

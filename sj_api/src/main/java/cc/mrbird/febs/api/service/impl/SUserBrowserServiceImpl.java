@@ -1,17 +1,31 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SUserBrowser;
+import cc.mrbird.febs.api.entity.SUserShare;
 import cc.mrbird.febs.api.mapper.SUserBrowserMapper;
 import cc.mrbird.febs.api.service.ISUserBrowserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * @author MrBird
  */
 @Service
 public class SUserBrowserServiceImpl extends ServiceImpl<SUserBrowserMapper, SUserBrowser> implements ISUserBrowserService {
+
+    @Override
+    public SUserBrowser createUserBrowser(SUserBrowser userBrowser) {
+
+        userBrowser.setUpdateTime(new Date());
+        userBrowser.setCreateTime(new Date());
+
+        this.baseMapper.insert(userBrowser);
+
+        return userBrowser;
+    }
 
     @Override
     public SUserBrowser findUserBrowser(SUserBrowser userBrowser) {
