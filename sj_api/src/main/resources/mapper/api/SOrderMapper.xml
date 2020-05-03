@@ -2,65 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SOrderMapper">
 
-    <select id="findOrderDetail" resultType="sOrder" parameterType="sOrder">
-
-        SELECT
-        o.id id,
-        o.order_sn orderSn,
-        o.user_id userId,
-        o.task_id taskId,
-        o.payment_type paymentType,
-        o.payment_state paymentState,
-        o.shipping_express_code shippingExpressCode,
-        o.shipping_express_id shippingExpressId,
-        o.shipping_code shippingCode,
-        o.shipping_fee shippingFee,
-        o.deliver_explain deliverExplain,
-        o.address_id addressId,
-        o.order_amount orderAmount,
-        o.pay_amount payAmount,
-        o.order_message orderMessage,
-        o.order_status orderStatus,
-        o.address_name addressName,
-        o.address_phone addressPhone,
-        o.address_detail addressDetail,
-        o.product_id productId,
-        o.product_number productNumber,
-        o.shipping_time shippingTime,
-        o.payment_time paymentTime,
-        o.create_time createTime,
-
-        p.product_name productName,
-        p.product_img productImg,
-        p.product_des productDes,
-        p.product_detail productDetail,
-        p.product_price productPrice,
-        p.price_unit priceUnit,
-        e.e_name shippingExpressName
-
-        FROM s_order o
-        LEFT JOIN s_product p
-        ON p.id = o.product_id
-        LEFT JOIN s_express e
-        ON e.id = o.shipping_express_id
-
-        WHERE 1 = 1
-
-        <if test="sOrder.userId != null and sOrder.userId != ''">
-            AND o.user_id = #{sOrder.userId}
-        </if>
-
-        <if test="sOrder.id != null and sOrder.id != ''">
-            AND o.id = #{sOrder.id}
-        </if>
-
-        <if test="sOrder.orderStatus != null and sOrder.orderStatus != ''">
-            AND o.order_status = #{sOrder.orderStatus}
-        </if>
-
-
-    </select>
-
     <select id="queryPage" resultType="java.util.Map">
         SELECT
             ss.id shopId,
@@ -129,8 +70,8 @@
             od.shipping_fee shippingFee,                        <!-- 运费（0：包邮） -->
             od.pay_amount payAmount,                            <!-- 实付金额 -->
             od.order_sn orderSn,                                <!-- 订单编号 -->
-            od.shipping_code shippingCode                       <!-- 物流单号 -->
-                                                                <!-- 优惠金额 -->
+            od.shipping_code shippingCode,                      <!-- 物流单号 -->
+            od.coupon_amount couponAmount                       <!-- 优惠金额 -->
                                                                 <!-- 返现合计 -->
                                                                 <!-- 赠送拆豆 -->
         FROM

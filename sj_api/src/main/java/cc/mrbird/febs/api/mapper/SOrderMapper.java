@@ -14,10 +14,6 @@ import java.util.Map;
  */
 public interface SOrderMapper extends BaseMapper<SOrder> {
 
-    IPage<SOrder> findOrderDetail(Page page, @Param("sOrder") SOrder sOrder);
-
-    SOrder findOrderDetail(@Param("sOrder") SOrder sOrder);
-
     /**
      * 查询我的订单列表
      * @param page
