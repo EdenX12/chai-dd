@@ -62,6 +62,11 @@ public class STaskLine implements Serializable {
     private Integer lineOrder;
 
     /**
+     * 订单商品id
+     */
+    private String orderProductId;
+
+    /**
      * 创建日期
      */
     private Date createTime;
