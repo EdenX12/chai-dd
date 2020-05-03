@@ -8,4 +8,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISUserBrowserService extends IService<SUserBrowser> {
 
+    SUserBrowser findUserBrowser(SUserBrowser userBrowser);
 }

@@ -2,7 +2,6 @@ package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.api.mapper.SUserTaskMapper;
-import cc.mrbird.febs.api.service.ISProductService;
 import cc.mrbird.febs.api.service.ISUserTaskService;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
@@ -11,7 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,47 +45,8 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
             queryWrapper.eq(SUserTask::getPayStatus, userTask.getPayStatus());
         }
 
-
-
         return this.baseMapper.selectList(queryWrapper);
     }
-
-    @Override
-    public Integer findProductCount(String userId,String productId) {
-
-        LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
-
-        // 用户ID
-        queryWrapper.eq(SUserTask::getUserId, userId);
-
-        // 商品ID
-        queryWrapper.eq(SUserTask::getProductId, productId);
-
-        // 支付状态
-        queryWrapper.eq(SUserTask::getPayStatus, 1);
-
-        // 状态  0 已接任务  1 转让中 3 任务完结  进行中+结算中
-       /* List status = new ArrayList();
-        status.add(0);
-        status.add(1);
-        status.add(3);
-*/
-        List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
-
-        List<String> productIdList = new ArrayList();
-        for (SUserTask userTask1 : userTaskList) {
-            productIdList.add(userTask1.getProductId());
-        }
-
-        // 去掉重复商品ID
-        Set set = new HashSet();
-        set.addAll(productIdList);
-        productIdList.clear();
-        productIdList.addAll(set);
-
-        return productIdList.size();
-    }
-
 
     @Override
     public SUserTask createUserTask(SUserTask userTask) {
@@ -174,18 +133,6 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     }
 
     @Override
-    public IPage<Map> findUserTaskEndList(SUserTask userTask, QueryRequest request) {
-        try {
-            Page<Map> page = new Page<>();
-            SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
-            return this.baseMapper.findUserTaskEndDetail(page, userTask);
-        } catch (Exception e) {
-            log.error("查询我的任务异常", e);
-            return null;
-        }
-    }
-
-    @Override
     public List<String> findUserIdsByParent(String userId) {
 
         LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
@@ -222,33 +169,27 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     }
 
     @Override
-    public Integer queryReCount(String productId, String taskLineId) {
-        return this.baseMapper.queryReCount(productId,taskLineId);
-    }
-
-    @Override
     public void updateTaskForUnLock() {
          this.baseMapper.updateTaskForUnLock();
     }
 
     @Override
-    public List<String> getUnLockPayUserTaskLines() {
-         return this.baseMapper.getUnLockPayUserTaskLines();
+    public void updateUserTaskLineFailBatch() {
+         this.baseMapper.updateUserTaskLineFailBatch();
     }
 
     @Override
-    public List<String> getUnLockPayTaskLines() {
-         return this.baseMapper.getUnLockPayTaskLines();
+    public void updateTaskLineFailBatch() {
+         this.baseMapper.updateTaskLineFailBatch();
     }
 
     @Override
-    public void updateUserTaskLineBatch(List<String> list) {
-         this.baseMapper.updateUserTaskLineBatch(list);
+    public void updateUserTaskLineSuccessBatch(String taskId) {
+        this.baseMapper.updateUserTaskLineSuccessBatch(taskId);
     }
 
     @Override
-    public void updateTaskLineBatch(List<String> list) {
-         this.baseMapper.updateTaskLineBatch(list);
+    public void updateTaskLineSuccessBatch(String taskId) {
+        this.baseMapper.updateTaskLineSuccessBatch(taskId);
     }
-
 }

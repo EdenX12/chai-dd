@@ -12,8 +12,4 @@ import org.springframework.stereotype.Service;
 @Service
 public class SUserTaskLineServiceImpl extends ServiceImpl<SUserTaskLineMapper, SUserTaskLine> implements ISUserTaskLineService {
 
-    @Override
-    public String queryIdByTask(String taskId) {
-        return this.baseMapper.queryIdByTask(taskId);
-    }
 }

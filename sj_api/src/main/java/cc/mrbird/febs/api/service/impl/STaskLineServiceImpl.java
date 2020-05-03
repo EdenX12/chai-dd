@@ -14,18 +14,12 @@ import org.springframework.stereotype.Service;
 public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine> implements ISTaskLineService {
 
     @Override
-    public String currentTaskLine(String productId) {
-        if(StringUtils.isEmpty(productId)){
-            return null;
-        }
-        return this.baseMapper.queryCurrentTaskLine(productId);
+    public Integer queryTaskLineCount(String productId) {
+        return this.baseMapper.queryTaskLineCount(productId);
     }
 
     @Override
     public Integer queryMinLineOrder(String productId) {
-        if(null != productId){
-            return null;
-        }
         return this.baseMapper.queryMinLineOrder(productId);
     }
 

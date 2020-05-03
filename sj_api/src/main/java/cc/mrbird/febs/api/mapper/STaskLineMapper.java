@@ -10,25 +10,26 @@ import org.apache.ibatis.annotations.Param;
 public interface STaskLineMapper extends BaseMapper<STaskLine> {
 
     /**
-     * 查询某产品当前任务线
+     * 查询任务线上是否有足够任务
      * @param productId
      * @return
      */
-   String  queryCurrentTaskLine(@Param("productId") String productId);
+    Integer queryTaskLineCount(@Param("productId") String productId);
 
     /**
      * 查询产品的任务线未满的最小顺序
      * @param productId
      * @return
      */
-    Integer  queryMinLineOrder(@Param("productId") String productId);
+    Integer queryMinLineOrder(@Param("productId") String productId);
 
     /**
      * 查询排序查询任务线Id
      * @param productId
      * @return
      */
-    String  queryIdByLineOrder(@Param("productId") String productId,@Param("lineOrder")Integer lineOrder);
+    String queryIdByLineOrder(@Param("productId") String productId,
+                              @Param("lineOrder") Integer lineOrder);
 
 
 }

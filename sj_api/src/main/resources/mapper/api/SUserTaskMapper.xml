@@ -97,7 +97,6 @@
 
     </select>
 
-
     <select id="findUserTaskOfferDetail" resultType="java.util.Map" parameterType="sUserTask">
 
         SELECT
@@ -161,108 +160,57 @@
     </select>
 
 
-
-
-
-    <select id="findUserTaskEndDetail" resultType="java.util.Map" parameterType="sUserTask">
-
-        SELECT
-            t.id taskId,
-            t.user_id userId,
-            t.product_id productId,
-            t.task_number taskNumber,
-            t.status status,
-            t.create_time createTime,
-            t.pay_time payTime,
-            datediff(now(), t.pay_time) taskDays,
-            p.product_name productName,
-            p.product_img productImg,
-            p.product_des productDes,
-            p.product_detail productDetail,
-            p.task_number totalTaskNumber,
-            t2.taskNumberOK taskNumberOK,
-            p.product_price productPrice,
-            p.total_reward totalReward,
-            p.task_price taskPrice,
-            p.price_unit priceUnit,
-
-            ifnull(bonus3.bonus_amount, 0) successReward,
-            u.user_name successUserName,
-            u.nick_name successNickName,
-            u.user_phone successUserPhone,
-
-            ifnull(bonus4.bonus_amount, 0) everyReward,
-            ifnull(bonus5.bonus_amount, 0) levelReReward,
-
-            ifnull(watchTask.watchCnt, 0) watchCnt,
-            ifnull(gotTask.hunterCnt, 0) hunterCnt
-
-          FROM s_user_task t
-        LEFT JOIN s_product p ON p.id = t.product_id
-        LEFT JOIN (SELECT product_id, SUM(task_number) taskNumberOK FROM s_user_task WHERE pay_status = 1 AND status !=2 GROUP BY product_id) t2
-          ON t2.product_id = t.product_id
-
-        LEFT JOIN (select product_id, count(*) watchCnt from s_user_task group by product_id) watchTask
-        ON watchTask.product_id = t.product_id
-
-        LEFT JOIN (select product_id, count(*) hunterCnt from s_user_task where pay_status =1 group by product_id) gotTask
-        ON gotTask.product_id = t.product_id
-
-        LEFT JOIN s_user_bonus_log bonus3 ON bonus3.task_id = t.id AND bonus3.bonus_type=3
-        LEFT JOIN s_user u ON u.id = bonus3.user_id
-        LEFT JOIN s_user_bonus_log bonus4 ON bonus4.task_id = t.id AND bonus4.bonus_type=4
-        LEFT JOIN s_user_bonus_log bonus5 ON bonus5.task_id = t.id AND bonus5.bonus_type=5
-        LEFT JOIN s_user_bonus_log bonus9 ON bonus9.task_id = t.id AND bonus9.bonus_type=9
-
-        WHERE t.pay_status = 1
-        AND t.user_id = #{sUserTask.userId}
-        AND t.status in (3, 4)
-
-    </select>
-
     <select id="queryProductCount" resultType="java.lang.Integer">
-    select count(DISTINCT product_id)  from s_user_task_line
-    where user_id=#{userId} and  status =1 or status =3
-    </select>
-
-    <!--查询已经领取的和锁定的总任务-->
-    <select id="queryReCount" resultType="java.lang.Integer">
-        select count(*)  from s_user_task_line where
-        (pay_status =1 or pay_status=0 )and  status =0
-        and product_id=#{productId} and and task_line_id=#{taskLineId}
-
-    </select>
-
-    <select id="getUnLockPayTaskLines" resultType="java.lang.String">
-    select DISTINCT  tl.id  from s_task_line tl
-    INNER JOIN s_user_task_line  utl  on tl.id=utl.task_line_id
-    INNER JOIN s_user_task  t on (TIMESTAMPDIFF(MINUTE,t.pay_time,NOW()) >= 5  and t.pay_status=0 and t.id=utl.task_id)
-    </select>
-
-    <select id="getUnLockPayUserTaskLines" resultType="java.lang.String">
-    select DISTINCT utl.id  from s_user_task_line  utl
-    inner JOIN s_user_task  t on (TIMESTAMPDIFF(MINUTE,t.pay_time,NOW()) >= 5  and t.pay_status=0 and t.id=utl.task_id)
+        SELECT count(DISTINCT product_id)
+        FROM s_user_task_line
+        WHERE user_id =#{userId}
+        AND  (status = 1 or status = 2)
     </select>
 
     <update id="updateTaskForUnLock">
-        update  s_user_task set pay_status=2 where TIMESTAMPDIFF(MINUTE,pay_time,NOW()) >= 5  and pay_status=0
+        UPDATE s_user_task
+           SET pay_status = 2,
+               update_time = now()
+         WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
+           AND pay_status = 0
     </update>
 
-    <update id="updateTaskLineBatch" parameterType="java.util.List">
-        update s_task_line set lock_task = lock_task-1 where id in
-        (
-        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
-            #{item}
-        </foreach>
-        )
+    <update id="updateTaskLineFailBatch">
+        UPDATE s_task_line
+           SET lock_task = lock_task - 1,
+               update_time = now()
+         WHERE id IN (SELECT task_line_id
+                        FROM s_user_task_line
+                       WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
+                         AND pay_status = 0
+                     )
     </update>
 
-    <update id="updateUserTaskLineBatch" parameterType="java.util.List">
-        update s_user_task_line set pay_status=2 where id in
-        (
-        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
-            #{item}
-        </foreach>
-        )
+    <update id="updateUserTaskLineFailBatch">
+        UPDATE s_user_task_line
+           SET pay_status = 2,
+               update_time = now()
+         WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
+           AND pay_status = 0
     </update>
+
+    <update id="updateTaskLineSuccessBatch" parameterType="java.lang.String">
+        UPDATE s_task_line
+           SET lock_task = lock_task - 1,
+               received_task = received_task + 1,
+               update_time = now()
+         WHERE id IN (SELECT task_line_id
+                        FROM s_user_task_line
+                       WHERE task_id = #{taskId}
+                     )
+    </update>
+
+    <update id="updateUserTaskLineSuccessBatch" parameterType="java.lang.String">
+        UPDATE s_user_task_line
+           SET pay_status = 1,
+               pay_time = now(),
+               update_time = now()
+         WHERE task_id = #{taskId}
+    </update>
+
 </mapper>

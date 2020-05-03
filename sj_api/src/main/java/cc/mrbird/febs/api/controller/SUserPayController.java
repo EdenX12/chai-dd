@@ -6,6 +6,7 @@ import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.utils.*;
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +21,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,9 +38,6 @@ public class SUserPayController extends BaseController {
     private ISUserPayService userPayService;
 
     @Autowired
-    private ISTaskOrderService taskOrderService;
-
-    @Autowired
     private ISUserTaskService userTaskService;
 
     @Autowired
@@ -53,10 +49,6 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISProductService productService;
 
-    @Autowired
-    private ISOfferPriceService offerPriceService;
-
-    @Autowired
     private ISUserService userService;
 
     @Autowired
@@ -72,10 +64,19 @@ public class SUserPayController extends BaseController {
     private ISUserBonusLogService userBonusLogService;
 
     @Autowired
-    private ISUserTaskLineService userTaskLineService;
+    private ISUserCouponService userCouponService;
 
     @Autowired
-    private ISTaskLineService taskLineService;
+    private ISUserCouponLogService userCouponLogService;
+
+    @Autowired
+    private ISParamsService paramsService;
+
+    @Autowired
+    private ISUserShareService userShareService;
+
+    @Autowired
+    private ISUserBrowserService userBrowserService;
 
     /**
      * 新增用户支付
@@ -180,6 +181,9 @@ public class SUserPayController extends BaseController {
                 userPay.setUserId(userTask.getUserId());
                 this.userPayService.save(userPay);
 
+                SUser user = new SUser();
+                user = this.userService.getById(userTask.getUserId());
+
                 // 修改s_user_task支付状态 已支付
                 userTask.setPayStatus(1);
                 userTask.setPayAmount(total);
@@ -188,39 +192,70 @@ public class SUserPayController extends BaseController {
                 this.userTaskService.updateUserTask(userTask);
 
                 // 修改s_user_task_line 支付状态 已支付
-
-                String   userTaskLineId = userTaskLineService.queryIdByTask(userTask.getId());
-                SUserTaskLine userTaskLine = userTaskLineService.getById(userTaskLineId);
-                userTaskLine.setPayStatus(1);
-                userTaskLine.setUpdateTime(new Date());
-                userTaskLineService.updateById(userTaskLine);
+                this.userTaskService.updateUserTaskLineSuccessBatch(relationId);
 
                 // 修改s_task_line 锁定任务数量-1  已领取任务数量+1
-                STaskLine taskLine = taskLineService.getById(userTaskLine.getTaskLineId());
-                taskLine.setLockTask(taskLine.getLockTask()-1);
-                taskLine.setReceivedTask(taskLine.getReceivedTask()+1);
-                // todo 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
-                // todo  拆豆奖励（10） s_user (reward_bean+10) 及 拆豆流水记录追加 SUserBeanLog
-                //目前的逻辑在下单里已经生成了，支付成功不需要了
-                /*SUserBeanLog userBeanLog = new SUserBeanLog();
-                userBeanLog.setUserId(user.getId());
-                userBeanLog.setChangeType(1);
-                userBeanLog.setChangeAmount(userLevel.getBeanRate().multiply(BigDecimal.valueOf(20)).intValue());
-                userBeanLog.setChangeTime(new Date());
-                userBeanLog.setRelationId(userTask.getId());
-                userBeanLog.setRemark("领取任务ID");
-                userBeanLog.setOldAmount(user.getCanuseBean());
-                this.userBeanLogService.save(userBeanLog);*/
+                this.userTaskService.updateTaskLineSuccessBatch(relationId);
 
-                //TODO 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
-                //目前的逻辑在下单里已经生成了，支付成功不需要了
-                //if (user.getParentId() == null) {
-                    // 根据user_id、productId 到s_user_browser表中 找到shareId
+                // 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
+                if (StringUtils.isNotBlank(userTask.getUserCouponId())) {
+                    SUserCoupon userCoupon = this.userCouponService.getById(userTask.getUserCouponId());
+                    if (userCoupon != null) {
+                        userCoupon.setCouponStatus(1);
+                        userCoupon.setUpdateTime(new Date());
+                        this.userCouponService.updateById(userCoupon);
 
+                        SUserCouponLog couponLog = new SUserCouponLog();
+                        couponLog.setCreateTime(new Date());
+                        couponLog.setUpdateTime(new Date());
+                        // 券类型 0-任务金 1-商铺券
+                        couponLog.setCouponType(0);
+                        couponLog.setCouponId(userCoupon.getCouponId());
+                        couponLog.setUserId(user.getId());
+                        this.userCouponLogService.save(couponLog);
+                    }
+                }
+
+                // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
+                Integer orderBeanCnt = 0;
+                SParams params = this.paramsService.queryBykeyForOne("order_bean_cnt");
+                if (params != null) {
+                    orderBeanCnt = Integer.valueOf(params.getPValue());
+                }
+                if (orderBeanCnt != null && orderBeanCnt > 0) {
+                    SUserBeanLog userBeanLog = new SUserBeanLog();
+                    userBeanLog.setUserId(user.getId());
+                    userBeanLog.setChangeType(1);
+                    userBeanLog.setChangeAmount(orderBeanCnt);
+                    userBeanLog.setChangeTime(new Date());
+                    userBeanLog.setRelationId(userTask.getId());
+                    userBeanLog.setRemark("领取任务ID");
+                    userBeanLog.setOldAmount(user.getCanuseBean());
+                    this.userBeanLogService.save(userBeanLog);
+
+                    user.setRewardBean(user.getRewardBean() + orderBeanCnt);
+                    this.userService.updateById(user);
+                }
+
+                // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
+                // 根据user_id、productId 到s_user_browser表中 找到shareId
+                if (user.getParentId() == null) {
+
+                    SUserBrowser userBrowser = new SUserBrowser();
+                    userBrowser.setUserId(user.getId());
+                    userBrowser.setProductId(userTask.getProductId());
+                    userBrowser = this.userBrowserService.findUserBrowser(userBrowser);
                     // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
-
-                //}
+                    if(userBrowser != null && userBrowser.getShareId() != null){
+                        SUserShare userShare = this.userShareService.getById(userBrowser.getShareId());
+                        if(userShare != null){
+                            user.setParentId(userShare.getUserId());
+                            this.userService.updateById(user);
+                        }
+                    }
+                }
             }
+
             if ("O".equals(strPayType)) {
 
                 // 支付购买订单成功

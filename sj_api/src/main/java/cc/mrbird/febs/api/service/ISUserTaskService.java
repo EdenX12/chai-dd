@@ -4,7 +4,6 @@ import cc.mrbird.febs.api.entity.SUserTask;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -34,13 +33,6 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @param userTask SUserTask
      */
     List<SUserTask> findUserTaskList(SUserTask userTask);
-
-    /**
-     * 检索进行中+结算中 并行商品数量
-     *
-     @return 商品数量
-     */
-    Integer findProductCount(String userId,String productId);
 
     /**
      * 查询我的任务列表
@@ -78,15 +70,6 @@ public interface ISUserTaskService extends IService<SUserTask> {
     IPage<Map> findUserTaskFollowList(QueryRequest queryRequest, String userId);
 
     /**
-     * 查询我的任务【已完成】列表
-     *
-     * @param userTask SUserTask
-     * @param queryRequest queryRequest
-     * @return IPage
-     */
-    IPage<Map> findUserTaskEndList(SUserTask userTask, QueryRequest queryRequest);
-
-    /**
      * 查询我的预备队
      *
      * @param userId Long
@@ -101,42 +84,28 @@ public interface ISUserTaskService extends IService<SUserTask> {
      */
     Integer queryProductCount(String userId);
 
-
-    /**
-     * 查询已经领取的和锁定的总任务
-     * @param productId
-     * @param taskLineId
-     * @return
-     */
-
-    Integer queryReCount (@Param("productId") String productId,String taskLineId);
-
     /**
      * 支付失败更新任务线的已锁定的任务状态
      */
     void updateTaskForUnLock();
 
     /**
-     * 支付失败，查询已锁定的用户任务线关联表ID
-     * @return
+     * 定时更新 锁定 批量更新支付状态为未支付
      */
-    List<String> getUnLockPayUserTaskLines();
+    void updateUserTaskLineFailBatch();
 
     /**
-     * 支付失败，查询锁定的任务线的ID
-     * @return
+     * 定时更新 锁定 批量更新任务线锁定数量
      */
-    List<String> getUnLockPayTaskLines();
+    void updateTaskLineFailBatch();
 
     /**
-     * 根据id集合批量更新支付状态为未支付
-     * @param list
+     * 支付成功后更新为 已支付
      */
-    void updateUserTaskLineBatch(List<String> list);
+    void updateUserTaskLineSuccessBatch(String taskId);
 
     /**
-     * 根据id集合批量更新任务线锁定数量
-     * @param list
+     * 支付成功后更新为 锁定数量->已接任务数量
      */
-    void updateTaskLineBatch(List<String> list);
+    void updateTaskLineSuccessBatch(String taskId);
 }
