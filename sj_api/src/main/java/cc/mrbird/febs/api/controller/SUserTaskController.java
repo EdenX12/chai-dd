@@ -57,9 +57,6 @@ public class SUserTaskController extends BaseController {
     private ISUserService userService;
 
     @Autowired
-    private ISUserFollowService userFollowService;
-
-    @Autowired
     private ISUserBeanLogService userBeanLogService;
 
     @Autowired

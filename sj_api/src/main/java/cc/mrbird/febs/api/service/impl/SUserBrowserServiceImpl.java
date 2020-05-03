@@ -1,7 +1,6 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SUserBrowser;
-import cc.mrbird.febs.api.entity.SUserShare;
 import cc.mrbird.febs.api.mapper.SUserBrowserMapper;
 import cc.mrbird.febs.api.service.ISUserBrowserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
