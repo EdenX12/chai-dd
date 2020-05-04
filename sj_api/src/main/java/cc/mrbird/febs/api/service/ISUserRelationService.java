@@ -8,4 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISUserRelationService extends IService<SUserRelation> {
 
+    SUserRelation createUserRelation(SUserRelation userRelation);
+
+    SUserRelation findUserRelation(SUserRelation userRelation);
 }

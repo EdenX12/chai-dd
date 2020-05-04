@@ -47,5 +47,5 @@ public interface ISOrderService extends IService<SOrder> {
      *
      * @return  List<SOrder>
      */
-    List<SOrder> findOrderPaySuccessList();
+    List<Map> findOrderPaySuccessList();
 }

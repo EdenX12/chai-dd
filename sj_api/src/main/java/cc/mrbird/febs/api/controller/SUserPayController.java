@@ -78,6 +78,9 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISUserBrowserService userBrowserService;
 
+    @Autowired
+    private ISUserRelationService userRelationService;
+
     /**
      * 新增用户支付
      */
@@ -248,9 +251,17 @@ public class SUserPayController extends BaseController {
                     // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
                     if(userBrowser != null && userBrowser.getShareId() != null){
                         SUserShare userShare = this.userShareService.getById(userBrowser.getShareId());
-                        if(userShare != null){
+                        if (userShare != null) {
                             user.setParentId(userShare.getUserId());
                             this.userService.updateById(user);
+
+                            SUserRelation userRelation = new SUserRelation();
+                            userRelation.setUnionId(user.getUnionId());
+                            userRelation.setParentId(userShare.getUserId());
+                            SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
+                            // 由预备队修改为禁卫军
+                            userRelationOne.setRelationType(1);
+                            this.userRelationService.updateById(userRelationOne);
                         }
                     }
                 }
@@ -289,6 +300,11 @@ public class SUserPayController extends BaseController {
 
 
                 // 然后选中的结算任务线 对应的 用户任务线表(s_user_task_line) 状态修改为 佣金结算中
+
+
+                // 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
+
+                // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
 
             }
 

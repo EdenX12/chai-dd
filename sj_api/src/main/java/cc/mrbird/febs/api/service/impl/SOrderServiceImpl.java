@@ -80,14 +80,9 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     }
 
     @Override
-    public List<SOrder> findOrderPaySuccessList() {
+    public List<Map> findOrderPaySuccessList() {
 
-        LambdaQueryWrapper<SOrder> queryWrapper = new LambdaQueryWrapper();
-
-        // 付款状态:0:未付款;1:已付款 2:已结算到冻结
-        queryWrapper.eq(SOrder::getPaymentState, 1);
-
-        return this.baseMapper.selectList(queryWrapper);
+        return this.baseMapper.queryOrderPaySuccessList();
     }
 
     @Override

@@ -32,6 +32,9 @@ public class SUserBrowserController extends BaseController {
     private ISUserBrowserService userBrowserService;
 
     @Autowired
+    private ISUserRelationService userRelationService;
+
+    @Autowired
     private ISUserService userService;
 
     @Autowired
@@ -97,6 +100,20 @@ public class SUserBrowserController extends BaseController {
                 // 点击阅读转发内容
                 user.setCanuseBean(user.getCanuseBean() + browserBeanCnt);
                 this.userService.updateById(user);
+
+                // 关系追加 (预备队关系)
+                SUserRelation userRelation = new SUserRelation();
+                if (user != null) {
+                    userRelation.setUserId(user.getId());
+                }
+                userRelation.setUnionId(unionId);
+                userRelation.setParentId(userShare.getUserId());
+                SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
+                if (userRelationOne == null) {
+                    // 预备队
+                    userRelation.setRelationType(0);
+                }
+                this.userRelationService.createUserRelation(userRelation);
             }
 
         } catch (Exception e) {

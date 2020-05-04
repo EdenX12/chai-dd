@@ -32,7 +32,9 @@ public class SUserBrowserServiceImpl extends ServiceImpl<SUserBrowserMapper, SUs
         LambdaQueryWrapper<SUserBrowser> queryWrapper = new LambdaQueryWrapper<SUserBrowser>();
 
         // 用户ID
-        queryWrapper.eq(SUserBrowser::getUserId, userBrowser.getUserId());
+        if (userBrowser.getUserId() != null) {
+            queryWrapper.eq(SUserBrowser::getUserId, userBrowser.getUserId());
+        }
 
         // 分享ID
         if (userBrowser.getShareId() != null) {

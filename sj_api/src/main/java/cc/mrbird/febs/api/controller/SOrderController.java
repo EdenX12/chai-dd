@@ -767,40 +767,34 @@ public class SOrderController extends BaseController {
     @Scheduled(cron = "0 0/2 0 * * ?")
     public void orderPaySuccessTask() {
 
-        List<SOrder> orderPaySuccessList = this.orderService.findOrderPaySuccessList();
+        // 支付成功超过5分钟订单
+        List<Map> orderPaySuccessList = this.orderService.findOrderPaySuccessList();
 
-        for (SOrder orderPaySuccess : orderPaySuccessList) {
+        for (Map orderPaySuccessMap : orderPaySuccessList) {
 
-            Calendar calendar= Calendar.getInstance();
-            calendar.add(Calendar.MINUTE, -5);
-            Date d = calendar.getTime();
+            String orderId = (String) orderPaySuccessMap.get("id");
 
-            // 支付成功超过5分钟订单
-            if (orderPaySuccess.getPaymentTime().compareTo(d) < 0) {
+            // 变更订单状态 （2:已结算到冻结）
 
-                // 变更订单状态 （2:已结算到冻结）
+            SOrderDetail orderDetail = new SOrderDetail();
+            orderDetail.setOrderId(orderId);
+            List<SOrderDetail> orderDetailPaySuccessList = this.orderDetailService.findOrderDetailList(orderDetail);
 
-                SOrderDetail orderDetail = new SOrderDetail();
-                orderDetail.setOrderId(orderPaySuccess.getId());
-                List<SOrderDetail> orderDetailPaySuccessList = this.orderDetailService.findOrderDetailList(orderDetail);
+            // 变更订单明细状态 （2:已结算到冻结）
 
-                // 变更订单明细状态 （2:已结算到冻结）
+            // 根据订单商品中的任务线ID检索 任务线表（s_task_line）
 
-                // 根据订单商品中的任务线ID检索 任务线表（s_task_line）
+            // 根据任务线ID 检索 用户任务线 变更用户任务线表状态（3 -> 4 佣金结算完成待入账）
 
-                // 根据任务线ID 检索 用户任务线 变更用户任务线表状态（3 -> 4 佣金结算完成待入账）
+            // 独赢（买家立返）20%
 
-                // 独赢（买家立返）20%
+            // 任务躺赢 (同组任务线上的拆家（X人）均分40%)
 
-                // 任务躺赢 (同组任务线上的拆家（X人）均分40%)
+            // 横向躺赢 同组任务线上的每个拆家对应的上级（Y人，Y<=X）均分25%
 
-                // 横向躺赢 同组任务线上的每个拆家对应的上级（Y人，Y<=X）均分25%
+            // 纵向躺赢 从买家的捆绑关系朝上查，上三级3个人按（8-5-2）分15%  若无上级 找预备队 5%
 
-                // 纵向躺赢 从买家的捆绑关系朝上查，上三级3个人按（8-5-2）分15%  若无上级 找预备队 5%
-
-                // 平台返回任务金
-
-            }
+            // 平台返回任务金
         }
 
     }

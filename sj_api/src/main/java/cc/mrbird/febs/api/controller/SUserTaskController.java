@@ -86,6 +86,9 @@ public class SUserTaskController extends BaseController {
     @Autowired
     private ISUserBrowserService userBrowserService;
 
+    @Autowired
+    private ISUserRelationService userRelationService;
+
     /**
      * 确认拆单
      */
@@ -348,15 +351,26 @@ public class SUserTaskController extends BaseController {
                 if (user.getParentId() == null) {
 
                     SUserBrowser userBrowser = new SUserBrowser();
-                    userBrowser.setUserId(userId);
+
+                    // 阅读表中可能暂时没有userId
+                    userBrowser.setUnionId(user.getUnionId());
                     userBrowser.setProductId(productId);
                     userBrowser = this.userBrowserService.findUserBrowser(userBrowser);
+
                     // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
-                    if(userBrowser != null && userBrowser.getShareId() != null){
+                    if (userBrowser != null && userBrowser.getShareId() != null) {
                         SUserShare userShare = this.userShareService.getById(userBrowser.getShareId());
-                        if(userShare != null){
+                        if (userShare != null) {
                             user.setParentId(userShare.getUserId());
                             this.userService.updateById(user);
+
+                            SUserRelation userRelation = new SUserRelation();
+                            userRelation.setUnionId(user.getUnionId());
+                            userRelation.setParentId(userShare.getUserId());
+                            SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
+                            // 由预备队修改为禁卫军
+                            userRelationOne.setRelationType(1);
+                            this.userRelationService.updateById(userRelationOne);
                         }
                     }
                 }

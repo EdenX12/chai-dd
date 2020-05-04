@@ -78,4 +78,11 @@
             s_order_detail od
         WHERE od.id = #{orderDetailId}
     </select>
+
+    <select id="queryOrderPaySuccessList" resultType="java.util.Map">
+        SELECT id
+        FROM s_order
+        WHERE payment_state = 1
+          AND TIMESTAMPDIFF(MINUTE, payment_time, NOW()) >= 5
+    </select>
 </mapper>

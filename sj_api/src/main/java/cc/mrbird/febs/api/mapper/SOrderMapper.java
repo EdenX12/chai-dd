@@ -35,4 +35,11 @@ public interface SOrderMapper extends BaseMapper<SOrder> {
      * @param orderDetailId
      */
     Map<String, Object> queryOrderDetail(@Param("orderDetailId")String orderDetailId);
+
+
+    /**
+     * 支付成功时间超过5分钟的订单处理
+     * @return
+     */
+    List<Map> queryOrderPaySuccessList();
 }
