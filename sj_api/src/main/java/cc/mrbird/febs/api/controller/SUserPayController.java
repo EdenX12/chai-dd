@@ -352,7 +352,7 @@ public class SUserPayController extends BaseController {
                     }
                 }
 
-                // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
+                // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog todo  ???确定这个地方是否也需要送拆豆？？？
                 Integer orderBeanCnt = 0;
                 SParams params = this.paramsService.queryBykeyForOne("order_bean_cnt");
                 if (params != null) {
@@ -365,7 +365,7 @@ public class SUserPayController extends BaseController {
                     userBeanLog.setChangeType(1);
                     userBeanLog.setChangeAmount(orderBeanCnt);
                     userBeanLog.setChangeTime(new Date());
-                    userBeanLog.setRelationId(order.getId());//TODO 待定
+                    userBeanLog.setRelationId(order.getId());//TODO 待定，确定是否是orderID
                     userBeanLog.setRemark("订单orderID");
                     userBeanLog.setOldAmount(user.getCanuseBean());
                     this.userBeanLogService.save(userBeanLog);
