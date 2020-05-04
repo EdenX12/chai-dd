@@ -6,6 +6,7 @@ import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.utils.*;
+import com.google.common.collect.Lists;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -80,6 +82,16 @@ public class SUserPayController extends BaseController {
 
     @Autowired
     private ISUserRelationService userRelationService;
+
+    @Autowired
+    private ISTaskLineService taskLineService;
+
+    @Autowired
+    private ISOrderProductService orderProductService;
+
+    @Autowired
+    private ISUserTaskLineService userTaskLineService;
+
 
     /**
      * 新增用户支付
@@ -269,12 +281,15 @@ public class SUserPayController extends BaseController {
 
             if ("O".equals(strPayType)) {
 
+
                 // 支付购买订单成功
                 SOrder order = this.orderService.getById(relationId);
                 userPay.setUserId(order.getUserId());
                 this.userPayService.save(userPay);
 
-                // 变更批量订单状态 已付款
+                String userId =order.getUserId();
+
+                        // 变更批量订单状态 已付款
                 order.setPaymentState(1);
                 order.setPaymentState(1);
                 order.setPaymentTime(new Date());
@@ -282,29 +297,82 @@ public class SUserPayController extends BaseController {
 
                 // 变更订单明细状态 已付款
                 SOrderDetail orderDetail = new SOrderDetail();
-                orderDetail.setUserId(order.getUserId());
+                orderDetail.setUserId(userId);
                 orderDetail.setOrderId(order.getId());
                 orderDetail.setOrderStatus(1);
                 orderDetail.setPaymentState(1);
                 orderDetail.setPaymentTime(new Date());
 
                 this.orderDetailService.updateOrderDetail(orderDetail);
+                List<Map<String,Object>> productIds = orderDetailService.queryProductByOrder(order.getId());
 
                 // 根据订单明细中的商品 然后从任务线表(s_task_line)中按顺序选中 结算状态未完成 作为结算任务线 修改为 结算中
-                // 订单商品表中的任务线ID 更新
-
-                // 上面任务线表中的所有 转让中的任务终止动作 （暂不做）
-                // 1.转让任务表状态更新 （转让中 - > 未成交流标）
-                // 2.任务报价表 全部竞标中修改已出局状态  所有出局者支付金额退还 (金额流水插入 冻结-余额）
-                // 3.用户任务表状态更新（转让中 -> 已接任务）
-
-
                 // 然后选中的结算任务线 对应的 用户任务线表(s_user_task_line) 状态修改为 佣金结算中
 
+                //1.  根据s_order_detail 这个表中的id 检索s_order_product  这儿可能会有多条数据 如有多条数据做循环处理
+                //2.  针对上记1中每一条数据，做以下处理：
+                //a . 根据s_order_product中的 商品ID（ product_id） 到s_task_line表中检索  条件 结算状态未完成（settle_status=0）
+                // line_order（asc升序） 取得N（商品数量）条 然后把这些数据中 结算中（1） order_product_id 更新
+                // 同时 批量更新 s_user_task_line表中的状态为结算中3（条件 taskLineId）
 
+                if(productIds != null && productIds.size()>0){
+                    List<String>  settleTaskLineIds = Lists.newArrayList();
+                    for(Map<String,Object> obj  : productIds){
+                        String productId = obj.get("productId").toString();
+                        String orderProductId = obj.get("orderProductId").toString();
+                        String settleTaskLineId = taskLineService.queryForSettle(productId);
+                        STaskLine taskLine = taskLineService.getById(settleTaskLineId);
+                        taskLine.setOrderProductId(orderProductId);
+                        // 结算中
+                        taskLine.setSettleStatus(1);
+                        taskLineService.updateById(taskLine);
+                        settleTaskLineIds.add(settleTaskLineId);
+                    }
+                    taskLineService.updateUserTaskLineForSettle(settleTaskLineIds);
+                }
                 // 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
+                List<SOrderDetail> orderDetails = orderDetailService.findOrderDetailList(orderDetail );
+                if (orderDetails != null && orderDetails.size() > 0) {
+                    for(SOrderDetail od : orderDetails){
+                        SUserCoupon userCoupon = this.userCouponService.getById(od.getUserCouponId());
+                        if (userCoupon != null) {
+                            userCoupon.setCouponStatus(1);
+                            userCoupon.setUpdateTime(new Date());
+                            this.userCouponService.updateById(userCoupon);
+
+                            SUserCouponLog couponLog = new SUserCouponLog();
+                            couponLog.setCreateTime(new Date());
+                            couponLog.setUpdateTime(new Date());
+                            // 券类型 0-任务金 1-商铺券
+                            couponLog.setCouponType(1);
+                            couponLog.setCouponId(userCoupon.getCouponId());
+                            couponLog.setUserId(userId);
+                            this.userCouponLogService.save(couponLog);
+                        }
+                    }
+                }
 
                 // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
+                Integer orderBeanCnt = 0;
+                SParams params = this.paramsService.queryBykeyForOne("order_bean_cnt");
+                if (params != null) {
+                    orderBeanCnt = Integer.valueOf(params.getPValue());
+                }
+                SUser user = userService.getById(userId);
+                if (orderBeanCnt != null && orderBeanCnt > 0) {
+                    SUserBeanLog userBeanLog = new SUserBeanLog();
+                    userBeanLog.setUserId(userId);
+                    userBeanLog.setChangeType(1);
+                    userBeanLog.setChangeAmount(orderBeanCnt);
+                    userBeanLog.setChangeTime(new Date());
+                    userBeanLog.setRelationId(order.getId());//TODO 待定
+                    userBeanLog.setRemark("订单orderID");
+                    userBeanLog.setOldAmount(user.getCanuseBean());
+                    this.userBeanLogService.save(userBeanLog);
+
+                    user.setRewardBean(user.getRewardBean() + orderBeanCnt);
+                    this.userService.updateById(user);
+                }
 
             }
 

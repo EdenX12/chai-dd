@@ -12,4 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class SUserPayServiceImpl extends ServiceImpl<SUserPayMapper, SUserPay> implements ISUserPayService {
 
+    @Override
+    public void updateTaskLineForPay(String orderId) {
+        this.baseMapper.updateTaskLineForPay(orderId);
+    }
+
+    @Override
+    public void updateUserTaskLineForPay(String orderId) {
+        this.baseMapper.updateUserTaskLineForPay(orderId);
+    }
 }

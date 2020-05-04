@@ -37,4 +37,18 @@ public interface ISTaskLineService extends IService<STaskLine> {
      * @return List<STaskLine>
      */
      List<STaskLine> findTaskLineList(STaskLine taskLine);
+
+    /**
+     * 查询结算的任务线
+     * @param productId
+     * @param
+     * @return
+     */
+    String queryForSettle(String productId);
+
+    /**
+     * 批量更新用户任务线
+     * @param list
+     */
+    void updateUserTaskLineForSettle(List<String> list);
 }

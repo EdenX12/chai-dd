@@ -4,6 +4,8 @@ import cc.mrbird.febs.api.entity.STaskLine;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author MrBird
  */
@@ -31,5 +33,23 @@ public interface STaskLineMapper extends BaseMapper<STaskLine> {
     String queryIdByLineOrder(@Param("productId") String productId,
                               @Param("lineOrder") Integer lineOrder);
 
+    /**
+     * 购买商品时候需要结算的任务线
+     * @param productId
+     * @param
+     * @return
+     */
+    String queryForSettle(@Param("productId") String productId);
+
+    /**
+     * 批量更新任务线
+     * @param list
+     */
+    void updateTaskLineForSettle(List<String> list);
+    /**
+     * 批量更新任务线
+     * @param list
+     */
+    void updateUserTaskLineForSettle(List<String> list);
 
 }

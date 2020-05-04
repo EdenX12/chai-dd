@@ -11,4 +11,6 @@ import java.util.List;
 public interface ISUserTaskLineService extends IService<SUserTaskLine> {
 
     List<SUserTaskLine> findUserTaskLineList(SUserTaskLine userTaskLine);
+
+    List<SUserTaskLine> queryByTaskLineId(String taskLineId);
 }

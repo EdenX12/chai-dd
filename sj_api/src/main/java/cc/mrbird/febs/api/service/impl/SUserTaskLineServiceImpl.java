@@ -43,4 +43,15 @@ public class SUserTaskLineServiceImpl extends ServiceImpl<SUserTaskLineMapper, S
         return this.baseMapper.selectList(queryWrapper);
     }
 
+    @Override
+    public List<SUserTaskLine> queryByTaskLineId(String taskLineId) {
+        LambdaQueryWrapper<SUserTaskLine> queryWrapper = new LambdaQueryWrapper();
+
+        if (taskLineId != null) {
+            queryWrapper.eq(SUserTaskLine::getTaskLineId, taskLineId);
+            queryWrapper.eq(SUserTaskLine::getPayStatus, 1);
+        }
+        return this.baseMapper.selectList(queryWrapper);
+    }
+
 }

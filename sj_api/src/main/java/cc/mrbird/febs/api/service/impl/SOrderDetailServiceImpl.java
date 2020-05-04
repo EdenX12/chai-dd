@@ -1,14 +1,17 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SOrderDetail;
+import cc.mrbird.febs.api.entity.SOrderProduct;
 import cc.mrbird.febs.api.mapper.SOrderDetailMapper;
 import cc.mrbird.febs.api.service.ISOrderDetailService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MrBird
@@ -47,8 +50,33 @@ public class SOrderDetailServiceImpl extends ServiceImpl<SOrderDetailMapper, SOr
         if (orderDetail.getOrderId() != null) {
             queryWrapper.eq(SOrderDetail::getOrderId, orderDetail.getOrderId());
         }
-
+        if (orderDetail.getUserId() != null) {
+            queryWrapper.eq(SOrderDetail::getUserId, orderDetail.getUserId());
+        }
+        if (orderDetail.getOrderStatus() != null) {
+            queryWrapper.eq(SOrderDetail::getOrderStatus, orderDetail.getOrderStatus());
+        }
+        if (orderDetail.getPaymentState() != null) {
+            queryWrapper.eq(SOrderDetail::getUserId, orderDetail.getPaymentState());
+        }
         return this.baseMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryProductByOrder(String orderId) {
+        return this.baseMapper.queryProductByOrder(orderId);
+    }
+
+    @Override
+    public List<String> queryIdByProductOrder(String productId, String orderId) {
+
+        LambdaQueryWrapper<SOrderProduct> queryWrapper = new LambdaQueryWrapper();
+        if (StringUtils.isNotBlank(productId) && StringUtils.isNotBlank(orderId)) {
+
+            queryWrapper.eq(SOrderProduct::getOrderDetailId, orderId);
+            queryWrapper.eq(SOrderProduct::getProductId, productId);
+        }
+        return null;
     }
 
 }

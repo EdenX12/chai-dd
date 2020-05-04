@@ -4,6 +4,7 @@ import cc.mrbird.febs.api.entity.SOrderDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MrBird
@@ -30,4 +31,13 @@ public interface ISOrderDetailService extends IService<SOrderDetail> {
      * @param orderDetail SOrderDetail
      */
     List<SOrderDetail> findOrderDetailList(SOrderDetail orderDetail);
+
+    /**
+     * 根据订单号查询商品id和数量
+     * @param orderId
+     * @return
+     */
+    List<Map<String,Object>>queryProductByOrder(String orderId);
+
+    List<String> queryIdByProductOrder(String productId,String orderId);
 }

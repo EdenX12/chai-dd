@@ -131,4 +131,5 @@
         AND SP.id = #{sProduct.id}
         AND SP.delete_flag = 0
     </select>
+
 </mapper>

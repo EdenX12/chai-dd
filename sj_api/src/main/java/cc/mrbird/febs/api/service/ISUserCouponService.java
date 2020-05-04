@@ -13,4 +13,6 @@ public interface ISUserCouponService extends IService<SUserCoupon> {
     List<SUserCoupon> findUserCouponList(String userId, String productId, Integer couponStatus, Integer couponType);
 
     SUserCoupon findUserCoupon(String userId, String userCouponId);
+
+    List<SUserCoupon> findUserCouponList(String orderId, Integer couponStatus, Integer couponType);
 }
