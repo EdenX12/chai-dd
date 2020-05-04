@@ -63,6 +63,16 @@ public class SOrderProduct implements Serializable {
     private BigDecimal scribingPrice;
 
     /**
+     * 总佣金（单位元）
+     */
+    private BigDecimal totalReward;
+
+    /**
+     * 任务单价（单位元）
+     */
+    private BigDecimal taskPrice;
+
+    /**
      * 商品名称
      */
     private String productName;

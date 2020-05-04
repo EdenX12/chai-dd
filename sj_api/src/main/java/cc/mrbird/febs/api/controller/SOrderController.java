@@ -70,6 +70,12 @@ public class SOrderController extends BaseController {
     private ISUserTaskService userTaskService;
 
     @Autowired
+    private ISTaskLineService taskLineService;
+
+    @Autowired
+    private ISUserTaskLineService userTaskLineService;
+
+    @Autowired
     private ISUserService userService;
 
     @Autowired
@@ -83,6 +89,12 @@ public class SOrderController extends BaseController {
 
     @Autowired
     private ISUserMsgService userMsgService;
+
+    @Autowired
+    private ISParamsService paramsService;
+
+    @Autowired
+    private ISUserRelationService userRelationService;
 
     /**
      * 确认订单
@@ -427,6 +439,8 @@ public class SOrderController extends BaseController {
                     orderProductInsert.setProductNumber(productNumber);
                     orderProductInsert.setProductPrice(productSpec.getProductPrice());
                     orderProductInsert.setScribingPrice(productSpec.getScribingPrice());
+                    orderProductInsert.setTotalReward(product.getTotalReward());
+                    orderProductInsert.setTaskPrice(product.getTaskPrice());
                     orderProductInsert.setProductName(product.getProductName());
                     orderProductInsert.setProductImg(product.getProductImg());
                     orderProductInsert.setProductDes(product.getProductDes());
@@ -768,236 +782,196 @@ public class SOrderController extends BaseController {
     public void orderPaySuccessTask() {
 
         // 支付成功超过5分钟订单
-        List<Map> orderPaySuccessList = this.orderService.findOrderPaySuccessList();
+        List<SOrder> orderPaySuccessList = this.orderService.findOrderPaySuccessList();
 
-        for (Map orderPaySuccessMap : orderPaySuccessList) {
+        // 买家立返佣金比例 （后续调整到Redis缓存读取）
+        SParams params = new SParams();
+        params = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        // 同组任务躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        // 横向上级躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("upper_horizontal_rate");
+        BigDecimal upperHorizontalRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        // 纵向上级1躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("upper_vertical1_rate1");
+        BigDecimal upperVertical1Rate1 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        // 纵向上级2躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("upper_vertical1_rate2");
+        BigDecimal upperVertical1Rate2 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        // 纵向上级3躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("upper_vertical1_rate3");
+        BigDecimal upperVertical1Rate3 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        // 纵向上级0躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("upper_vertical1_rate0");
+        BigDecimal upperVertical1Rate0 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
 
-            String orderId = (String) orderPaySuccessMap.get("id");
+        for (SOrder order : orderPaySuccessList) {
 
             // 变更订单状态 （2:已结算到冻结）
+            order.setPaymentState(2);
+            this.orderService.updateById(order);
 
             SOrderDetail orderDetail = new SOrderDetail();
-            orderDetail.setOrderId(orderId);
+            orderDetail.setOrderId(order.getId());
             List<SOrderDetail> orderDetailPaySuccessList = this.orderDetailService.findOrderDetailList(orderDetail);
 
-            // 变更订单明细状态 （2:已结算到冻结）
+            for (SOrderDetail orderDetailPaySuccess : orderDetailPaySuccessList) {
 
-            // 根据订单商品中的任务线ID检索 任务线表（s_task_line）
+                // 变更订单明细状态 （2:已结算到冻结）
+                orderDetailPaySuccess.setPaymentState(2);
+                this.orderDetailService.updateById(orderDetailPaySuccess);
 
-            // 根据任务线ID 检索 用户任务线 变更用户任务线表状态（3 -> 4 佣金结算完成待入账）
+                List<SOrderProduct> orderProductList = this.orderProductService.findOrderProductList(orderDetailPaySuccess.getId());
 
-            // 独赢（买家立返）20%
+                for (SOrderProduct orderProduct : orderProductList) {
 
-            // 任务躺赢 (同组任务线上的拆家（X人）均分40%)
+                    // 根据任务线中的订单商品ID，检索任务线表（s_task_line）
+                    STaskLine taskLine = new STaskLine();
+                    taskLine.setOrderProductId(orderProduct.getId());
+                    List<STaskLine> taskLineList = this.taskLineService.findTaskLineList(taskLine);
 
-            // 横向躺赢 同组任务线上的每个拆家对应的上级（Y人，Y<=X）均分25%
+                    for (STaskLine taskLineOne : taskLineList) {
 
-            // 纵向躺赢 从买家的捆绑关系朝上查，上三级3个人按（8-5-2）分15%  若无上级 找预备队 5%
+                        // 独赢（买家立返）20%
+                        SUserBonusLog userBonusLog = new SUserBonusLog();
+                        userBonusLog.setUserId(orderProduct.getUserId());
+                        userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                        userBonusLog.setTaskLineId(taskLineOne.getId());
+                        userBonusLog.setUserTaskLineId(null);
+                        userBonusLog.setProductId(orderProduct.getProductId());
+                        userBonusLog.setBonusType(1);
+                        userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(buyerRate));
+                        userBonusLog.setCreateTime(new Date());
+                        userBonusLog.setUpdateTime(new Date());
+                        userBonusLog.setStatus(0);
+                        this.userBonusLogService.save(userBonusLog);
 
-            // 平台返回任务金
+                        // 纵向躺赢 从买家的捆绑关系朝上查，上三级3个人按（8-5-2）分15%  若无上级 找预备队 5%
+                        SUser userMe = this.userService.getById(orderProduct.getUserId());
+
+                        // 有上级的情况下
+                        if (userMe.getParentId() != null) {
+
+                            // 上一级用户
+                            SUser userSuperOne = this.userService.getById(userMe.getParentId());
+
+                            userBonusLog.setUserId(userSuperOne.getId());
+                            userBonusLog.setBonusType(4);
+                            userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate1));
+                            this.userBonusLogService.save(userBonusLog);
+
+                            if (userSuperOne.getParentId() != null) {
+
+                                // 上二级用户
+                                SUser userSuperTwo = this.userService.getById(userSuperOne.getParentId());
+
+                                userBonusLog.setUserId(userSuperTwo.getId());
+                                userBonusLog.setBonusType(4);
+                                userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate2));
+                                this.userBonusLogService.save(userBonusLog);
+
+                                if (userSuperTwo.getParentId() != null) {
+
+                                    // 上三级用户
+                                    SUser userSuperThree = this.userService.getById(userSuperTwo.getParentId());
+
+                                    userBonusLog.setUserId(userSuperThree.getId());
+                                    userBonusLog.setBonusType(4);
+                                    userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate3));
+                                    this.userBonusLogService.save(userBonusLog);
+                                }
+                            }
+                        } else {
+
+                            // 无上级的情况下 则查看u最后一次是谁的预备队（假设是A某），则给A某分配5%
+                            SUserRelation userRelation = new SUserRelation();
+                            userRelation.setRelationType(0);
+                            userRelation.setUnionId(userMe.getUnionId());
+                            SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
+                            if (userRelationOne != null) {
+                                userBonusLog.setUserId(userRelationOne.getParentId());
+                                userBonusLog.setBonusType(4);
+                                userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate0));
+                                this.userBonusLogService.save(userBonusLog);
+                            }
+                        }
+
+                        // 根据任务线ID 检索 用户任务线
+                        SUserTaskLine userTaskLine = new SUserTaskLine();
+                        userTaskLine.setTaskLineId(taskLineOne.getId());
+                        List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
+
+                        // 同组任务线上的拆家（X人）均分
+                        BigDecimal sameGroup = orderProduct.getTotalReward().multiply(sameGroupRate).divide(
+                                new BigDecimal(userTaskLineList.size()), 2, BigDecimal.ROUND_HALF_UP);
+
+                        int taskUserSuperCnt = 0;
+                        // 计算同组任务线上的每个拆家对应的上级个数（横向上级）
+                        for (SUserTaskLine userTaskLineOne : userTaskLineList) {
+                            SUser taskUser = this.userService.getById(userTaskLineOne.getUserId());
+                            if (taskUser.getParentId() != null) {
+                                taskUserSuperCnt = taskUserSuperCnt + 1;
+                            }
+                        }
+                        BigDecimal upperHorizontal = orderProduct.getTotalReward().multiply(upperHorizontalRate).divide(
+                                new BigDecimal(taskUserSuperCnt), 2, BigDecimal.ROUND_HALF_UP);
+
+                        for (SUserTaskLine userTaskLineOne : userTaskLineList) {
+
+                            // 变更用户任务线表状态（3 -> 4 佣金结算完成待入账）
+                            userTaskLineOne.setStatus(4);
+                            userTaskLineOne.setUpdateTime(new Date());
+                            this.userTaskLineService.updateById(userTaskLineOne);
+
+                            // 任务躺赢 (同组任务线上的拆家（X人）均分40%)
+                            userBonusLog.setUserId(userTaskLineOne.getUserId());
+                            userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                            userBonusLog.setTaskLineId(taskLineOne.getId());
+                            userBonusLog.setUserTaskLineId(userTaskLineOne.getId());
+                            userBonusLog.setProductId(orderProduct.getProductId());
+                            userBonusLog.setBonusType(2);
+                            userBonusLog.setBonusAmount(sameGroup);
+                            userBonusLog.setCreateTime(new Date());
+                            userBonusLog.setUpdateTime(new Date());
+                            userBonusLog.setStatus(0);
+                            this.userBonusLogService.save(userBonusLog);
+
+                            // 横向躺赢 同组任务线上的每个拆家对应的上级（Y人，Y<=X）均分25%
+                            SUser taskUser = this.userService.getById(userTaskLineOne.getUserId());
+                            if (taskUser.getParentId() != null) {
+
+                                userBonusLog.setUserId(taskUser.getParentId());
+                                userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                                userBonusLog.setTaskLineId(taskLineOne.getId());
+                                userBonusLog.setUserTaskLineId(userTaskLineOne.getId());
+                                userBonusLog.setProductId(orderProduct.getProductId());
+                                userBonusLog.setBonusType(3);
+                                userBonusLog.setBonusAmount(upperHorizontal);
+                                userBonusLog.setCreateTime(new Date());
+                                userBonusLog.setUpdateTime(new Date());
+                                userBonusLog.setStatus(0);
+                                this.userBonusLogService.save(userBonusLog);
+                            }
+
+                            // 平台返回任务金
+                            userBonusLog.setUserId(userTaskLineOne.getUserId());
+                            userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                            userBonusLog.setTaskLineId(taskLineOne.getId());
+                            userBonusLog.setUserTaskLineId(userTaskLineOne.getId());
+                            userBonusLog.setProductId(orderProduct.getProductId());
+                            userBonusLog.setBonusType(5);
+                            userBonusLog.setBonusAmount(userTaskLineOne.getPayAmount());
+                            userBonusLog.setCreateTime(new Date());
+                            userBonusLog.setUpdateTime(new Date());
+                            userBonusLog.setStatus(0);
+                            this.userBonusLogService.save(userBonusLog);
+                        }
+                    }
+                }
+            }
         }
-
     }
 
 }
-
-
-
-// 前版本代码 备用 最后删除
-// 产品下的所有 转让中的任务终止动作：
-//                SUserTask userTask = new SUserTask();
-//                userTask.setProductId(order.getProductId());
-//                userTask.setPayStatus(1);
-//                userTask.setStatus(1);
-//                List<SUserTask> userTaskList = this.userTaskService.findUserTaskList(userTask);
-
-//                for (SUserTask userTasking : userTaskList) {
-//
-//                    // 2.转让任务表状态更新 （转让中 - > 未成交流标）
-//                    STaskOrder taskOrder = new STaskOrder();
-//                    taskOrder.setTaskId(userTasking.getId());
-//                    taskOrder.setStatus(0);
-//                    List<STaskOrder> taskOrderList = taskOrderService.findTaskOrderList(taskOrder);
-//
-//                    for (STaskOrder taskOrdering : taskOrderList) {
-//
-//                        // 1.任务报价表 全部竞标中修改已出局状态  所有出局者支付金额退还
-//                        SOfferPrice offerPrice = new SOfferPrice();
-//                        offerPrice.setTaskOrderId(taskOrdering.getId());
-//                        this.offerPriceService.updateOfferPriceOut(offerPrice);
-//
-//                        // 所有出局者
-//                        List<SOfferPrice> offerPriceOutList = this.offerPriceService.findOfferPriceOutList(offerPrice);
-//
-//                        for (SOfferPrice offerPriceOut : offerPriceOutList) {
-//                            SUser user = this.userService.getById(offerPriceOut.getUserId());
-//
-//                            // 金额流水插入
-//                            SUserAmountLog userAmountLog = new SUserAmountLog();
-//                            userAmountLog.setUserId(user.getId());
-//                            userAmountLog.setChangeType(8);
-//                            userAmountLog.setChangeAmount(offerPriceOut.getAmount());
-//                            userAmountLog.setChangeTime(new Date());
-//                            userAmountLog.setRelationId(offerPriceOut.getId());
-//                            userAmountLog.setRemark("关联任务报价ID");
-//                            userAmountLog.setOldAmount(user.getTotalAmount());
-//                            this.userAmountLogService.save(userAmountLog);
-//
-//                            // 冻结金额-
-//                            user.setLockAmount(user.getLockAmount().subtract(offerPriceOut.getAmount()));
-//                            // 余额+
-//                            user.setTotalAmount(user.getTotalAmount().add(offerPriceOut.getAmount()));
-//
-//                            this.userService.updateById(user);
-//                        }
-//
-//                        taskOrdering.setStatus(2);
-//                        this.taskOrderService.updateById(taskOrdering);
-//                    }
-//
-//                    // 3.用户任务表状态更新（转让中 -> 已接任务   -->下面会变为任务完结）
-//                    userTasking.setStatus(0);
-//                    this.userTaskService.updateById(userTasking);
-//                }
-//
-//                // 判断此用户是否领取过任务
-//                boolean taskGotUser = false;
-//                // 其他人总的领取份数
-//                int totalTaskNumberOther = 0;
-//
-//                // 4.用户任务表状态更新（已接任务 -> 任务完结）
-//                userTask.setProductId(order.getProductId());
-//                userTask.setPayStatus(1);
-//                userTask.setStatus(0);
-//                userTaskList = this.userTaskService.findUserTaskList(userTask);
-//                for (SUserTask userTask0 : userTaskList) {
-//                    userTask0.setStatus(3);
-//                    this.userTaskService.updateById(userTask0);
-//
-//                    if (order.getUserId() == userTask0.getUserId() && order.getTaskId() == userTask0.getId()) {
-//                        taskGotUser = true;
-//                    } else {
-//                        totalTaskNumberOther = totalTaskNumberOther + userTask0.getTaskNumber();
-//                    }
-//                }
-//
-//                SProduct product = this.productService.getById(order.getProductId());
-//
-//                // 独赢收益计算 (如领取过任务 40%  50%由其他领取该任务者均分 未领取过任务 5%  80%被其他领取该任务者均分)
-//                BigDecimal everyReward = new BigDecimal(0);
-//                if (taskGotUser) {
-//
-//                    SUserBonusLog userBonusLog = new SUserBonusLog();
-//                    userBonusLog.setUserId(order.getUserId());
-//                    userBonusLog.setTaskId(order.getTaskId());
-//                    userBonusLog.setOrderId(order.getId());
-//                    userBonusLog.setBonusType(3);
-//                    userBonusLog.setBonusAmount(product.getTotalReward().multiply(BigDecimal.valueOf(0.4)));
-//                    userBonusLog.setCreateTime(new Date());
-//                    userBonusLog.setStatus(0);
-//                    userBonusLog.setTaskNumber(null);
-//
-//                    this.userBonusLogService.save(userBonusLog);
-//
-//                    // 每份任务的躺赢收益
-//                    if (totalTaskNumberOther != 0) {
-//                        everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.5)).divide(
-//                                new BigDecimal(totalTaskNumberOther), 2, BigDecimal.ROUND_HALF_UP);
-//                    }
-//                } else {
-//
-//                    SUserBonusLog userBonusLog = new SUserBonusLog();
-//                    userBonusLog.setUserId(order.getUserId());
-//                    userBonusLog.setTaskId(order.getTaskId());
-//                    userBonusLog.setOrderId(order.getId());
-//                    userBonusLog.setBonusType(3);
-//                    userBonusLog.setBonusAmount(product.getTotalReward().multiply(BigDecimal.valueOf(0.05)));
-//                    userBonusLog.setCreateTime(new Date());
-//                    userBonusLog.setStatus(0);
-//                    userBonusLog.setTaskNumber(null);
-//
-//                    this.userBonusLogService.save(userBonusLog);
-//
-//                    // 每份任务的躺赢收益
-//                    if (totalTaskNumberOther != 0) {
-//                        everyReward = product.getTotalReward().multiply(BigDecimal.valueOf(0.8)).divide(
-//                                new BigDecimal(totalTaskNumberOther), 2, BigDecimal.ROUND_HALF_UP);
-//                    }
-//
-//                }
-//
-//                for (SUserTask userTasked : userTaskList) {
-//
-//                    // 躺赢收益
-//                    SUserBonusLog userBonusLog = new SUserBonusLog();
-//
-//                    // 独赢的人 不分得躺赢收益
-//                    if (order.getUserId() != userTasked.getUserId() || order.getTaskId() != userTasked.getId()) {
-//
-//                        userBonusLog.setUserId(userTasked.getUserId());
-//                        userBonusLog.setTaskId(userTasked.getId());
-//                        userBonusLog.setOrderId(order.getId());
-//                        userBonusLog.setBonusType(4);
-//                        userBonusLog.setBonusAmount(everyReward);
-//                        userBonusLog.setCreateTime(new Date());
-//                        userBonusLog.setStatus(0);
-//                        userBonusLog.setTaskNumber(userTasked.getTaskNumber());
-//
-//                        this.userBonusLogService.save(userBonusLog);
-//                    }
-//
-//                    // 任务金解冻入账
-//                    userBonusLog = new SUserBonusLog();
-//                    userBonusLog.setUserId(userTasked.getUserId());
-//                    userBonusLog.setTaskId(userTasked.getId());
-//                    userBonusLog.setOrderId(order.getId());
-//                    userBonusLog.setBonusType(9);
-//                    userBonusLog.setBonusAmount(product.getTaskPrice());
-//                    userBonusLog.setCreateTime(new Date());
-//                    userBonusLog.setStatus(0);
-//                    userBonusLog.setTaskNumber(userTasked.getTaskNumber());
-//
-//                    this.userBonusLogService.save(userBonusLog);
-//                }
-//
-//                SUser user = this.userService.getById(order.getUserId());
-//
-//                // 下级贡献收益计算 往上推四级
-//                List<SUser> userList = new ArrayList();
-//                if (user.getParentId() != null) {
-//                    // 第一级
-//                    SUser user1 = userService.getById(user.getParentId());
-//                    userList.add(user1);
-//                    if (user1.getParentId() != null) {
-//                        // 第二级
-//                        SUser user2 = userService.getById(user1.getParentId());
-//                        userList.add(user2);
-//                        if (user2.getParentId() != null) {
-//                            // 第三级
-//                            SUser user3 = userService.getById(user2.getParentId());
-//                            userList.add(user3);
-//                            if (user3.getParentId() != null) {
-//                                // 第四级
-//                                SUser user4 = userService.getById(user3.getParentId());
-//                                userList.add(user4);
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                // （如是见习猎人分0.5%;如是初级猎手分1%，如遇中级猎人分2%，如遇高级猎人分3%）
-//                for (SUser user0 : userList) {
-//                    SUserLevel userLevel = userLevelService.findByLevelType(user0.getUserLevelType());
-//
-//                    SUserBonusLog userBonusLog = new SUserBonusLog();
-//                    userBonusLog.setUserId(user0.getId());
-//                    userBonusLog.setTaskId(order.getTaskId());
-//                    userBonusLog.setOrderId(order.getId());
-//                    userBonusLog.setBonusType(5);
-//                    userBonusLog.setBonusAmount(product.getTotalReward().multiply(userLevel.getIncomeRate()));
-//                    userBonusLog.setCreateTime(new Date());
-//                    userBonusLog.setStatus(0);
-//                    userBonusLog.setTaskNumber(null);
-//
-//                    this.userBonusLogService.save(userBonusLog);
-//                }

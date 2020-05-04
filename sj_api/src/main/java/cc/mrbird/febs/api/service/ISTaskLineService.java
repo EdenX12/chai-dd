@@ -3,6 +3,8 @@ package cc.mrbird.febs.api.service;
 import cc.mrbird.febs.api.entity.STaskLine;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author MrBird
  */
@@ -28,4 +30,11 @@ public interface ISTaskLineService extends IService<STaskLine> {
      * @return
      */
      String queryIdByLineOrder(String productId, Integer lineOrder);
+
+    /**
+     * 根据条件检索任务线
+     * @param taskLine STaskLine
+     * @return List<STaskLine>
+     */
+     List<STaskLine> findTaskLineList(STaskLine taskLine);
 }

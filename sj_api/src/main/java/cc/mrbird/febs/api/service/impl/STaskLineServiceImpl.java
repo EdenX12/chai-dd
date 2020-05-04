@@ -3,9 +3,12 @@ package cc.mrbird.febs.api.service.impl;
 import cc.mrbird.febs.api.entity.STaskLine;
 import cc.mrbird.febs.api.mapper.STaskLineMapper;
 import cc.mrbird.febs.api.service.ISTaskLineService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author MrBird
@@ -25,6 +28,34 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
 
     @Override
     public String queryIdByLineOrder(String productId, Integer lineOrder) {
-        return this.baseMapper.queryIdByLineOrder(productId,lineOrder);
+        return this.baseMapper.queryIdByLineOrder(productId, lineOrder);
+    }
+
+    @Override
+    public List<STaskLine> findTaskLineList(STaskLine taskLine) {
+
+        LambdaQueryWrapper<STaskLine> queryWrapper = new LambdaQueryWrapper();
+
+        if (taskLine.getId() != null) {
+            queryWrapper.eq(STaskLine::getId, taskLine.getId());
+        }
+
+        if (taskLine.getProductId() != null) {
+            queryWrapper.eq(STaskLine::getProductId, taskLine.getProductId());
+        }
+
+        if (taskLine.getOrderProductId() != null) {
+            queryWrapper.eq(STaskLine::getOrderProductId, taskLine.getOrderProductId());
+        }
+
+        if (taskLine.getLineStatus() != null) {
+            queryWrapper.eq(STaskLine::getLineStatus, taskLine.getLineStatus());
+        }
+
+        if (taskLine.getSettleStatus() != null) {
+            queryWrapper.eq(STaskLine::getSettleStatus, taskLine.getSettleStatus());
+        }
+
+        return this.baseMapper.selectList(queryWrapper);
     }
 }

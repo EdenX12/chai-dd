@@ -47,6 +47,13 @@ public class SUserRelationServiceImpl extends ServiceImpl<SUserRelationMapper, S
             queryWrapper.eq(SUserRelation::getUnionId, userRelation.getUnionId());
         }
 
+        // 关系类型 0-预备队 1-近卫军
+        if (userRelation.getRelationType() != null) {
+            queryWrapper.eq(SUserRelation::getRelationType, userRelation.getRelationType());
+        }
+
+        queryWrapper.orderByDesc(SUserRelation::getCreateTime);
+
         return this.baseMapper.selectOne(queryWrapper);
     }
 }

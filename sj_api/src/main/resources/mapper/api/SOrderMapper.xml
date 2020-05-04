@@ -80,7 +80,14 @@
     </select>
 
     <select id="queryOrderPaySuccessList" resultType="java.util.Map">
-        SELECT id
+        SELECT  id,
+                user_id userId,
+                payment_type paymentType,
+                payment_state paymentState,
+                payment_time paymentTime,
+                pay_amount payAmount,
+                channel,
+                create_time createTime
         FROM s_order
         WHERE payment_state = 1
           AND TIMESTAMPDIFF(MINUTE, payment_time, NOW()) >= 5

@@ -2,21 +2,4 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserFollowMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cc.mrbird.febs.api.entity.SUserFollow">
-        <result column="id" property="id" />
-        <result column="user_id" property="userId" />
-        <result column="product_id" property="productId" />
-        <result column="task_order_id" property="taskOrderId" />
-        <result column="follow_type" property="followType" />
-        <result column="status" property="status" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, user_id, product_id, task_id, follow_type, status, create_time, update_time
-    </sql>
-
 </mapper>

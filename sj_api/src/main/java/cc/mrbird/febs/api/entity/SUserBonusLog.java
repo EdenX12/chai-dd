@@ -33,19 +33,24 @@ public class SUserBonusLog implements Serializable {
     private String userId;
 
     /**
+     * 商品ID
+     */
+    private String productId;
+
+    /**
      * 用户任务线ID
      */
     private String userTaskLineId;
 
     /**
+     * 任务线ID
+     */
+    private String taskLineId;
+
+    /**
      * 购买订单ID
      */
     private String orderDetailId;
-
-    /**
-     * 任务份数
-     */
-    private Integer taskNumber;
 
     /**
      * 类型 1-独赢（买家立返）;2-任务躺赢;3-横向躺赢;4-纵向躺赢;5-平台返回任务金;6-已转出;7-已收购;
@@ -61,6 +66,11 @@ public class SUserBonusLog implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
     /**
      * 备注

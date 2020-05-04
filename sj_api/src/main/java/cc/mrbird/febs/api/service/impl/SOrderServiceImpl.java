@@ -80,7 +80,7 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     }
 
     @Override
-    public List<Map> findOrderPaySuccessList() {
+    public List<SOrder> findOrderPaySuccessList() {
 
         return this.baseMapper.queryOrderPaySuccessList();
     }
