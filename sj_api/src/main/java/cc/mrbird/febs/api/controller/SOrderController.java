@@ -69,9 +69,6 @@ public class SOrderController extends BaseController {
     private ISShopCouponService shopCouponService;
 
     @Autowired
-    private ISUserTaskService userTaskService;
-
-    @Autowired
     private ISTaskLineService taskLineService;
 
     @Autowired
