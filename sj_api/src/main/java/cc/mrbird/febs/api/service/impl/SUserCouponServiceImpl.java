@@ -56,4 +56,6 @@ public class SUserCouponServiceImpl extends ServiceImpl<SUserCouponMapper, SUser
 
         return this.baseMapper.selectOne(queryWrapper);
     }
+
+
 }

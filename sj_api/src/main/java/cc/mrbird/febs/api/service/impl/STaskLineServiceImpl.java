@@ -64,10 +64,6 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
         return this.baseMapper.queryForSettle(productId);
     }
 
-    @Override
-    public void updateTaskLineForSettle(List<String> list) {
-        this.baseMapper.updateTaskLineForSettle(list);
-    }
 
     @Override
     public void updateUserTaskLineForSettle(List<String> list) {
