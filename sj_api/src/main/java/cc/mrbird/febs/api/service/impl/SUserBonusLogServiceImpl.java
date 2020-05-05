@@ -20,19 +20,39 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
 
         LambdaQueryWrapper<SUserBonusLog> queryWrapper = new LambdaQueryWrapper();
 
-//        // 购买订单ID不为空的情况下
-//        if (userBonusLog.getOrderId() != null) {
-//            queryWrapper.eq(SUserBonusLog::getOrderId, userBonusLog.getOrderId());
-//        }
-//
-//        // 任务ID不为空的情况下
-//        if (userBonusLog.getTaskId() != null) {
-//            queryWrapper.eq(SUserBonusLog::getTaskId, userBonusLog.getTaskId());
-//        }
-
         // 用户ID不为空的情况下
         if (userBonusLog.getUserId() != null) {
             queryWrapper.eq(SUserBonusLog::getUserId, userBonusLog.getUserId());
+        }
+
+        // 商品ID不为空的情况下
+        if (userBonusLog.getProductId() != null) {
+            queryWrapper.eq(SUserBonusLog::getProductId, userBonusLog.getProductId());
+        }
+
+        // 购买订单ID不为空的情况下
+        if (userBonusLog.getOrderDetailId() != null) {
+            queryWrapper.eq(SUserBonusLog::getOrderDetailId, userBonusLog.getOrderDetailId());
+        }
+
+        // 任务线ID不为空的情况下
+        if (userBonusLog.getTaskLineId() != null) {
+            queryWrapper.eq(SUserBonusLog::getTaskLineId, userBonusLog.getTaskLineId());
+        }
+
+        // 用户任务线ID不为空的情况下
+        if (userBonusLog.getUserTaskLineId() != null) {
+            queryWrapper.eq(SUserBonusLog::getUserTaskLineId, userBonusLog.getUserTaskLineId());
+        }
+
+        // 类型不为空的情况下
+        if (userBonusLog.getBonusType() != null) {
+            queryWrapper.eq(SUserBonusLog::getBonusType, userBonusLog.getBonusType());
+        }
+
+        // 状态不为空的情况下
+        if (userBonusLog.getStatus() != null) {
+            queryWrapper.eq(SUserBonusLog::getStatus, userBonusLog.getStatus());
         }
 
         return this.baseMapper.selectList(queryWrapper);

@@ -29,22 +29,22 @@ public interface ISTaskLineService extends IService<STaskLine> {
      * @param productId
      * @return
      */
-     String queryIdByLineOrder(String productId, Integer lineOrder);
+    String queryIdByLineOrder(String productId, Integer lineOrder);
 
     /**
      * 根据条件检索任务线
      * @param taskLine STaskLine
      * @return List<STaskLine>
      */
-     List<STaskLine> findTaskLineList(STaskLine taskLine);
+    List<STaskLine> findTaskLineList(STaskLine taskLine);
 
     /**
-     * 查询结算的任务线
+     * 按顺序查询待结算的任务线
      * @param productId
      * @param
      * @return
      */
-    String queryForSettle(String productId);
+    STaskLine findTaskLineForSettle(String productId);
 
     /**
      * 批量更新用户任务线

@@ -10,7 +10,6 @@ import cc.mrbird.febs.api.service.ISUserCouponService;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
-import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

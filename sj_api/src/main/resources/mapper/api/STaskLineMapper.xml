@@ -27,12 +27,10 @@
            AND line_order=#{lineOrder}
     </select>
 
-    <select id="queryForSettle" resultType="java.lang.String">
-        select id  from s_task_line where product_id=#{productId} and settle_status=0 ORDER BY line_order asc LIMIT 1
-    </select>
-
     <update id="updateUserTaskLineForSettle" parameterType="list">
-        update s_user_task_line set status=3,order_product_id= where task_line_id in (
+        UPDATE s_user_task_line
+           SET status=3
+         WHERE task_line_id in (
         <foreach collection="list" item="item" index="index" open="" close="" separator=",">
             #{item}
         </foreach>

@@ -34,19 +34,6 @@ public interface STaskLineMapper extends BaseMapper<STaskLine> {
                               @Param("lineOrder") Integer lineOrder);
 
     /**
-     * 购买商品时候需要结算的任务线
-     * @param productId
-     * @param
-     * @return
-     */
-    String queryForSettle(@Param("productId") String productId);
-
-    /**
-     * 批量更新任务线
-     * @param list
-     */
-    void updateTaskLineForSettle(List<String> list);
-    /**
      * 批量更新任务线
      * @param list
      */

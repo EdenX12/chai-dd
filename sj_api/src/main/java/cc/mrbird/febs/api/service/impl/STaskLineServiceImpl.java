@@ -5,7 +5,6 @@ import cc.mrbird.febs.api.mapper.STaskLineMapper;
 import cc.mrbird.febs.api.service.ISTaskLineService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,6 +59,20 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     }
 
     @Override
+    public STaskLine findTaskLineForSettle(String productId) {
+
+        LambdaQueryWrapper<STaskLine> queryWrapper = new LambdaQueryWrapper();
+
+        // 商品ID
+        queryWrapper.eq(STaskLine::getProductId, productId);
+
+        // 结算状态  0：未完成
+        queryWrapper.eq(STaskLine::getSettleStatus, 0);
+
+        queryWrapper.orderByAsc(STaskLine::getLineOrder);
+
+        return this.baseMapper.selectOne(queryWrapper);
+    }
     public String queryForSettle(String productId ) {
         return this.baseMapper.queryForSettle(productId);
     }
@@ -69,4 +82,5 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     public void updateUserTaskLineForSettle(List<String> list) {
         this.baseMapper.updateUserTaskLineForSettle(list);
     }
+
 }

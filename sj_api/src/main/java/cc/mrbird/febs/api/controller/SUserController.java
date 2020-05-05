@@ -23,14 +23,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import cc.mrbird.febs.api.entity.SUserLevel;
-import cc.mrbird.febs.api.entity.SUserMsg;
-import cc.mrbird.febs.api.entity.SUserWechat;
-import cc.mrbird.febs.api.service.ISUserLevelService;
-import cc.mrbird.febs.api.service.ISUserMsgService;
-import cc.mrbird.febs.api.service.ISUserTaskService;
-import cc.mrbird.febs.api.service.ISUserWechatService;
-import cc.mrbird.febs.api.service.ITokenService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,15 +38,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vdurmont.emoji.EmojiParser;
 
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.authentication.JWTToken;
 import cc.mrbird.febs.common.authentication.JWTUtil;
@@ -62,10 +52,8 @@ import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.properties.FebsProperties;
 import cc.mrbird.febs.common.service.RedisService;
 import cc.mrbird.febs.common.utils.AddressUtil;
-import cc.mrbird.febs.common.utils.ContentUtil;
 import cc.mrbird.febs.common.utils.DateUtil;
 import cc.mrbird.febs.common.utils.FebsUtil;
-import cc.mrbird.febs.common.utils.HttpRequest;
 import cc.mrbird.febs.common.utils.HttpRequestWechatUtil;
 import cc.mrbird.febs.common.utils.IPUtil;
 import cc.mrbird.febs.common.utils.MD5Util;
@@ -108,7 +96,10 @@ public class SUserController extends BaseController {
     private ISUserMsgService userMsgService;
 
     @Autowired
-    private ISUserTaskService userTaskService;
+    private ISUserRelationService userRelationService;
+
+    @Autowired
+    private ISUserCouponService userCouponService;
 
     @Autowired
     private ITokenService tokenService;
@@ -135,10 +126,10 @@ public class SUserController extends BaseController {
     	ModelAndView mav=new ModelAndView("redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx84e3a803bae71f3a&redirect_uri=http%3a%2f%2fwww.person-info.com%2fweb%2fapi%2fs-user%2fcustomer%3ftId%3d"+id+"&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect");
 		return mav;
     }
+
     /**
      * 小程序登录
      * @param request
-     * @param code
      * @return
      * @throws Exception
      */
@@ -388,64 +379,50 @@ public class SUserController extends BaseController {
         returnMap.put("userPhone", user.getUserPhone());
         // 用户头像
         returnMap.put("userImg", user.getUserImg());
-        // 猎豆数量
+        // 拆豆数量
         returnMap.put("rewardBean", user.getRewardBean());
         // 可用余额
         returnMap.put("totalAmount", user.getTotalAmount());
         // 冻结金额
         returnMap.put("lockAmount", user.getLockAmount());
         // 等级名称
-        SUserLevel userLevel = userLevelService.findByLevelType(user.getUserLevelType());
+        SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
         returnMap.put("levelName", userLevel.getLevelName());
+        // 每件商品最高任务线数
+        returnMap.put("buyNumber", userLevel.getBuyNumber());
+        // 最多并行商品件数
+        returnMap.put("productNumber", userLevel.getProductNumber());
+
         // 未读消息数
         SUserMsg userMsg = new SUserMsg();
         userMsg.setUserId(user.getId());
-        int notReadMsgCount = userMsgService.findUserMsgNotReadCount(userMsg);
+        int notReadMsgCount = this.userMsgService.findUserMsgNotReadCount(userMsg);
         returnMap.put("notReadMsgCount", notReadMsgCount);
 
-        // 一级组织人数
-        List parentIds1 = new ArrayList();
-        parentIds1.add(user.getId());
-        List<SUser> userList1 = userService.findByParentId(parentIds1);
-        returnMap.put("levelCount1", userList1.size());
+        // 优惠券数量
+        int userCouponCnt = 0;
+        List<SUserCoupon> userCouponList = userCouponService.findUserCouponList(
+                user.getId(), null, 0, null);
+        if (userCouponList != null) {
+            userCouponCnt = userCouponList.size();
+        }
+        returnMap.put("userCouponCnt", userCouponCnt);
 
-        // 二级组织人数
-        List parentIds2 = new ArrayList();
-        for (SUser user1 : userList1) {
-            parentIds2.add(user1.getId());
-        }
+        // 战队人数
+        int userRelationCnt = this.userRelationService.findUserRelationCnt(user.getId());
+        returnMap.put("relationCount", userRelationCnt);
 
-        List<SUser> userList2 = new ArrayList();
-        if (parentIds2 != null && parentIds2.size() >0 ) {
-            userList2 = userService.findByParentId(parentIds2);
-        }
-        returnMap.put("levelCount2", userList2.size());
+        // 今日新增人数
+        int userRelationTodayCnt = this.userRelationService.findUserRelationTodayCnt(user.getId());
+        returnMap.put("userRelationTodayCnt", userRelationTodayCnt);
 
-        // 三级组织人数
-        List parentIds3 = new ArrayList();
-        for (SUser user2 : userList2) {
-            parentIds3.add(user2.getId());
-        }
-        List<SUser> userList3 = new ArrayList();
-        if (parentIds3 != null && parentIds3.size() > 0) {
-            userList3 = userService.findByParentId(parentIds3);
-        }
-        returnMap.put("levelCount3", userList3.size());
+        // 累计收益
+        BigDecimal totalBonus = new BigDecimal(0);
+        // 今日收益
+        BigDecimal todayBonus = new BigDecimal(0);
 
-        // 四级组织人数
-        List parentIds4 = new ArrayList();
-        for (SUser user3 : userList3) {
-            parentIds4.add(user3.getId());
-        }
-        List<SUser> userList4 = new ArrayList();
-        if (parentIds4 != null && parentIds4.size() > 0) {
-            userList4 = userService.findByParentId(parentIds4);
-        }
-        returnMap.put("levelCount4", userList4.size());
-
-        // 预备队人数
-        List<String> userIds = userTaskService.findUserIdsByParent(user.getId());
-        returnMap.put("reserveCount", userIds.size());
+        returnMap.put("totalBonus", totalBonus);
+        returnMap.put("todayBonus", todayBonus);
 
         response.data(returnMap);
 
