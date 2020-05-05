@@ -101,7 +101,7 @@ public class SIndexController extends BaseController {
 
                 // 躺赢奖励
                 BigDecimal taskReturnAmt = new BigDecimal(0);
-                BigDecimal taskNumber = (BigDecimal) productRecommendMap.get("taskNumber");
+                BigDecimal taskNumber = new BigDecimal(String.valueOf(productRecommendMap.get("taskNumber")));
                 taskReturnAmt = ((BigDecimal) productRecommendMap.get("totalReward")).multiply(sameGroupRate).divide(taskNumber);
                 productRecommendMap.put("taskReturnAmt", taskReturnAmt);
             }
