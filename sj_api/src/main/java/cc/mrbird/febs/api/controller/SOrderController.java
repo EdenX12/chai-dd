@@ -134,9 +134,7 @@ public class SOrderController extends BaseController {
                 }
 
                 // 商品详情
-                SProduct product = new SProduct();
-                product.setId(productSpec.getProductId());
-                Map productDetail = this.productService.findProductDetail(product);
+                Map productDetail = this.productService.findProductDetail(productSpec.getProductId());
 
                 Map<String, Object> newProductDetail = new HashMap<>();
 
@@ -159,7 +157,7 @@ public class SOrderController extends BaseController {
                 newProductDetail.put("productDes", productDetail.get("productDes"));
 
                 // 商品图片
-                newProductDetail.put("productImg", productDetail.get("productImg"));
+                newProductDetail.put("imgUrlList", productDetail.get("imgUrlList"));
 
                 // 返还金额
                 newProductDetail.put("buyerReturnAmt", productDetail.get("buyerReturnAmt"));

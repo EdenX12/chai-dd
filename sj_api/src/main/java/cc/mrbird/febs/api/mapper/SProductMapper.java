@@ -18,6 +18,6 @@ public interface SProductMapper extends BaseMapper<SProduct> {
 
     IPage<Map> findProductDetailBySmallTypeId(Page page, @Param("sProduct") SProduct sProduct);
 
-    Map findProductDetail(@Param("sProduct") SProduct sProduct);
+    Map findProductDetail(@Param("productId") String productId);
 
 }

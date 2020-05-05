@@ -7,11 +7,13 @@ import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -20,6 +22,8 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/s-product")
 public class SProductController extends BaseController {
+
+    private String message;
 
     @Autowired
     private ISProductTypeService productTypeService;
@@ -38,6 +42,12 @@ public class SProductController extends BaseController {
 
     @Autowired
     private ISTaskCouponService taskCouponService;
+
+    @Autowired
+    private ISProductImgService productImgService;
+
+    @Autowired
+    private ISParamsService paramsService;
 
     /**
      * 取得所有商品分类信息
@@ -145,17 +155,80 @@ public class SProductController extends BaseController {
         SProduct product = new SProduct();
         product.setTypeId(typeId);
 
+        // 买家立返佣金比例 （后续调整到Redis缓存读取）
+        SParams params = new SParams();
+        params = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+
+        // 同组任务躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+
         // 级别（1、2）
         if (productType.getLevel() == 1) {
 
             // 根据大分类检索商品列表
-            productPageList = getDataTable(
-                    this.productService.findProductListByBigTypeId(product, queryRequest));
+            IPage<Map> returnPage = this.productService.findProductListByBigTypeId(product, queryRequest);
+
+            List<Map> list = returnPage.getRecords();
+
+            for (Map returnMap : list) {
+
+                // 商品图片
+                List<SProductImg> productImgList = this.productImgService.findProductImgList((String)returnMap.get("productId"));
+                returnMap.put("imgUrlList", productImgList);
+
+                // 总佣金
+                BigDecimal totalReward = new BigDecimal(returnMap.get("totalReward").toString());
+                // 任务数量
+                BigDecimal taskNumber = new BigDecimal(returnMap.get("taskNumber").toString());
+
+                // 买家立返
+                BigDecimal buyerReturnAmt = new BigDecimal(0);
+                buyerReturnAmt = totalReward.multiply(buyerRate);
+                returnMap.put("buyerReturnAmt", buyerReturnAmt);
+
+                // 躺赢奖励
+                BigDecimal taskReturnAmt = new BigDecimal(0);
+                taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
+                returnMap.put("taskReturnAmt", taskReturnAmt);
+
+            }
+            returnPage.setRecords(list);
+
+            productPageList = getDataTable(returnPage);
         } else {
 
             // 根据小分类检索商品列表
-            productPageList = getDataTable(
-                    this.productService.findProductListBySmallTypeId(product, queryRequest));
+            IPage<Map> returnPage = this.productService.findProductListBySmallTypeId(product, queryRequest);
+
+            List<Map> list = returnPage.getRecords();
+
+            for (Map returnMap : list) {
+
+                // 商品图片
+                List<SProductImg> productImgList = this.productImgService.findProductImgList((String)returnMap.get("productId"));
+                returnMap.put("imgUrlList", productImgList);
+
+                // 总佣金
+                BigDecimal totalReward = new BigDecimal(returnMap.get("totalReward").toString());
+                // 任务数量
+                BigDecimal taskNumber = new BigDecimal(returnMap.get("taskNumber").toString());
+
+                // 买家立返
+                BigDecimal buyerReturnAmt = new BigDecimal(0);
+                buyerReturnAmt = totalReward.multiply(buyerRate);
+                returnMap.put("buyerReturnAmt", buyerReturnAmt);
+
+                // 躺赢奖励
+                BigDecimal taskReturnAmt = new BigDecimal(0);
+                taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
+                returnMap.put("taskReturnAmt", taskReturnAmt);
+
+            }
+            returnPage.setRecords(list);
+
+            productPageList = getDataTable(returnPage);
         }
 
         response.put("code", 0);
@@ -174,21 +247,19 @@ public class SProductController extends BaseController {
 
         FebsResponse response = new FebsResponse();
 
-        SProduct product = new SProduct();
-        product.setId(productId);
-
         // 商品详情
-        Map productDetail = this.productService.findProductDetail(product);
+        Map productDetail = this.productService.findProductDetail(productId);
+
+        if (productDetail == null) {
+            message = "您选择的商品不存在！";
+            response.put("code", 1);
+            response.message(message);
+            return response;
+        }
 
         // 规格组合（第一条默认值）
         List<SProductSpec> productSpecList = this.productSpecService.findProductSpecList(productId);
-        if(productDetail != null){
-            productDetail.put("productSpec", productSpecList);
-        }else{
-            response.put("code", 0);
-            response.data(productDetail);
-            return  response;
-        }
+        productDetail.put("productSpec", productSpecList);
 
         SUser user = FebsUtil.getCurrentUser();
 

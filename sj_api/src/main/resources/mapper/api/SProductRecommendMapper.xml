@@ -8,6 +8,7 @@
             SP.id                                                   productId,          <!-- 商品ID -->
             SP.product_name                                         productName,        <!-- 商品名称 -->
 		    SP.product_des                                          productDes,         <!-- 商品简介 -->
+            SP.product_img                                          productImg,         <!-- 商品图片 -->
 			SP.product_price                                        productPrice,       <!-- 商品价格 -->
 			SP.scribing_price                                       scribingPrice,      <!-- 商品划线价 -->
 			SP.task_price                                           taskPrice,          <!-- 任务金 -->
