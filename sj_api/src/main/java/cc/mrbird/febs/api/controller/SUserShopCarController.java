@@ -121,6 +121,7 @@ public class SUserShopCarController extends BaseController {
             newProductDetail.put("productDes", productDetail.get("productDes"));
 
             // 商品图片
+            newProductDetail.put("productImg", productDetail.get("productImg"));
             newProductDetail.put("imgUrlList", productDetail.get("imgUrlList"));
 
             // 返还金额
