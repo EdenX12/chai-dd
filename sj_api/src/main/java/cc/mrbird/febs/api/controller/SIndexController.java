@@ -94,15 +94,19 @@ public class SIndexController extends BaseController {
                 List<SProductImg> productImgList = this.productImgService.findProductImgList((String)productRecommendMap.get("productId"));
                 productRecommendMap.put("imgUrlList", productImgList);
 
+                // 总佣金
+                BigDecimal totalReward = new BigDecimal(productRecommendMap.get("totalReward").toString());
+                // 任务数量
+                BigDecimal taskNumber = new BigDecimal(productRecommendMap.get("taskNumber").toString());
+
                 // 买家立返
                 BigDecimal buyerReturnAmt = new BigDecimal(0);
-                buyerReturnAmt = ((BigDecimal) productRecommendMap.get("totalReward")).multiply(buyerRate);
+                buyerReturnAmt = totalReward.multiply(buyerRate);
                 productRecommendMap.put("buyerReturnAmt", buyerReturnAmt);
 
                 // 躺赢奖励
                 BigDecimal taskReturnAmt = new BigDecimal(0);
-                BigDecimal taskNumber = new BigDecimal(String.valueOf(productRecommendMap.get("taskNumber")));
-                taskReturnAmt = ((BigDecimal) productRecommendMap.get("totalReward")).multiply(sameGroupRate).divide(taskNumber);
+                taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
                 productRecommendMap.put("taskReturnAmt", taskReturnAmt);
             }
 

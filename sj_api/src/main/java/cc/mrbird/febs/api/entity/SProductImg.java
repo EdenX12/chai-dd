@@ -45,9 +45,4 @@ public class SProductImg implements Serializable {
      * 创建日期
      */
     private Date createTime;
-
-    /**
-     * 更新日期
-     */
-    private Date updateTime;
 }
