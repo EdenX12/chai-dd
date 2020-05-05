@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -105,7 +106,7 @@ public class SOrderController extends BaseController {
     @Log("确认订单")
     @Transactional
     @PostMapping("/confirmOrder")
-    public FebsResponse confirmOrder(List<Map> productSpecList) {
+    public FebsResponse confirmOrder(@RequestBody List<Map> productSpecList) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -119,7 +120,7 @@ public class SOrderController extends BaseController {
             for (Map productSpecMap : productSpecList) {
 
                 // 规格商品ID
-                String productSpecId = (String) productSpecMap.get("productSpecId");
+                String productSpecId = productSpecMap.get("productSpecId").toString();
 
                 // 商品数量
                 int productNumber = (Integer) productSpecMap.get("productNumber");
@@ -272,7 +273,7 @@ public class SOrderController extends BaseController {
                 }
 
                 // 店铺ID
-                shopId = (String) productMap.get("shopId");
+                shopId = String.valueOf(productMap.get("shopId"));
 
                 // 商品合计金额
                 totalProductAmt = totalProductAmt.add( ((BigDecimal) productMap.get("productPrice")).multiply((BigDecimal) productMap.get("productNumber")) );
@@ -326,7 +327,7 @@ public class SOrderController extends BaseController {
             message = "用户确认订单失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error(e.getMessage());
         }
 
         return response;
@@ -517,7 +518,7 @@ public class SOrderController extends BaseController {
             message = "购买订单失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;
