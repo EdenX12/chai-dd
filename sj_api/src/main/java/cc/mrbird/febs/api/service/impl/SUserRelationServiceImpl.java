@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author MrBird
@@ -52,8 +53,18 @@ public class SUserRelationServiceImpl extends ServiceImpl<SUserRelationMapper, S
             queryWrapper.eq(SUserRelation::getRelationType, userRelation.getRelationType());
         }
 
-        queryWrapper.orderByDesc(SUserRelation::getCreateTime);
-
         return this.baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public Integer findUserRelationCnt(String userId) {
+
+        return this.baseMapper.queryUserRelationCnt(userId);
+    }
+
+    @Override
+    public Integer findUserRelationTodayCnt(String userId) {
+
+        return this.baseMapper.queryUserRelationTodayCnt(userId);
     }
 }

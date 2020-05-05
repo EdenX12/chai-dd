@@ -24,7 +24,9 @@ public class SUserCouponServiceImpl extends ServiceImpl<SUserCouponMapper, SUser
         queryWrapper.eq(SUserCoupon::getUserId, userId);
 
         // 商品ID （或者ISNULL 针对全部商品的优惠券）
-        queryWrapper.and(wrapper -> wrapper.eq(SUserCoupon::getProductId, productId).or().isNull(SUserCoupon::getProductId));
+        if (productId != null) {
+            queryWrapper.and(wrapper -> wrapper.eq(SUserCoupon::getProductId, productId).or().isNull(SUserCoupon::getProductId));
+        }
 
         // 券类型 0-任务金 1-商铺券
         if (couponType != null) {
