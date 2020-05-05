@@ -41,10 +41,11 @@ public class WeChatPayUtil {
         mm1.put("appid", appId);
         mm1.put("mch_id", mchId);
         mm1.put("nonce_str", nonceStr);
-       
-            mm1.put("body",  productName);
-        
-
+        try {
+            mm1.put("body",  new String(productName.getBytes(),"utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         mm1.put("attach", relationId);
 
         String orderSn = "" + System.currentTimeMillis();
@@ -71,7 +72,7 @@ public class WeChatPayUtil {
 
         mm1.put("openid", openid);
 
-        mm1.put("device_info", "WEB");
+        //mm1.put("device_info", "WEB");
         mm1.put("sign", SignUtil.findSignForPay(mm1, appKey).toUpperCase());
 
         String aa1 = XmlUtil.maptoXml(mm1);
@@ -93,7 +94,7 @@ public class WeChatPayUtil {
         Map<String, Object> newMap = new HashMap<String, Object>();
         newMap.put("appId", map2.get("appid"));
         newMap.put("timeStamp", map2.get("timestamp"));
-        newMap.put("nonceStr", "e-rongque");
+        newMap.put("nonceStr", nonceStr);
         newMap.put("signType", "MD5");
         newMap.put("package", "prepay_id=" + map2.get("prepay_id"));
 
