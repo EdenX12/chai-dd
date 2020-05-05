@@ -126,7 +126,7 @@ public class SUserTaskController extends BaseController {
                     taskNumber,
                     userCouponId,
                     resultData,
-                    (BigDecimal) productInfo.get("taskPrice"));
+                    new BigDecimal (productInfo.get("taskPrice").toString()));
 
             response.put("code", 0);
             response.data(resultData);
@@ -234,7 +234,7 @@ public class SUserTaskController extends BaseController {
                     product.getTaskPrice());
 
             // 实付金额
-            BigDecimal needPayAmt = (BigDecimal) taskAmtMap.get("needPayAmt");
+            BigDecimal needPayAmt = new BigDecimal(taskAmtMap.get("needPayAmt").toString());
 
             // 奖励拆豆
             Integer orderBeanCnt = (Integer) taskAmtMap.get("orderBeanCnt");
