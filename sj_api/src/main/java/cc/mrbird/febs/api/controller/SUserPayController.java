@@ -48,22 +48,10 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISOrderDetailService orderDetailService;
 
-    @Autowired
-    private ISProductService productService;
-
     private ISUserService userService;
 
     @Autowired
-    private ISUserLevelService userLevelService;
-
-    @Autowired
-    private ISUserAmountLogService userAmountLogService;
-
-    @Autowired
     private ISUserBeanLogService userBeanLogService;
-
-    @Autowired
-    private ISUserBonusLogService userBonusLogService;
 
     @Autowired
     private ISUserCouponService userCouponService;
@@ -88,10 +76,6 @@ public class SUserPayController extends BaseController {
 
     @Autowired
     private ISOrderProductService orderProductService;
-
-    @Autowired
-    private ISUserTaskLineService userTaskLineService;
-
 
     /**
      * 新增用户支付
