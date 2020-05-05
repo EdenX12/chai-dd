@@ -60,13 +60,19 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     }
 
     @Override
-    public String queryForSettle(String productId ) {
-        return this.baseMapper.queryForSettle(productId);
-    }
+    public STaskLine findTaskLineForSettle(String productId) {
 
-    @Override
-    public void updateTaskLineForSettle(List<String> list) {
-        this.baseMapper.updateTaskLineForSettle(list);
+        LambdaQueryWrapper<STaskLine> queryWrapper = new LambdaQueryWrapper();
+
+        // 商品ID
+        queryWrapper.eq(STaskLine::getProductId, productId);
+
+        // 结算状态  0：未完成
+        queryWrapper.eq(STaskLine::getSettleStatus, 0);
+
+        queryWrapper.orderByAsc(STaskLine::getLineOrder);
+
+        return this.baseMapper.selectOne(queryWrapper);
     }
 
     @Override
