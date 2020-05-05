@@ -1,6 +1,7 @@
 package cc.mrbird.febs.api.service;
 
 import cc.mrbird.febs.api.entity.SProduct;
+import cc.mrbird.febs.api.entity.SUser;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -36,5 +37,5 @@ public interface ISProductService extends IService<SProduct> {
      * @param productId String
      * @return SProduct
      */
-    Map findProductDetail(String  productId);
+    Map findProductDetail(String  productId, SUser user);
 }

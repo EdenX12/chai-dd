@@ -26,33 +26,16 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
         // 转让任务ID不为空的情况下
         if (userFollow.getTaskOrderId() != null) {
             queryWrapper.eq(SUserFollow::getTaskOrderId, userFollow.getTaskOrderId());
-            queryWrapper.eq(SUserFollow::getFollowType, 1);
-        } else {
-            queryWrapper.eq(SUserFollow::getProductId, userFollow.getProductId());
-            queryWrapper.eq(SUserFollow::getFollowType, 0);
         }
+
+        // 商品ID不为空的情况下
+        if (userFollow.getProductId() != null) {
+            queryWrapper.eq(SUserFollow::getProductId, userFollow.getProductId());
+        }
+
+        queryWrapper.eq(SUserFollow::getFollowType, userFollow.getFollowType());
 
         return this.baseMapper.selectOne(queryWrapper);
-    }
-
-    @Override
-    public int findUserFollowCount(SUserFollow userFollow) {
-
-        LambdaQueryWrapper<SUserFollow> queryWrapper = new LambdaQueryWrapper();
-
-        // 转让任务ID不为空的情况下
-        if (userFollow.getTaskOrderId() != null) {
-            queryWrapper.eq(SUserFollow::getTaskOrderId, userFollow.getTaskOrderId());
-            queryWrapper.eq(SUserFollow::getFollowType, 1);
-        } else {
-            queryWrapper.eq(SUserFollow::getProductId, userFollow.getProductId());
-            queryWrapper.eq(SUserFollow::getFollowType, 0);
-        }
-
-        // 已关注
-        queryWrapper.eq(SUserFollow::getStatus, 1);
-
-        return this.baseMapper.selectCount(queryWrapper);
     }
 
     @Override

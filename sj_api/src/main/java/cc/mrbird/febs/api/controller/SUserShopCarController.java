@@ -98,7 +98,7 @@ public class SUserShopCarController extends BaseController {
             SProductSpec productSpec = this.productSpecService.findProductSpec(userShopCarLoop.getProductSpecId());
 
             // 商品详情
-            Map productDetail = this.productService.findProductDetail(productSpec.getProductId());
+            Map productDetail = this.productService.findProductDetail(productSpec.getProductId(), user);
 
             Map<String, Object> newProductDetail = new HashMap<>();
 

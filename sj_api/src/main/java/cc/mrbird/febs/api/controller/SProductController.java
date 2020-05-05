@@ -49,6 +49,9 @@ public class SProductController extends BaseController {
     @Autowired
     private ISParamsService paramsService;
 
+    @Autowired
+    private ISUserFollowService userFollowService;
+
     /**
      * 取得所有商品分类信息
      * @return List<SProductType>
@@ -193,6 +196,23 @@ public class SProductController extends BaseController {
                 taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
                 returnMap.put("taskReturnAmt", taskReturnAmt);
 
+                SUser user = FebsUtil.getCurrentUser();
+                if (user == null) {
+                    // 未登录显示未关注
+                    returnMap.put("followFlag", false);
+                } else {
+                    // 是否已关注
+                    SUserFollow userFollow = new SUserFollow();
+                    userFollow.setUserId(user.getId());
+                    userFollow.setFollowType(0);
+                    userFollow.setProductId((String)returnMap.get("productId"));
+                    userFollow = this.userFollowService.findUserFollowDetail(userFollow);
+                    if (userFollow != null && userFollow.getStatus() == 1) {
+                        returnMap.put("followFlag", true);
+                    } else {
+                        returnMap.put("followFlag", false);
+                    }
+                }
             }
             returnPage.setRecords(list);
 
@@ -225,6 +245,23 @@ public class SProductController extends BaseController {
                 taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
                 returnMap.put("taskReturnAmt", taskReturnAmt);
 
+                SUser user = FebsUtil.getCurrentUser();
+                if (user == null) {
+                    // 未登录显示未关注
+                    returnMap.put("followFlag", false);
+                } else {
+                    // 是否已关注
+                    SUserFollow userFollow = new SUserFollow();
+                    userFollow.setUserId(user.getId());
+                    userFollow.setFollowType(0);
+                    userFollow.setProductId((String)returnMap.get("productId"));
+                    userFollow = this.userFollowService.findUserFollowDetail(userFollow);
+                    if (userFollow != null && userFollow.getStatus() == 1) {
+                        returnMap.put("followFlag", true);
+                    } else {
+                        returnMap.put("followFlag", false);
+                    }
+                }
             }
             returnPage.setRecords(list);
 
@@ -248,7 +285,8 @@ public class SProductController extends BaseController {
         FebsResponse response = new FebsResponse();
 
         // 商品详情
-        Map productDetail = this.productService.findProductDetail(productId);
+        SUser user = FebsUtil.getCurrentUser();
+        Map productDetail = this.productService.findProductDetail(productId, user);
 
         if (productDetail == null) {
             message = "您选择的商品不存在！";
@@ -260,8 +298,6 @@ public class SProductController extends BaseController {
         // 规格组合（第一条默认值）
         List<SProductSpec> productSpecList = this.productSpecService.findProductSpecList(productId);
         productDetail.put("productSpec", productSpecList);
-
-        SUser user = FebsUtil.getCurrentUser();
 
         List<Map> couponList = new ArrayList();
 

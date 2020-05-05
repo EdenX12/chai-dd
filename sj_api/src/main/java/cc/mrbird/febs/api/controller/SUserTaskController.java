@@ -118,7 +118,7 @@ public class SUserTaskController extends BaseController {
             }
 
             // 商品信息取得
-            Map<String, Object> productInfo = this.productService.findProductDetail(productId);
+            Map<String, Object> productInfo = this.productService.findProductDetail(productId, user);
             resultData.put("productInfo", productInfo);
 
             // 计算总任务金、优惠金额、实付金额等
@@ -434,7 +434,7 @@ public class SUserTaskController extends BaseController {
             List<Map> userTaskList = result.getRecords();
             for (Map userTask : userTaskList) {
                 Map<String, Object> productDetail = this.productService.findProductDetail(
-                        userTask.get("productId").toString());
+                        userTask.get("productId").toString(), user);
 
                 userTask.put("productDetail", productDetail);
             }
@@ -469,7 +469,8 @@ public class SUserTaskController extends BaseController {
         if (result != null) {
             List<Map> userTaskList = result.getRecords();
             for (Map userTask : userTaskList) {
-                Map<String, Object> productDetail = this.productService.findProductDetail(userTask.get("productId").toString());
+                Map<String, Object> productDetail = this.productService.findProductDetail(
+                        userTask.get("productId").toString(), user);
 
                 userTask.put("productDetail", productDetail);
             }
@@ -504,7 +505,8 @@ public class SUserTaskController extends BaseController {
         if (result != null) {
             List<Map> userTaskList = result.getRecords();
             for (Map userTask : userTaskList) {
-                Map<String, Object> productDetail = this.productService.findProductDetail(userTask.get("productId").toString());
+                Map<String, Object> productDetail = this.productService.findProductDetail(
+                        userTask.get("productId").toString(), user);
 
                 userTask.put("productDetail", productDetail);
             }
@@ -540,7 +542,7 @@ public class SUserTaskController extends BaseController {
             List<Map> userTaskList = result.getRecords();
             for (Map userTask : userTaskList) {
                 Map<String, Object> productDetail = this.productService.findProductDetail(
-                        userTask.get("productId").toString());
+                        userTask.get("productId").toString(), user);
 
                 userTask.put("productDetail", productDetail);
             }

@@ -5,6 +5,7 @@ import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
+import cc.mrbird.febs.common.utils.FebsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,9 @@ public class SIndexController extends BaseController {
 
     @Autowired
     private ISParamsService paramsService;
+
+    @Autowired
+    private ISUserFollowService userFollowService;
 
     /**
      * 取得首页信息
@@ -108,6 +112,24 @@ public class SIndexController extends BaseController {
                 BigDecimal taskReturnAmt = new BigDecimal(0);
                 taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
                 productRecommendMap.put("taskReturnAmt", taskReturnAmt);
+
+                SUser user = FebsUtil.getCurrentUser();
+                if (user == null) {
+                    // 未登录显示未关注
+                    productRecommendMap.put("followFlag", false);
+                } else {
+                    // 是否已关注
+                    SUserFollow userFollow = new SUserFollow();
+                    userFollow.setUserId(user.getId());
+                    userFollow.setFollowType(0);
+                    userFollow.setProductId((String)productRecommendMap.get("productId"));
+                    userFollow = this.userFollowService.findUserFollowDetail(userFollow);
+                    if (userFollow != null && userFollow.getStatus() == 1) {
+                        productRecommendMap.put("followFlag", true);
+                    } else {
+                        productRecommendMap.put("followFlag", false);
+                    }
+                }
             }
 
             recommendTypeMap.put("recommendType", recommendType);

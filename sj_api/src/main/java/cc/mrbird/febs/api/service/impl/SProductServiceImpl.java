@@ -1,12 +1,11 @@
 package cc.mrbird.febs.api.service.impl;
 
-import cc.mrbird.febs.api.entity.SParams;
-import cc.mrbird.febs.api.entity.SProduct;
-import cc.mrbird.febs.api.entity.SProductImg;
+import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.mapper.SProductMapper;
 import cc.mrbird.febs.api.service.ISParamsService;
 import cc.mrbird.febs.api.service.ISProductImgService;
 import cc.mrbird.febs.api.service.ISProductService;
+import cc.mrbird.febs.api.service.ISUserFollowService;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.SortUtil;
@@ -35,6 +34,9 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
     @Autowired
     private ISParamsService paramsService;
+
+    @Autowired
+    private ISUserFollowService userFollowService;
 
     @Override
     public IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest request) {
@@ -71,7 +73,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
     }
 
     @Override
-    public Map findProductDetail(String productId) {
+    public Map findProductDetail(String productId, SUser user) {
 
         try {
 
@@ -104,6 +106,23 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
             BigDecimal taskReturnAmt = new BigDecimal(0);
             taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
             returnMap.put("taskReturnAmt", taskReturnAmt);
+
+            if (user == null) {
+                // 未登录显示未关注
+                returnMap.put("followFlag", false);
+            } else {
+                // 是否已关注
+                SUserFollow userFollow = new SUserFollow();
+                userFollow.setUserId(user.getId());
+                userFollow.setFollowType(0);
+                userFollow.setProductId((String)returnMap.get("productId"));
+                userFollow = this.userFollowService.findUserFollowDetail(userFollow);
+                if (userFollow != null && userFollow.getStatus() == 1) {
+                    returnMap.put("followFlag", true);
+                } else {
+                    returnMap.put("followFlag", false);
+                }
+            }
 
             return returnMap;
 

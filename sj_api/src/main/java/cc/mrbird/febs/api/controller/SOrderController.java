@@ -112,6 +112,8 @@ public class SOrderController extends BaseController {
 
         try {
 
+            SUser user = FebsUtil.getCurrentUser();
+
             List<Map<String, Object>> productList = new ArrayList<>();
 
             for (Map productSpecMap : productSpecList) {
@@ -134,7 +136,7 @@ public class SOrderController extends BaseController {
                 }
 
                 // 商品详情
-                Map productDetail = this.productService.findProductDetail(productSpec.getProductId());
+                Map productDetail = this.productService.findProductDetail(productSpec.getProductId(), user);
 
                 Map<String, Object> newProductDetail = new HashMap<>();
 
