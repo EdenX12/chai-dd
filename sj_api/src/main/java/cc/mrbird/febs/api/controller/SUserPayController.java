@@ -101,7 +101,7 @@ public class SUserPayController extends BaseController {
             message = "新增用户支付失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;

@@ -99,7 +99,7 @@ public class SOfferPriceController extends BaseController {
             message = "新增任务报价失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;

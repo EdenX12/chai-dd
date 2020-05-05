@@ -81,7 +81,7 @@ public class SUserWithdrawController extends BaseController {
             message = "新增用户提现";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;
