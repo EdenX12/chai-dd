@@ -73,9 +73,6 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
 
         return this.baseMapper.selectOne(queryWrapper);
     }
-    public String queryForSettle(String productId ) {
-        return this.baseMapper.queryForSettle(productId);
-    }
 
 
     @Override
