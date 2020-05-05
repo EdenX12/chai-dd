@@ -2,10 +2,7 @@ package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.mapper.SProductMapper;
-import cc.mrbird.febs.api.service.ISParamsService;
-import cc.mrbird.febs.api.service.ISProductImgService;
-import cc.mrbird.febs.api.service.ISProductService;
-import cc.mrbird.febs.api.service.ISUserFollowService;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.SortUtil;
@@ -37,6 +34,9 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
     @Autowired
     private ISUserFollowService userFollowService;
+
+    @Autowired
+    private ISUserLevelService userLevelService;
 
     @Override
     public IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest request) {
@@ -122,6 +122,10 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
                 } else {
                     returnMap.put("followFlag", false);
                 }
+
+                // 任务线最大数量
+                SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
+                returnMap.put("maxTaskNumber", userLevel.getBuyNumber());
             }
 
             return returnMap;
