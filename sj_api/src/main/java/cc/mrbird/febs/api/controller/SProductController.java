@@ -182,7 +182,13 @@ public class SProductController extends BaseController {
 
         // 规格组合（第一条默认值）
         List<SProductSpec> productSpecList = this.productSpecService.findProductSpecList(productId);
-        productDetail.put("productSpec", productSpecList);
+        if(productDetail != null){
+            productDetail.put("productSpec", productSpecList);
+        }else{
+            response.put("code", 0);
+            response.data(productDetail);
+            return  response;
+        }
 
         SUser user = FebsUtil.getCurrentUser();
 
