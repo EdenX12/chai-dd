@@ -248,15 +248,14 @@ public class SUserShopCarController extends BaseController {
                 userShopCar.setUserId(user.getId());
                 userShopCar.setId(userShopCarId);
 
-                this.userShopCarService.addUserShopCar(userShopCar);
-
+                this.userShopCarService.deleteUserShopCar(userShopCar);
             }
 
         } catch (Exception e) {
             message = "删除购物车商品失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;
