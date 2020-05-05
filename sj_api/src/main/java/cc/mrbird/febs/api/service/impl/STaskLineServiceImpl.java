@@ -5,7 +5,6 @@ import cc.mrbird.febs.api.mapper.STaskLineMapper;
 import cc.mrbird.febs.api.service.ISTaskLineService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,4 +78,5 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     public void updateUserTaskLineForSettle(List<String> list) {
         this.baseMapper.updateUserTaskLineForSettle(list);
     }
+
 }
