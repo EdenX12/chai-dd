@@ -623,7 +623,7 @@ public class SUserTaskController extends BaseController {
 
         // 新手只能购买新手区商品  其他只能购买非新手区商品
         SProduct product = this.productService.getById(productId);
-        if (StringUtils.isBlank(productId) || product == null || !"1".equals(product.getProductStatus())) {
+        if (StringUtils.isBlank(productId) || product == null || product.getProductStatus() != 1) {
             return "该商品状态不可购买，请重新选择商品！";
         }
         if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
