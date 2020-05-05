@@ -73,7 +73,7 @@ public class SUserAddressController extends BaseController {
             message = "新增用户收货地址失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;
@@ -125,7 +125,7 @@ public class SUserAddressController extends BaseController {
             message = "修改用户收货地址失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;

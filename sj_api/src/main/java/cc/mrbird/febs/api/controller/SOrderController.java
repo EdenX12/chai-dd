@@ -713,7 +713,7 @@ public class SOrderController extends BaseController {
             message = "更新用户购买订单状态失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;

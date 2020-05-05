@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -64,7 +65,7 @@ public class SUserShopCarController extends BaseController {
             message = "商品加入购物车失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;
@@ -232,7 +233,7 @@ public class SUserShopCarController extends BaseController {
     @Log("删除购物车商品")
     @Transactional
     @PostMapping("/deleteShopCar")
-    public FebsResponse deleteShopCar(List<String> userShopCarIds) {
+    public FebsResponse deleteShopCar(@RequestParam(value ="userShopCarIds") List<String> userShopCarIds) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -288,7 +289,7 @@ public class SUserShopCarController extends BaseController {
             message = "更新购物车选中状态失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;

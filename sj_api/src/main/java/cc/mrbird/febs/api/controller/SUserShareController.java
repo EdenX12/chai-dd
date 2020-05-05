@@ -91,7 +91,7 @@ public class SUserShareController extends BaseController {
             message = "转发分享商品";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage());
         }
 
         return response;
