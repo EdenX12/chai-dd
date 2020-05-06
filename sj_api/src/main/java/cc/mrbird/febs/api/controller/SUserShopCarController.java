@@ -125,6 +125,12 @@ public class SUserShopCarController extends BaseController {
             newProductDetail.put("productImg", productDetail.get("productImg"));
             newProductDetail.put("imgUrlList", productDetail.get("imgUrlList"));
 
+            // 是否已关注
+            newProductDetail.put("followFlag", productDetail.get("followFlag"));
+
+            // 任务线最大数量
+            newProductDetail.put("maxTaskNumber", productDetail.get("maxTaskNumber"));
+
             // 返还金额
             newProductDetail.put("buyerReturnAmt", productDetail.get("buyerReturnAmt"));
 

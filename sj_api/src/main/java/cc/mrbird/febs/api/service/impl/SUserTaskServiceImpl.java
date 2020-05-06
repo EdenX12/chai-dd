@@ -133,37 +133,6 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     }
 
     @Override
-    public List<String> findUserIdsByParent(String userId) {
-
-        LambdaQueryWrapper<SUserTask> queryWrapper = new LambdaQueryWrapper<SUserTask>();
-
-        queryWrapper.eq(SUserTask::getUserId, userId);
-
-        List<SUserTask> userTaskList = this.baseMapper.selectList(queryWrapper);
-
-        List<String> userIds = new ArrayList();
-
-        for (SUserTask userTask : userTaskList) {
-
-            LambdaQueryWrapper<SUserTask> queryWrapper1 = new LambdaQueryWrapper<SUserTask>();
-
-
-            List<SUserTask> userTaskList2 = this.baseMapper.selectList(queryWrapper1);
-            for (SUserTask userTask2 : userTaskList2) {
-                userIds.add(userTask2.getUserId());
-            }
-        }
-
-        // 去重
-        Set set = new HashSet();
-        set.addAll(userIds);
-        userIds.clear();
-        userIds.addAll(set);
-
-        return userIds;
-    }
-
-    @Override
     public Integer queryProductCount(String userId) {
         return this.baseMapper.queryProductCount(userId);
     }

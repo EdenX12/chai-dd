@@ -28,20 +28,6 @@ public class SOrderDetailServiceImpl extends ServiceImpl<SOrderDetailMapper, SOr
     }
 
     @Override
-    public void updateOrderDetail(SOrderDetail orderDetail) {
-
-        LambdaQueryWrapper<SOrderDetail> queryWrapper = new LambdaQueryWrapper<SOrderDetail>();
-
-        // 用户ID
-        queryWrapper.eq(SOrderDetail::getUserId, orderDetail.getUserId());
-
-        // 订单ID
-        queryWrapper.eq(SOrderDetail::getOrderId, orderDetail.getOrderId());
-
-        this.baseMapper.update(orderDetail, queryWrapper);
-    }
-
-    @Override
     public List<SOrderDetail> findOrderDetailList(SOrderDetail orderDetail) {
 
         LambdaQueryWrapper<SOrderDetail> queryWrapper = new LambdaQueryWrapper();
@@ -60,23 +46,6 @@ public class SOrderDetailServiceImpl extends ServiceImpl<SOrderDetailMapper, SOr
             queryWrapper.eq(SOrderDetail::getUserId, orderDetail.getPaymentState());
         }
         return this.baseMapper.selectList(queryWrapper);
-    }
-
-    @Override
-    public List<Map<String, Object>> queryProductByOrder(String orderId) {
-        return this.baseMapper.queryProductByOrder(orderId);
-    }
-
-    @Override
-    public List<String> queryIdByProductOrder(String productId, String orderId) {
-
-        LambdaQueryWrapper<SOrderProduct> queryWrapper = new LambdaQueryWrapper();
-        if (StringUtils.isNotBlank(productId) && StringUtils.isNotBlank(orderId)) {
-
-            queryWrapper.eq(SOrderProduct::getOrderDetailId, orderId);
-            queryWrapper.eq(SOrderProduct::getProductId, productId);
-        }
-        return null;
     }
 
 }

@@ -70,14 +70,6 @@ public interface ISUserTaskService extends IService<SUserTask> {
     IPage<Map> findUserTaskFollowList(QueryRequest queryRequest, String userId);
 
     /**
-     * 查询我的预备队
-     *
-     * @param userId Long
-     * @return List
-     */
-    List<String> findUserIdsByParent(String userId);
-
-    /**
      * 当前用户的并行商品数量
      * @param userId
      * @return

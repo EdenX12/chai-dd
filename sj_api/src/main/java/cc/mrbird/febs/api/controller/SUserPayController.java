@@ -116,7 +116,7 @@ public class SUserPayController extends BaseController {
     public void paySuccess(HttpServletRequest request, HttpServletResponse response) {
 
         // 获取返回数据
-        StringBuffer sb   =new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         InputStream is = null;
         try {
             is = request.getInputStream();
@@ -276,7 +276,7 @@ public class SUserPayController extends BaseController {
                 SUser user = new SUser();
                 user = this.userService.getById(order.getUserId());
 
-                // 变更批量订单状态 已付款
+                // 付款状态:  状态 0 锁定（支付中） 1 已支付； 2-待支付； 3 不支付（取消或过期）  9:已结算到冻结
                 order.setPaymentState(1);
                 order.setPaymentTime(new Date());
                 this.orderService.updateOrder(order);
@@ -365,7 +365,7 @@ public class SUserPayController extends BaseController {
                     }
                 }
 
-                // 同时 批量更新 s_user_task_line表中的状态为结算中3（条件 taskLineId）
+                // 同时 批量更新 s_user_task_line表中的状态为 3 佣金计算中（条件 taskLineId）
                 this.taskLineService.updateUserTaskLineForSettle(settleTaskLineIds);
             }
 

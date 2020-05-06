@@ -14,7 +14,7 @@
                 when od.order_status = 1            then '待发货'
                 when od.order_status = 2            then '待收货'
                 when od.order_status = 4            then '售后中'
-                when od.order_status in(3, 5, -1)   then '已完成'
+                when od.order_status in(3, 5, -1, 6)   then '已完成'
             end as orderStatusName
         FROM
         s_order_detail od
@@ -27,9 +27,9 @@
             AND od.order_status= #{status}
         </if>
 
-        <!-- 已完成： 3已确认收货 5 已退货退款 -1 已取消 -->
+        <!-- 已完成： 3已确认收货 5 已退货退款 -1 已取消 6 超时关闭 -->
         <if test="status == '5'">
-            AND od.order_status in(3, 5, -1)
+            AND od.order_status in(3, 5, -1, 6)
         </if>
 
         <!-- 全部：9 无条件-->
@@ -61,7 +61,7 @@
                 when od.order_status = 1 then '买家已付款'
                 when od.order_status = 2 then '卖家已发货'
                 when od.order_status = 4 then '售后处理中'
-                when od.order_status in(3, 5, -1)	 then '订单已关闭'
+                when od.order_status in(3, 5, -1, 6)	 then '订单已关闭'
             end orderStatusName,                                <!-- 订单状态 -->
             od.address_name addressName,                        <!-- 收件人信息 -->
             CONCAT(LEFT(od.address_phone,3), '*****' , RIGHT(od.address_phone,4)) adddressPhone,

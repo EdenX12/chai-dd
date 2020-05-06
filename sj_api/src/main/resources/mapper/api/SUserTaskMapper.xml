@@ -169,7 +169,7 @@
 
     <update id="updateTaskForUnLock">
         UPDATE s_user_task
-           SET pay_status = 2,
+           SET pay_status = 3,
                update_time = now()
          WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
            AND pay_status = 0
@@ -188,7 +188,7 @@
 
     <update id="updateUserTaskLineFailBatch">
         UPDATE s_user_task_line
-           SET pay_status = 2,
+           SET pay_status = 3,
                update_time = now()
          WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
            AND pay_status = 0

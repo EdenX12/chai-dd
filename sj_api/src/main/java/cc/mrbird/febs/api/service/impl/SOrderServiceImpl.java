@@ -45,11 +45,8 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
 
             if (list != null) {
                 for (int i = 0; i < list.size(); i++) {
-
                     String orderDetailId = (String) list.get(i).get("orderDetailId");
-
                     if (orderDetailId != null) {
-
                         List<Map> productList = this.baseMapper.queryProductDetailId(orderDetailId);
                         list.get(i).put("productList", productList);
                     }

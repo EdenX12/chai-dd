@@ -162,6 +162,12 @@ public class SOrderController extends BaseController {
                 newProductDetail.put("productImg", productDetail.get("productImg"));
                 newProductDetail.put("imgUrlList", productDetail.get("imgUrlList"));
 
+                // 是否已关注
+                newProductDetail.put("followFlag", productDetail.get("followFlag"));
+
+                // 任务线最大数量
+                newProductDetail.put("maxTaskNumber", productDetail.get("maxTaskNumber"));
+
                 // 返还金额
                 newProductDetail.put("buyerReturnAmt", productDetail.get("buyerReturnAmt"));
 
@@ -365,7 +371,8 @@ public class SOrderController extends BaseController {
             SOrder order = new SOrder();
             order.setUserId(user.getId());
             order.setCreateTime(new Date());
-            order.setPaymentState(0);
+            // 付款状态: 0 锁定（支付中）1 已支付 2 待支付 3 不支付（取消或过期）9 已结算到冻结
+            order.setPaymentState(2);
             order.setPaymentTime(new Date());
             // 实付金额
             order.setPayAmount(null);
@@ -397,6 +404,7 @@ public class SOrderController extends BaseController {
                 orderDetail.setUserId(user.getId());
                 orderDetail.setOrderSn("O" + System.currentTimeMillis());
                 orderDetail.setPaymentType(paymentType);
+                // 付款状态: 0 锁定（支付中）1 已支付 2 待支付 3 不支付（取消或过期）9 已结算到冻结
                 orderDetail.setPaymentState(0);
                 orderDetail.setPaymentTime(new Date());
                 orderDetail.setAddressId(addressId);
@@ -754,8 +762,8 @@ public class SOrderController extends BaseController {
 
         for (SOrder order : orderPaySuccessList) {
 
-            // 变更订单状态 （2:已结算到冻结）
-            order.setPaymentState(2);
+            // 变更订单状态 （9:已结算到冻结）
+            order.setPaymentState(9);
             this.orderService.updateById(order);
 
             SOrderDetail orderDetail = new SOrderDetail();
@@ -765,8 +773,8 @@ public class SOrderController extends BaseController {
             SUser userLock = new SUser();
             for (SOrderDetail orderDetailPaySuccess : orderDetailPaySuccessList) {
 
-                // 变更订单明细状态 （2:已结算到冻结）
-                orderDetailPaySuccess.setPaymentState(2);
+                // 变更订单明细状态 （9:已结算到冻结）
+                orderDetailPaySuccess.setPaymentState(9);
                 this.orderDetailService.updateById(orderDetailPaySuccess);
 
                 List<SOrderProduct> orderProductList = this.orderProductService.findOrderProductList(orderDetailPaySuccess.getId());

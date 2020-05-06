@@ -11,6 +11,5 @@ import java.util.Map;
  * @author MrBird
  */
 public interface SOrderDetailMapper extends BaseMapper<SOrderDetail> {
-    List<Map<String,Object>> queryProductByOrder(@Param("orderId")String orderId);
 
 }

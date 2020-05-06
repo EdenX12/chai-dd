@@ -107,7 +107,6 @@ public class SUserTaskController extends BaseController {
         try {
 
             SUser user = FebsUtil.getCurrentUser();
-            String userId = user.getId();
 
             // 检查任务数量、优惠券
             String errorMessage = this.validateTask(user, productId, taskNumber, userCouponId);
@@ -397,20 +396,80 @@ public class SUserTaskController extends BaseController {
         return response;
     }
 
+
     /**
-     * 任务支付失败时 锁定去除 修改状态为未支付 并且修改任务线 锁定任务数
+     * 支付领取任务成功页面
+     */
+    @Log("支付领取任务成功页面")
+    @PostMapping("/payUserTaskSuccess")
+    public FebsResponse payUserTaskSuccess(HttpServletRequest request,
+                                    String userTaskId) {
+
+        Map<String, Object> taskSuccessMap = new HashMap();
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        // 根据userTaskId取得支付金额、商品ID
+        SUserTask userTask = this.userTaskService.getById(userTaskId);
+
+        // 支付金额
+        BigDecimal payAmount = userTask.getPayAmount();
+
+        // 商品ID
+        String productId = userTask.getProductId();
+
+        // 根据userTaskId取得user_task_line条数
+        SUserTaskLine userTaskLine = new SUserTaskLine();
+        userTaskLine.setTaskId(userTaskId);
+        List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
+        // 领取任务数量
+        int successTaskNumber = userTaskLineList.size();
+
+        // 根据商品ID 取得 奖励佣金 任务总额度 计算 预计躺赢
+        SProduct product = this.productService.getById(productId);
+
+        // 同组任务躺赢佣金比例
+        SParams  params = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+
+        // 赠送拆豆取得
+        params = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        Integer orderBeanCnt = Integer.valueOf(params.getPValue());
+
+        // 总佣金
+        BigDecimal totalReward = product.getTotalReward();
+
+        // 本次预计躺赢
+        BigDecimal bonusAmount = totalReward.multiply(sameGroupRate).multiply(new BigDecimal(successTaskNumber)).divide(
+                new BigDecimal(product.getTaskNumber()), 2, BigDecimal.ROUND_HALF_UP);
+
+        // 本次支付金额
+        taskSuccessMap.put("payAmount", payAmount);
+        // 本次预计躺赢
+        taskSuccessMap.put("bonusAmount", bonusAmount);
+        // 拆单奖励个数
+        taskSuccessMap.put("orderBeanCnt", orderBeanCnt);
+
+        response.data(taskSuccessMap);
+
+        return response;
+    }
+
+    /**
+     * 任务支付失败时 锁定去除 修改状态为 3-不支付[取消或超期] 并且修改任务线 锁定任务数
      * 2分钟执行一次 (支付失败时间超过5分钟的任务处理)
      */
     @Scheduled(cron = "0 0/2 0 * * ?")
     public void unLockPayFailTask() {
 
-        // 抽取s_user_task中 支付状态（锁定） 支付时间大于5分钟的 数据 修改状态为 未支付
+        // 抽取s_user_task中 支付状态（锁定） 支付时间大于5分钟的 数据 修改状态为 3-不支付[取消或超期]
         this.userTaskService.updateTaskForUnLock();
 
         // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
         userTaskService.updateTaskLineFailBatch();
 
-        // 同时把s_user_task_line中的相关数据也同样修改为 未支付
+        // 同时把s_user_task_line中的相关数据也同样修改为 3-不支付[取消或超期]
         userTaskService.updateUserTaskLineFailBatch();
     }
 
