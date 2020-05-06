@@ -127,7 +127,6 @@ public class SUserTaskController extends BaseController {
                     resultData,
                     new BigDecimal (productInfo.get("taskPrice").toString()));
 
-            response.put("code", 0);
             response.data(resultData);
 
         } catch(Exception e) {
@@ -206,6 +205,8 @@ public class SUserTaskController extends BaseController {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
+
+        Map<String, Object> resultData = new HashMap();
 
         try {
 
@@ -384,8 +385,13 @@ public class SUserTaskController extends BaseController {
                         "1",
                         "任务金");
 
-                response.data(jsonObject);
+                resultData.put("jsonObject", jsonObject);
             }
+
+            // 用户任务ID
+            resultData.put("userTaskId", userTask.getId());
+
+            response.data(resultData);
 
         } catch (Exception e) {
             response.put("code", 1);
