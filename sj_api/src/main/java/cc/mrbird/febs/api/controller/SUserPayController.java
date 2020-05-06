@@ -279,6 +279,7 @@ public class SUserPayController extends BaseController {
                 // 付款状态:  状态 0 锁定（支付中） 1 已支付； 2-待支付； 3 不支付（取消或过期）  9:已结算到冻结
                 order.setPaymentState(1);
                 order.setPaymentTime(new Date());
+                order.setPayAmount(total);
                 this.orderService.updateOrder(order);
 
                 SOrderDetail orderDetail = new SOrderDetail();

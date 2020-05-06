@@ -174,7 +174,10 @@ public class SOrderController extends BaseController {
                 // 快递邮费
                 newProductDetail.put("expressFee", productDetail.get("expressFee"));
 
-                // 商品规格
+                // 商品规格ID
+                newProductDetail.put("productSpecId", productSpec.getId());
+
+                // 商品规格名称
                 newProductDetail.put("productSpecName", productSpec.getProductSpecValueName());
 
                 // 商品规格价格
@@ -225,6 +228,9 @@ public class SOrderController extends BaseController {
             // 赠送拆豆总数
             int totalBeanCnt = 0;
 
+            SParams params = this.paramsService.queryBykeyForOne("product_bean_cnt");
+            Integer productBeanCnt = Integer.valueOf(params.getPValue());
+
             // 拆单显示（不同的商户 显示到不同的订单）
             for (Map productMap : productList) {
 
@@ -262,7 +268,7 @@ public class SOrderController extends BaseController {
                     // 商家订单快递费用
                     orderExpressAmt = new BigDecimal(productMap.get("expressFee").toString());
                     // 商家订单赠送拆豆
-                    orderBeanCnt =  (int) productMap.get("productNumber") * 8;
+                    orderBeanCnt =  (int) productMap.get("productNumber") * productBeanCnt;
 
                 } else {
 
@@ -271,7 +277,7 @@ public class SOrderController extends BaseController {
                     // 商家订单快递费用
                     orderExpressAmt = orderExpressAmt.add( (new BigDecimal(productMap.get("expressFee").toString())).multiply(new BigDecimal(productMap.get("productNumber").toString())) );
                     // 商家订单赠送拆豆
-                    orderBeanCnt = orderBeanCnt + (int) productMap.get("productNumber") * 8;
+                    orderBeanCnt = orderBeanCnt + (int) productMap.get("productNumber") * productBeanCnt;
 
                     orderProductList.add(productMap);
                 }
@@ -289,7 +295,7 @@ public class SOrderController extends BaseController {
                 totalExpressAmt = totalExpressAmt.add( (new BigDecimal(productMap.get("expressFee").toString())).multiply(new BigDecimal(productMap.get("productNumber").toString())) );
 
                 // 赠送拆豆总数 (数量 * 8)
-                totalBeanCnt = totalBeanCnt +  (int) productMap.get("productNumber") * 8;
+                totalBeanCnt = totalBeanCnt +  (int) productMap.get("productNumber") * productBeanCnt;
             }
             orderMap.put("orderProduct", orderProductList);
             // 商家订单返还金额
@@ -345,6 +351,25 @@ public class SOrderController extends BaseController {
     @PostMapping("/payOrder")
     public FebsResponse payOrder(HttpServletRequest request, String jsonString) {
 
+//        {
+//            "orderDetailId": "1",  默认nul  待支付订单中 去支付 才会传此值 如传递订单明细ID 只可能一个店铺
+//            "addressId": "1",
+//            "paymentType": 1,
+//            "shopOrder": [
+//            {
+//                "shopId": "1",
+//                "orderMessage": "221221",
+//                "userCouponId": 1,
+//                "orderProduct": [
+//                    {
+//                    "productNumber": 2,
+//                    "productSpecId": 1
+//                    }
+//                ]
+//            }
+//            ]
+//        }
+
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
@@ -353,6 +378,9 @@ public class SOrderController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
 
             JSONObject json = JSON.parseObject(jsonString);
+
+            // 订单明细ID  如果 orderDetailId 不为Null s_order_detail表做更新，s_order和s_user_pay重新生成
+            String orderDetailId = json.getString("orderDetailId");
 
             // 收货地址
             String addressId = json.getString("addressId");
@@ -386,6 +414,11 @@ public class SOrderController extends BaseController {
 
             for(int i=0; i<confirmOrder.size(); i++){
 
+                BigDecimal orderAmount = new BigDecimal(0);
+                BigDecimal shippingFee = new BigDecimal(0);
+                BigDecimal payAmount = new BigDecimal(0);
+                BigDecimal couponAmount = new BigDecimal(0);
+
                 JSONObject confirmOrderJson = confirmOrder.getJSONObject(i);
 
                 // 店铺ID
@@ -399,67 +432,77 @@ public class SOrderController extends BaseController {
 
                 // 生成订单明细表
                 SOrderDetail orderDetail = new SOrderDetail();
-                orderDetail.setOrderId(order.getId());
-                orderDetail.setShopId(shopId);
-                orderDetail.setUserId(user.getId());
-                orderDetail.setOrderSn("O" + System.currentTimeMillis());
-                orderDetail.setPaymentType(paymentType);
-                // 付款状态: 0 锁定（支付中）1 已支付 2 待支付 3 不支付（取消或过期）9 已结算到冻结
-                orderDetail.setPaymentState(0);
-                orderDetail.setPaymentTime(new Date());
-                orderDetail.setAddressId(addressId);
-                orderDetail.setOrderMessage(orderMessage);
-                orderDetail.setOrderStatus(0);
-                orderDetail.setAddressName(userAddress.getTrueName());
-                orderDetail.setAddressPhone(userAddress.getTelPhone());
-                orderDetail.setAddressDetail(userAddress.getProvinceName() + userAddress.getCityName() + userAddress.getAreaName() + userAddress.getAreaInfo());
-                orderDetail.setChannel(2);
-                orderDetail.setCreateTime(new Date());
 
-                orderDetail = this.orderDetailService.addOrderDetail(orderDetail);
+                if (orderDetailId == null) {
 
-                BigDecimal orderAmount = new BigDecimal(0);
-                BigDecimal shippingFee = new BigDecimal(0);
-                BigDecimal payAmount = new BigDecimal(0);
-                BigDecimal couponAmount = new BigDecimal(0);
+                    orderDetail.setOrderId(order.getId());
+                    orderDetail.setShopId(shopId);
+                    orderDetail.setUserId(user.getId());
+                    orderDetail.setOrderSn("O" + System.currentTimeMillis());
+                    orderDetail.setPaymentType(paymentType);
+                    // 付款状态: 0 锁定（支付中）1 已支付 2 待支付 3 不支付（取消或过期）9 已结算到冻结
+                    orderDetail.setPaymentState(2);
+                    orderDetail.setPaymentTime(new Date());
+                    orderDetail.setAddressId(addressId);
+                    orderDetail.setOrderMessage(orderMessage);
+                    orderDetail.setOrderStatus(0);
+                    orderDetail.setAddressName(userAddress.getTrueName());
+                    orderDetail.setAddressPhone(userAddress.getTelPhone());
+                    orderDetail.setAddressDetail(userAddress.getProvinceName() + userAddress.getCityName() + userAddress.getAreaName() + userAddress.getAreaInfo());
+                    orderDetail.setChannel(2);
+                    orderDetail.setCreateTime(new Date());
 
-                for(int j=0; j<orderProduct.size(); j++){
+                    orderDetail = this.orderDetailService.addOrderDetail(orderDetail);
 
-                    JSONObject orderProductJson = orderProduct.getJSONObject(j);
+                    for(int j=0; j<orderProduct.size(); j++){
 
-                    // 商品数量
-                    int productNumber = orderProductJson.getIntValue("productNumber");
+                        JSONObject orderProductJson = orderProduct.getJSONObject(j);
 
-                    // 商品规格ID
-                    String productSpecId = orderProductJson.getString("productSpecId");
+                        // 商品数量
+                        int productNumber = orderProductJson.getIntValue("productNumber");
 
-                    SProductSpec productSpec = this.productSpecService.findProductSpec(productSpecId);
+                        // 商品规格ID
+                        String productSpecId = orderProductJson.getString("productSpecId");
 
-                    SProduct product = this.productService.getById(productSpec.getProductId());
+                        SProductSpec productSpec = this.productSpecService.findProductSpec(productSpecId);
 
-                    // 生成订单产品表
-                    SOrderProduct orderProductInsert = new SOrderProduct();
+                        SProduct product = this.productService.getById(productSpec.getProductId());
 
-                    orderProductInsert.setUserId(user.getId());
-                    orderProductInsert.setOrderDetailId(orderDetail.getId());
-                    orderProductInsert.setProductId(productSpec.getProductId());
-                    orderProductInsert.setProductSpecValueName(productSpec.getProductSpecValueName());
-                    orderProductInsert.setProductNumber(productNumber);
-                    orderProductInsert.setProductPrice(productSpec.getProductPrice());
-                    orderProductInsert.setScribingPrice(productSpec.getScribingPrice());
-                    orderProductInsert.setTotalReward(product.getTotalReward());
-                    orderProductInsert.setTaskPrice(product.getTaskPrice());
-                    orderProductInsert.setProductName(product.getProductName());
-                    orderProductInsert.setProductImg(product.getProductImg());
-                    orderProductInsert.setProductDes(product.getProductDes());
-                    orderProductInsert.setProductDetail(product.getProductDetail());
-                    orderProductInsert.setCreateTime(new Date());
+                        // 生成订单产品表
+                        SOrderProduct orderProductInsert = new SOrderProduct();
 
-                    this.orderProductService.addOrderProduct(orderProductInsert);
+                        orderProductInsert.setUserId(user.getId());
+                        orderProductInsert.setOrderDetailId(orderDetail.getId());
+                        orderProductInsert.setProductId(productSpec.getProductId());
+                        orderProductInsert.setProductSpecId(productSpec.getId());
+                        orderProductInsert.setProductSpecValueName(productSpec.getProductSpecValueName());
+                        orderProductInsert.setProductNumber(productNumber);
+                        orderProductInsert.setProductPrice(productSpec.getProductPrice());
+                        orderProductInsert.setScribingPrice(productSpec.getScribingPrice());
+                        orderProductInsert.setTotalReward(product.getTotalReward());
+                        orderProductInsert.setTaskPrice(product.getTaskPrice());
+                        orderProductInsert.setProductName(product.getProductName());
+                        orderProductInsert.setProductImg(product.getProductImg());
+                        orderProductInsert.setProductDes(product.getProductDes());
+                        orderProductInsert.setProductDetail(product.getProductDetail());
+                        orderProductInsert.setCreateTime(new Date());
 
-                    orderAmount = orderAmount.add( productSpec.getProductPrice().multiply(new BigDecimal(productNumber)));
-                    shippingFee = shippingFee.add(product.getExpressFee());
+                        this.orderProductService.addOrderProduct(orderProductInsert);
 
+                        orderAmount = orderAmount.add( productSpec.getProductPrice().multiply(new BigDecimal(productNumber)));
+                        shippingFee = shippingFee.add(product.getExpressFee());
+                    }
+
+                } else {
+
+                    // 订单列表 去支付
+                    orderDetail = this.orderDetailService.getById(orderDetailId);
+
+                    // 重新再设定订单ID
+                    orderDetail.setOrderId(order.getId());
+
+                    orderAmount = orderDetail.getOrderAmount();
+                    shippingFee = orderDetail.getShippingFee();
                 }
 
                 // 用户选用优惠券ID
