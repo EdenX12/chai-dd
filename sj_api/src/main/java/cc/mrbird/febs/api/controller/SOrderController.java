@@ -345,6 +345,25 @@ public class SOrderController extends BaseController {
     @PostMapping("/payOrder")
     public FebsResponse payOrder(HttpServletRequest request, String jsonString) {
 
+//        {
+//            "orderDetailId": "1",  默认nul  待支付订单中 去支付 才会传此值
+//            "addressId": "1",
+//            "paymentType": 1,
+//            "shopOrder": [
+//            {
+//                "shopId": "1",
+//                "orderMessage": "221221",
+//                "userCouponId": 1,
+//                "orderProduct": [
+//                    {
+//                    "productNumber": 2,
+//                    "productSpecId": 1
+//                    }
+//                ]
+//            }
+//            ]
+//        }
+
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
