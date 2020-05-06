@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -257,6 +258,8 @@ public class SUserTaskController extends BaseController {
             userTask.setUserCouponId(userCouponId);
             userTask.setCreateTime(new Date());
             userTask.setUpdateTime(new Date());
+            userTask.setTaskNumber(taskNumber);
+            userTask.setOrderSn("T"+System.currentTimeMillis());
             userTask = userTaskService.createUserTask(userTask);
 
             // 根据商品ID、任务数从s_task_line表中分配N条任务线
@@ -662,6 +665,25 @@ public class SUserTaskController extends BaseController {
 
         response.put("code", 0);
         response.data(userTaskPageList);
+
+        return response;
+    }
+
+    @PostMapping("/getTaskDetail")
+    @Limit(key = "getTaskDetail", period = 60, count = 20, name = "查询拆单详情", prefix = "limit")
+    public FebsResponse getTaskDetail(@NotEmpty(message = "任务ID不可为空") String userTaskId) {
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        //商品详情
+        //任务金 合计
+        //优惠券
+        //任务躺赢
+        //赠送拆豆
+        //订单编号
+
+        response.put("code", 0);
 
         return response;
     }

@@ -63,6 +63,15 @@ public class SUserTask implements Serializable {
     private Integer channel;
 
     /**
+     * 任务数量
+     */
+    private  Integer taskNumber;
+    /**
+     * 订单号
+     */
+    private String orderSn;
+
+    /**
      * 创建日期
      */
     private Date createTime;
