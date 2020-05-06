@@ -40,19 +40,25 @@
 
     <select id="queryProductDetailId" resultType="java.util.Map">
         SELECT
-            op.product_id productId,
-            op.product_name productName,
-            op.product_des productDes,
-            op.product_img productImg,
+            op.id                       orderProductId,
+            op.product_id               productId,
+            op.product_name             productName,
+            op.product_des              productDes,
+            op.product_img              productImg,
+            op.total_reward             totalReward,
+            op.product_spec_id          productSpecId,
             op.product_spec_value_name  productSpecValueName,
-            op.product_price productPirce,
-            op.product_number productNumber
+            op.product_price            productPirce,
+            op.product_number           productNumber
         FROM s_order_product op
         WHERE op.order_detail_id = #{orderDetailId}
     </select>
 
     <select id="queryOrderDetail" resultType="java.util.Map">
         SELECT
+            od.id orderDetailId,                                <!-- 订单明细ID -->
+            od.shop_id shopId,                                  <!-- 订单店铺ID -->
+            od.user_coupon_id userCouponId,                     <!-- 优惠券ID -->
             od.create_time createTime,                          <!-- 订单创建时间 -->
             od.payment_time paymentTime,                        <!-- 订单支付时间 -->
             od.shipping_time shippingTime,                      <!-- 订单发货时间 -->
@@ -63,6 +69,7 @@
                 when od.order_status = 4 then '售后处理中'
                 when od.order_status in(3, 5, -1, 6)	 then '订单已关闭'
             end orderStatusName,                                <!-- 订单状态 -->
+            od.address_id addressId,                            <!-- 收货地址id -->
             od.address_name addressName,                        <!-- 收件人信息 -->
             CONCAT(LEFT(od.address_phone,3), '*****' , RIGHT(od.address_phone,4)) adddressPhone,
             od.address_detail addressDetail,
@@ -72,8 +79,6 @@
             od.order_sn orderSn,                                <!-- 订单编号 -->
             od.shipping_code shippingCode,                      <!-- 物流单号 -->
             od.coupon_amount couponAmount                       <!-- 优惠金额 -->
-                                                                <!-- 返现合计 -->
-                                                                <!-- 赠送拆豆 -->
         FROM
             s_order_detail od
         WHERE od.id = #{orderDetailId}

@@ -2,8 +2,12 @@ package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SActivity;
 import cc.mrbird.febs.api.entity.SOrder;
+import cc.mrbird.febs.api.entity.SParams;
+import cc.mrbird.febs.api.entity.SProductImg;
 import cc.mrbird.febs.api.mapper.SOrderMapper;
 import cc.mrbird.febs.api.service.ISOrderService;
+import cc.mrbird.febs.api.service.ISParamsService;
+import cc.mrbird.febs.api.service.ISProductImgService;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.SortUtil;
@@ -12,8 +16,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +29,12 @@ import java.util.Map;
  */
 @Service
 public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> implements ISOrderService {
+
+    @Autowired
+    private ISProductImgService productImgService;
+
+    @Autowired
+    private ISParamsService paramsService;
 
     @Override
     public SOrder addOrder(SOrder order) {
@@ -65,12 +77,51 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     @Override
     public Map<String, Object> queryOrderDetail(String orderDetailId) {
 
+        // 买家立返佣金比例 （后续调整到Redis缓存读取）
+        SParams params = new SParams();
+        params = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+
+        params = this.paramsService.queryBykeyForOne("product_bean_cnt");
+        Integer productBeanCnt = Integer.valueOf(params.getPValue());
+
         Map<String, Object> result = this.baseMapper.queryOrderDetail(orderDetailId);
 
         if (result != null) {
 
             List<Map> productList = this.baseMapper.queryProductDetailId(orderDetailId);
             result.put("productList", productList);
+
+            // 买家立返
+            BigDecimal buyerReturnAmt = new BigDecimal(0);
+
+            // 赠送拆豆
+            Integer rewardBean = 0;
+
+            for (Map productMap : productList) {
+
+                // 商品图片
+                List<SProductImg> productImgList = this.productImgService.findProductImgList((String)productMap.get("productId"));
+                productMap.put("imgUrlList", productImgList);
+
+                // 总佣金
+                BigDecimal totalReward = new BigDecimal(productMap.get("totalReward").toString());
+
+                // 商品数量
+                BigDecimal productNumber = new BigDecimal(productMap.get("productNumber").toString());
+
+                // 买家立返
+                buyerReturnAmt = buyerReturnAmt.add(totalReward.multiply(buyerRate).multiply(productNumber));
+
+                // 赠送拆豆
+                rewardBean = rewardBean + productBeanCnt * Integer.parseInt(productMap.get("productNumber").toString());
+            }
+
+            // 计算返现合计
+            result.put("buyerReturnAmt", buyerReturnAmt);
+
+            // 计算赠送拆豆
+            result.put("rewardBean", rewardBean);
         }
 
         return  result;
