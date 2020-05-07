@@ -48,6 +48,7 @@ public class SUserPayController extends BaseController {
     @Autowired
     private ISOrderDetailService orderDetailService;
 
+    @Autowired
     private ISUserService userService;
 
     @Autowired
@@ -76,6 +77,12 @@ public class SUserPayController extends BaseController {
 
     @Autowired
     private ISOrderProductService orderProductService;
+
+    @Autowired
+    private ISProductSpecService productSpecService;
+
+    @Autowired
+    private ISProductService productService;
 
     /**
      * 新增用户支付
@@ -317,6 +324,16 @@ public class SUserPayController extends BaseController {
                             // 用户任务线待更新结算状态
                             settleTaskLineIds.add(taskLine.getId());
                         }
+
+                        // 更新商品规格库存数量
+                        SProductSpec productSpec = this.productSpecService.findProductSpec(orderProduct.getProductSpecId());
+                        productSpec.setStockNumber(productSpec.getStockNumber() - orderProduct.getProductNumber());
+                        this.productSpecService.updateById(productSpec);
+
+                        // 更新商品库存数量
+                        SProduct product = this.productService.getById(orderProduct.getProductId());
+                        product.setStockNumber(product.getStockNumber() - orderProduct.getProductNumber());
+                        this.productService.updateById(product);
                     }
 
                     // 如有使用优惠券的话 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
