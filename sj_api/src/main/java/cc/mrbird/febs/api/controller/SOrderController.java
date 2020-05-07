@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -103,7 +104,7 @@ public class SOrderController extends BaseController {
     @Log("确认订单")
     @Transactional
     @PostMapping("/confirmOrder")
-    public FebsResponse confirmOrder(@RequestBody List<Map> productSpecList) {
+    public FebsResponse confirmOrder(@RequestBody List<Map> productSpecList,String addressId) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -330,6 +331,17 @@ public class SOrderController extends BaseController {
 
             // 返优惠券（张）
             resultMap.put("totalReturnCouponCnt", orderList.size());
+
+            //收货地址
+
+            if(StringUtils.isNotBlank(addressId)){
+                SUserAddress userAddress = userAddressService.getById(addressId);
+                resultMap.put("userAddress", userAddress);
+            }else{
+                SUserAddress userAddress = new SUserAddress();
+                userAddress.setUserId(user.getId());
+                resultMap.put("userAddress", userAddressService.findUserAddress(userAddress));
+            }
 
             response.data(resultMap);
 
