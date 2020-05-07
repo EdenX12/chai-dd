@@ -56,7 +56,27 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
 
         userAddress.setUpdateTime(new Date());
 
+        // 如果修改为默认的话，以前默认去掉
+        if ("1".equals(userAddress.getIsDefault())) {
+
+            LambdaQueryWrapper<SUserAddress> queryDefaultWrapper = new LambdaQueryWrapper<SUserAddress>();
+
+            // 用户ID
+            queryDefaultWrapper.eq(SUserAddress::getUserId, userAddress.getUserId());
+
+            // 默认
+            queryDefaultWrapper.eq(SUserAddress::getIsDefault, "1");
+
+            SUserAddress userAddressDefault = this.baseMapper.selectOne(queryDefaultWrapper);
+
+            if (userAddressDefault != null) {
+                userAddressDefault.setIsDefault("0");
+                this.baseMapper.updateById(userAddressDefault);
+            }
+        }
+
         this.baseMapper.update(userAddress, queryWrapper);
+
         return userAddress;
     }
 
@@ -72,14 +92,48 @@ public class SUserAddressServiceImpl extends ServiceImpl<SUserAddressMapper, SUs
         // 用户地址ID
         queryWrapper.eq(SUserAddress::getId, userAddress.getId());
 
+        SUserAddress userAddressOne = this.baseMapper.selectOne(queryWrapper);
+        String isDefault = userAddressOne.getIsDefault();
+
         this.baseMapper.delete(queryWrapper);
+
+        // 如果删除是默认数据，如存在数据 再增加一条默认数据
+        if ("1".equals(isDefault)) {
+
+            LambdaQueryWrapper<SUserAddress> queryWrapperDefault = new LambdaQueryWrapper<SUserAddress>();
+
+            // 用户ID
+            queryWrapperDefault.eq(SUserAddress::getUserId, userAddress.getUserId());
+
+            queryWrapperDefault.orderByDesc(SUserAddress::getUpdateTime);
+
+            List<SUserAddress> list = this.baseMapper.selectList(queryWrapperDefault);
+            if (list != null && list.size() > 0) {
+                SUserAddress userAddressDefault = list.get(0);
+                userAddressDefault.setIsDefault("1");
+                this.baseMapper.updateById(userAddressDefault);
+            }
+        }
+
     }
 
     @Override
     @Transactional
     public SUserAddress addUserAddress(SUserAddress userAddress) {
 
+        LambdaQueryWrapper<SUserAddress> queryWrapper = new LambdaQueryWrapper();
+
+        // 用户ID
+        queryWrapper.eq(SUserAddress::getUserId, userAddress.getUserId());
+
+        // 只有一条数据的话 初始设为默认
+        List<SUserAddress> userAddressList = this.baseMapper.selectList(queryWrapper);
+        if (userAddressList == null || userAddressList.size() == 0) {
+            userAddress.setIsDefault("1");
+        }
+
         userAddress.setCreateTime(new Date());
+        userAddress.setUpdateTime(new Date());
         this.baseMapper.insert(userAddress);
         return userAddress;
     }
