@@ -103,6 +103,8 @@ public class SProductController extends BaseController {
         // 商品大分类循环
         for (SProductType productBigType : productBigTypeList) {
 
+            productTypeMap = new HashMap<>();
+
             // 普通分类及子分类
             productTypeMap.put("productBigTypeName", productBigType.getTypeName());
             // 0-普通; 1-推荐
