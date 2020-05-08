@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author MrBird
  */
 @Service
 public class STaskCouponServiceImpl extends ServiceImpl<STaskCouponMapper, STaskCoupon> implements ISTaskCouponService {
-
 
     @Override
     public STaskCoupon findReturnTaskCoupon() {
@@ -28,6 +29,11 @@ public class STaskCouponServiceImpl extends ServiceImpl<STaskCouponMapper, STask
         // 顺序
         queryWrapper.orderByAsc(STaskCoupon::getCreateTime);
 
-        return this.baseMapper.selectOne(queryWrapper);
+        List<STaskCoupon> list = this.baseMapper.selectList(queryWrapper);
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 }

@@ -71,9 +71,14 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
 
         queryWrapper.orderByAsc(STaskLine::getLineOrder);
 
-        return this.baseMapper.selectOne(queryWrapper);
-    }
+        List<STaskLine> list = this.baseMapper.selectList(queryWrapper);
 
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
+    }
 
     @Override
     public void updateUserTaskLineForSettle(List<String> list) {
