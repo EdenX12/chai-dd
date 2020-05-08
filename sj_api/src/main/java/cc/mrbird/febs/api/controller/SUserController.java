@@ -375,6 +375,8 @@ public class SUserController extends BaseController {
 
         // 用户名称
         returnMap.put("userName", user.getUserName());
+        // 用户昵称
+        returnMap.put("nickName", user.getNickName());
         // 用户电话
         returnMap.put("userPhone", user.getUserPhone());
         // 用户头像
