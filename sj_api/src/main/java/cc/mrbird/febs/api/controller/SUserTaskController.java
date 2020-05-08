@@ -568,7 +568,7 @@ public class SUserTaskController extends BaseController {
 
         // 我的完成中任务
         IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
-                queryRequest, user.getId(),4);
+                queryRequest, user.getId(),5);
 
         if (result != null) {
             List<Map> userTaskList = result.getRecords();
@@ -604,7 +604,7 @@ public class SUserTaskController extends BaseController {
 
         // 我的结算中任务
         IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
-                queryRequest, user.getId(),3);
+                queryRequest, user.getId(),4);
 
         if (result != null) {
             List<Map> userTaskList = result.getRecords();
