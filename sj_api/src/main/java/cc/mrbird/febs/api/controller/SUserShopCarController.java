@@ -59,6 +59,32 @@ public class SUserShopCarController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
             userShopCar.setUserId(user.getId());
 
+            // 商品是否存在
+            SProduct product = this.productService.getById(userShopCar.getProductId());
+            if (product == null) {
+                message = "商品不存在";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
+            // 商品规格是否存在
+            SProductSpec productSpec = this.productSpecService.getById(userShopCar.getProductSpecId());
+            if (productSpec == null) {
+                message = "商品不存在";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
+            // 数量大于0
+            if (userShopCar.getCount() <=0) {
+                message = "商品数量必须大于0";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
             this.userShopCarService.addUserShopCar(userShopCar);
 
         } catch (Exception e) {

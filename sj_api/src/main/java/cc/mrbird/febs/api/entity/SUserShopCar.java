@@ -33,6 +33,11 @@ public class SUserShopCar implements Serializable {
     private String userId;
 
     /**
+     * 商品ID
+     */
+    private String productId;
+
+    /**
      * 商品规格ID
      */
     private String productSpecId;
