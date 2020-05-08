@@ -2,7 +2,9 @@ package cc.mrbird.febs.api.service;
 
 import cc.mrbird.febs.api.entity.SUserBonusLog;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -17,4 +19,20 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
      * @return List
      */
     List<SUserBonusLog> findUserBonusList(SUserBonusLog userBonusLog);
+
+    /**
+     * 战队累计收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusRewardSum(@Param("userId") String userId);
+
+    /**
+     * 战队今日累计收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusRewardTodaySum(@Param("userId") String userId);
 }

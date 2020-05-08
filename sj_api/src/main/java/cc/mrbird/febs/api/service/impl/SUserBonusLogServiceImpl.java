@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -58,4 +59,15 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
         return this.baseMapper.selectList(queryWrapper);
     }
 
+    @Override
+    public BigDecimal findUserBonusRewardSum(String userId) {
+
+        return this.baseMapper.findUserBonusRewardSum(userId);
+    }
+
+    @Override
+    public BigDecimal findUserBonusRewardTodaySum(String userId) {
+
+        return this.baseMapper.findUserBonusRewardTodaySum(userId);
+    }
 }

@@ -86,6 +86,7 @@ public class SUserController extends BaseController {
 
 	@Autowired
 	private ISUserService userService;
+
 	@Autowired
 	private ISUserWechatService sUserWechatService;
 
@@ -100,6 +101,9 @@ public class SUserController extends BaseController {
 
     @Autowired
     private ISUserCouponService userCouponService;
+
+    @Autowired
+    private ISUserBonusLogService userBonusLogService;
 
     @Autowired
     private ITokenService tokenService;
@@ -418,10 +422,11 @@ public class SUserController extends BaseController {
         int userRelationTodayCnt = this.userRelationService.findUserRelationTodayCnt(user.getId());
         returnMap.put("userRelationTodayCnt", userRelationTodayCnt);
 
-        // 累计收益
-        BigDecimal totalBonus = new BigDecimal(0);
+        // 累计收益 （横向+纵向 躺赢收益）
+        BigDecimal totalBonus = this.userBonusLogService.findUserBonusRewardSum(user.getId());
+
         // 今日收益
-        BigDecimal todayBonus = new BigDecimal(0);
+        BigDecimal todayBonus = this.userBonusLogService.findUserBonusRewardTodaySum(user.getId());
 
         returnMap.put("totalBonus", totalBonus);
         returnMap.put("todayBonus", todayBonus);
