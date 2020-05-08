@@ -3,7 +3,7 @@
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserBonusLogMapper">
 
     <select id="findUserBonusOrgRewardSum" resultType="java.math.BigDecimal">
-        SELECT SUM(bonus_amount) bonusAmount
+        SELECT IFNULL(SUM(bonus_amount),0) bonusAmount
           FROM s_user_bonus_log
          WHERE user_id=#{userId}
 
@@ -16,7 +16,7 @@
     </select>
 
     <select id="findUserBonusOrgRewardTodaySum" resultType="java.math.BigDecimal">
-        SELECT SUM(bonus_amount) bonusAmount
+        SELECT IFNULL(SUM(bonus_amount),0) bonusAmount
           FROM s_user_bonus_log
          WHERE user_id=#{userId}
            AND bonus_type IN (3, 4)
@@ -25,7 +25,7 @@
     </select>
 
     <select id="findUserBonusTaskRewardSum" resultType="java.math.BigDecimal">
-        SELECT SUM(bonus_amount) bonusAmount
+        SELECT IFNULL(SUM(bonus_amount),0) bonusAmount
         FROM s_user_bonus_log
         WHERE user_id=#{userId}
 

@@ -108,18 +108,19 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
             BigDecimal taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
             returnMap.put("taskReturnAmt", taskReturnAmt);
 
-            // 任务躺赢（实际）  【结算中 已完成 状态显示】 根据userId productId从bonusLog中读取
-            BigDecimal taskTaskRewardAmt = this.userBonusLogService.findUserBonusTaskRewardSum(user.getId(), productId);
-            returnMap.put("taskTaskRewardAmt", taskTaskRewardAmt);
-
-            // 组织躺赢（纵向+横向 实际）【结算中 已完成 状态显示】
-            BigDecimal taskOrgRewardAmt = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), productId);
-            returnMap.put("taskOrgRewardAmt", taskOrgRewardAmt);
-
             if (user == null) {
                 // 未登录显示未关注
                 returnMap.put("followFlag", false);
             } else {
+
+                // 任务躺赢（实际）  【结算中 已完成 状态显示】 根据userId productId从bonusLog中读取
+                BigDecimal taskTaskRewardAmt = this.userBonusLogService.findUserBonusTaskRewardSum(user.getId(), productId);
+                returnMap.put("taskTaskRewardAmt", taskTaskRewardAmt);
+
+                // 组织躺赢（纵向+横向 实际）【结算中 已完成 状态显示】
+                BigDecimal taskOrgRewardAmt = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), productId);
+                returnMap.put("taskOrgRewardAmt", taskOrgRewardAmt);
+
                 // 是否已关注
                 SUserFollow userFollow = new SUserFollow();
                 userFollow.setUserId(user.getId());
