@@ -1,6 +1,5 @@
 package cc.mrbird.febs.api.service.impl;
 
-import cc.mrbird.febs.api.entity.SActivity;
 import cc.mrbird.febs.api.entity.SOrder;
 import cc.mrbird.febs.api.entity.SParams;
 import cc.mrbird.febs.api.entity.SProductImg;
@@ -8,19 +7,16 @@ import cc.mrbird.febs.api.mapper.SOrderMapper;
 import cc.mrbird.febs.api.service.ISOrderService;
 import cc.mrbird.febs.api.service.ISParamsService;
 import cc.mrbird.febs.api.service.ISProductImgService;
-import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
