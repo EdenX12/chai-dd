@@ -93,7 +93,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
         httpResponse.setContentType("application/json; charset=utf-8");
         final String message = "未认证，请在前端系统进行认证";
         try (PrintWriter out = httpResponse.getWriter()) {
-            String responseJson = "{\"message\":\"" + message + "\"}";
+            String responseJson = "{\"message\":\"" + message + "\",\"code\":\"" + -1 + "\"}";
             out.print(responseJson);
         } catch (IOException e) {
             log.error("sendChallenge error：", e);
