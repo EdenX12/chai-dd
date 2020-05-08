@@ -104,7 +104,7 @@ public class SOrderController extends BaseController {
     @Log("确认订单")
     @Transactional
     @PostMapping("/confirmOrder")
-    public FebsResponse confirmOrder(@RequestBody List<Map> productSpecList,String addressId) {
+    public FebsResponse confirmOrder(@RequestBody String jsonString) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -115,15 +115,25 @@ public class SOrderController extends BaseController {
 
             SUser user = FebsUtil.getCurrentUser();
 
+            JSONObject json = JSON.parseObject(jsonString);
+
+            // 收货地址
+            String addressId = json.getString("addressId");
+
+            // 店铺ID
+            JSONArray productSpecList = json.getJSONArray("productSpecList");
+
             List<Map<String, Object>> productList = new ArrayList<>();
 
-            for (Map productSpecMap : productSpecList) {
+            for(int i=0; i<productSpecList.size(); i++){
+
+                JSONObject productSpecJson = productSpecList.getJSONObject(i);
 
                 // 规格商品ID
-                String productSpecId = productSpecMap.get("productSpecId").toString();
+                String productSpecId = productSpecJson.get("productSpecId").toString();
 
                 // 商品数量
-                int productNumber = (Integer) productSpecMap.get("productNumber");
+                int productNumber = (Integer) productSpecJson.get("productNumber");
 
                 // 商品规格
                 SProductSpec productSpec = this.productSpecService.findProductSpec(productSpecId);
@@ -332,12 +342,11 @@ public class SOrderController extends BaseController {
             // 返优惠券（张）
             resultMap.put("totalReturnCouponCnt", orderList.size());
 
-            //收货地址
-
-            if(StringUtils.isNotBlank(addressId)){
+            // 收货地址
+            if (StringUtils.isNotBlank(addressId)) {
                 SUserAddress userAddress = userAddressService.getById(addressId);
                 resultMap.put("userAddress", userAddress);
-            }else{
+            } else {
                 SUserAddress userAddress = new SUserAddress();
                 userAddress.setUserId(user.getId());
                 resultMap.put("userAddress", userAddressService.findUserAddress(userAddress));
