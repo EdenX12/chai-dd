@@ -26,7 +26,7 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
      * @param userId String
      * @return BigDecimal
      */
-    BigDecimal findUserBonusRewardSum(@Param("userId") String userId);
+    BigDecimal findUserBonusOrgRewardSum(@Param("userId") String userId, @Param("productId") String productId);
 
     /**
      * 战队今日累计收益
@@ -34,5 +34,13 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
      * @param userId String
      * @return BigDecimal
      */
-    BigDecimal findUserBonusRewardTodaySum(@Param("userId") String userId);
+    BigDecimal findUserBonusOrgRewardTodaySum(@Param("userId") String userId);
+
+    /**
+     * 任务躺赢收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusTaskRewardSum(@Param("userId") String userId, @Param("productId") String productId);
 }

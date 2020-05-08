@@ -60,14 +60,21 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
     }
 
     @Override
-    public BigDecimal findUserBonusRewardSum(String userId) {
+    public BigDecimal findUserBonusOrgRewardSum(String userId, String productId) {
 
-        return this.baseMapper.findUserBonusRewardSum(userId);
+        return this.baseMapper.findUserBonusOrgRewardSum(userId, productId);
     }
 
     @Override
-    public BigDecimal findUserBonusRewardTodaySum(String userId) {
+    public BigDecimal findUserBonusOrgRewardTodaySum(String userId) {
 
-        return this.baseMapper.findUserBonusRewardTodaySum(userId);
+        return this.baseMapper.findUserBonusOrgRewardTodaySum(userId);
     }
+
+    @Override
+    public BigDecimal findUserBonusTaskRewardSum(String userId, String productId) {
+
+        return this.baseMapper.findUserBonusTaskRewardSum(userId, productId);
+    }
+
 }

@@ -38,6 +38,9 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
     @Autowired
     private ISUserLevelService userLevelService;
 
+    @Autowired
+    private ISUserBonusLogService userBonusLogService;
+
     @Override
     public IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest request) {
 
@@ -98,14 +101,20 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
             BigDecimal taskNumber = new BigDecimal(returnMap.get("taskNumber").toString());
 
             // 买家立返
-            BigDecimal buyerReturnAmt = new BigDecimal(0);
-            buyerReturnAmt = totalReward.multiply(buyerRate);
+            BigDecimal buyerReturnAmt = totalReward.multiply(buyerRate);
             returnMap.put("buyerReturnAmt", buyerReturnAmt);
 
-            // 躺赢奖励
-            BigDecimal taskReturnAmt = new BigDecimal(0);
-            taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
+            // 躺赢奖励（起）
+            BigDecimal taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
             returnMap.put("taskReturnAmt", taskReturnAmt);
+
+            // 任务躺赢（实际）  【结算中 已完成 状态显示】 根据userId productId从bonusLog中读取
+            BigDecimal taskTaskRewardAmt = this.userBonusLogService.findUserBonusTaskRewardSum(user.getId(), productId);
+            returnMap.put("taskTaskRewardAmt", taskTaskRewardAmt);
+
+            // 组织躺赢（纵向+横向 实际）【结算中 已完成 状态显示】
+            BigDecimal taskOrgRewardAmt = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), productId);
+            returnMap.put("taskOrgRewardAmt", taskOrgRewardAmt);
 
             if (user == null) {
                 // 未登录显示未关注

@@ -422,11 +422,11 @@ public class SUserController extends BaseController {
         int userRelationTodayCnt = this.userRelationService.findUserRelationTodayCnt(user.getId());
         returnMap.put("userRelationTodayCnt", userRelationTodayCnt);
 
-        // 累计收益 （横向+纵向 躺赢收益）
-        BigDecimal totalBonus = this.userBonusLogService.findUserBonusRewardSum(user.getId());
+        // 战队贡献累计收益 （横向+纵向 躺赢收益）
+        BigDecimal totalBonus = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), null);
 
-        // 今日收益
-        BigDecimal todayBonus = this.userBonusLogService.findUserBonusRewardTodaySum(user.getId());
+        // 战队贡献今日收益
+        BigDecimal todayBonus = this.userBonusLogService.findUserBonusOrgRewardTodaySum(user.getId());
 
         returnMap.put("totalBonus", totalBonus);
         returnMap.put("todayBonus", todayBonus);
