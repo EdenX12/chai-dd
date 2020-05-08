@@ -370,7 +370,7 @@ public class SOrderController extends BaseController {
     @Log("确认支付购买订单")
     @Transactional
     @PostMapping("/payOrder")
-    public FebsResponse payOrder(HttpServletRequest request, String jsonString) {
+    public FebsResponse payOrder(HttpServletRequest request, @RequestBody String jsonString) {
 
 //        {
 //            "orderDetailId": "1",  默认nul  待支付订单中 去支付 才会传此值 如传递订单明细ID 只可能一个店铺
