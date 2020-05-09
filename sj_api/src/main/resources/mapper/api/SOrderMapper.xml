@@ -58,7 +58,9 @@
         SELECT
             od.id orderDetailId,                                <!-- 订单明细ID -->
             od.shop_id shopId,                                  <!-- 订单店铺ID -->
+            ss.shop_name shopName,                              <!-- 店铺名称 -->
             od.user_coupon_id userCouponId,                     <!-- 优惠券ID -->
+            od.order_status orderStatus,                        <!-- 订单状态 -->
             od.create_time createTime,                          <!-- 订单创建时间 -->
             od.payment_time paymentTime,                        <!-- 订单支付时间 -->
             od.shipping_time shippingTime,                      <!-- 订单发货时间 -->
@@ -81,6 +83,7 @@
             od.coupon_amount couponAmount                       <!-- 优惠金额 -->
         FROM
             s_order_detail od
+        LEFT JOIN s_shop ss ON ss.id = od.shop_id
         WHERE od.id = #{orderDetailId}
     </select>
 

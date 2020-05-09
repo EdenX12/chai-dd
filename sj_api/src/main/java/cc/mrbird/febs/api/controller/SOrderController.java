@@ -58,6 +58,9 @@ public class SOrderController extends BaseController {
     private ISProductSpecService productSpecService;
 
     @Autowired
+    private ISUserShopCarService userShopCarService;
+
+    @Autowired
     private ISUserAddressService userAddressService;
 
     @Autowired
@@ -512,6 +515,12 @@ public class SOrderController extends BaseController {
 
                         orderAmount = orderAmount.add( productSpec.getProductPrice().multiply(new BigDecimal(productNumber)));
                         shippingFee = shippingFee.add(product.getExpressFee());
+
+                        // 如果是从购物车中购买的话，购物车中商品删除
+                        SUserShopCar userShopCar = new SUserShopCar();
+                        userShopCar.setUserId(user.getId());
+                        userShopCar.setProductSpecId(productSpecId);
+                        this.userShopCarService.deleteUserShopCar(userShopCar);
                     }
 
                 } else {

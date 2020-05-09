@@ -43,10 +43,19 @@ public class SUserShopCarServiceImpl extends ServiceImpl<SUserShopCarMapper, SUs
         LambdaQueryWrapper<SUserShopCar> queryWrapper = new LambdaQueryWrapper<SUserShopCar>();
 
         // 用户ID
-        queryWrapper.eq(SUserShopCar::getUserId, userShopCar.getUserId());
+        if (userShopCar.getUserId() != null) {
+            queryWrapper.eq(SUserShopCar::getUserId, userShopCar.getUserId());
+        }
 
         // 用户购物车ID
-        queryWrapper.eq(SUserShopCar::getId, userShopCar.getId());
+        if (userShopCar.getId() != null) {
+            queryWrapper.eq(SUserShopCar::getId, userShopCar.getId());
+        }
+
+        // 用户购物商品ID
+        if (userShopCar.getProductSpecId() != null) {
+            queryWrapper.eq(SUserShopCar::getProductSpecId, userShopCar.getProductSpecId());
+        }
 
         this.baseMapper.delete(queryWrapper);
     }
