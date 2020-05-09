@@ -34,6 +34,9 @@ public class SIndexController extends BaseController {
     private ISActivityService activityService;
 
     @Autowired
+    private ISFuncModuleService funcModuleService;
+
+    @Autowired
     private ISRecommendTypeService recommendTypeService;
 
     @Autowired
@@ -68,6 +71,10 @@ public class SIndexController extends BaseController {
         // 首页轮播图检索
         List<SBanner> bannerList = this.bannerService.findBannerList();
         returnMap.put("bannerList", bannerList);
+
+        // 模块功能区域检索
+        List<SFuncModule> funcModuleList = this.funcModuleService.findFuncModuleList();
+        returnMap.put("funcModuleList", funcModuleList);
 
         // 活动区域图片检索
         List<SActivity> activityList = this.activityService.findActivityList();
