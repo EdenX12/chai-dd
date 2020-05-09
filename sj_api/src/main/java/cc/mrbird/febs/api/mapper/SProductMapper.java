@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public interface SProductMapper extends BaseMapper<SProduct> {
 
+    IPage<Map> findProductDetailByProductName(Page page, @Param("productName") String productName);
+
     IPage<Map> findProductDetailByBigTypeId(Page page, @Param("sProduct") SProduct sProduct);
 
     IPage<Map> findProductDetailBySmallTypeId(Page page, @Param("sProduct") SProduct sProduct);

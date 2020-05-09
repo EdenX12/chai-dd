@@ -14,6 +14,15 @@ import java.util.Map;
 public interface ISProductService extends IService<SProduct> {
 
     /**
+     * 模糊检索商品列表
+     *
+     * @param productName String
+     * @param request queryRequest
+     * @return IPage
+     */
+    IPage<Map> findProductListByProductName(String productName, QueryRequest request);
+
+    /**
      * 根据商品大分类查询商品列表
      *
      * @param product SProduct

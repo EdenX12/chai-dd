@@ -42,6 +42,23 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
     private ISUserBonusLogService userBonusLogService;
 
     @Override
+    public IPage<Map> findProductListByProductName(String productName, QueryRequest request) {
+
+        try {
+
+            Page<SProduct> page = new Page<>();
+
+            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+
+            return this.baseMapper.findProductDetailByProductName(page, productName);
+
+        } catch (Exception e) {
+            log.error("模糊查询全部商品异常", e);
+            return null;
+        }
+    }
+
+    @Override
     public IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest request) {
 
         try {

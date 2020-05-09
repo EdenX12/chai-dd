@@ -277,6 +277,78 @@ public class SProductController extends BaseController {
     }
 
     /**
+     * 全文模糊检索商品
+     * @return List<Map>
+     */
+    @PostMapping("/selectProductList")
+    @Limit(key = "selectProductList", period = 60, count = 20, name = "全文模糊检索接口", prefix = "limit")
+    public FebsResponse selectProductList(QueryRequest queryRequest, String productName) {
+
+        FebsResponse response = new FebsResponse();
+
+        Map<String, Object> productPageList = new HashMap<>();
+
+        // 买家立返佣金比例 （后续调整到Redis缓存读取）
+        SParams params = new SParams();
+        params = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+
+        // 同组任务躺赢佣金比例
+        params = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+
+        // 模糊检索商品列表
+        IPage<Map> returnPage = this.productService.findProductListByProductName(productName, queryRequest);
+
+        List<Map> list = returnPage.getRecords();
+
+        for (Map returnMap : list) {
+
+            // 商品图片
+            List<SProductImg> productImgList = this.productImgService.findProductImgList((String)returnMap.get("productId"));
+            returnMap.put("imgUrlList", productImgList);
+
+            // 总佣金
+            BigDecimal totalReward = new BigDecimal(returnMap.get("totalReward").toString());
+            // 任务数量
+            BigDecimal taskNumber = new BigDecimal(returnMap.get("taskNumber").toString());
+
+            // 买家立返
+            BigDecimal buyerReturnAmt = totalReward.multiply(buyerRate);
+            returnMap.put("buyerReturnAmt", buyerReturnAmt);
+
+            // 躺赢奖励
+            BigDecimal taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
+            returnMap.put("taskReturnAmt", taskReturnAmt);
+
+            SUser user = FebsUtil.getCurrentUser();
+            if (user == null) {
+                // 未登录显示未关注
+                returnMap.put("followFlag", false);
+            } else {
+                // 是否已关注
+                SUserFollow userFollow = new SUserFollow();
+                userFollow.setUserId(user.getId());
+                userFollow.setFollowType(0);
+                userFollow.setProductId((String)returnMap.get("productId"));
+                userFollow = this.userFollowService.findUserFollowDetail(userFollow);
+                if (userFollow != null && userFollow.getStatus() == 1) {
+                    returnMap.put("followFlag", true);
+                } else {
+                    returnMap.put("followFlag", false);
+                }
+            }
+        }
+        returnPage.setRecords(list);
+        productPageList = getDataTable(returnPage);
+
+        response.put("code", 0);
+        response.data(productPageList);
+
+        return response;
+    }
+
+    /**
      * 根据商品ID取得商品信息
      * @return SProduct
      */
