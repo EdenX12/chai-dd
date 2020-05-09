@@ -294,13 +294,13 @@ public class SUserShopCarController extends BaseController {
     }
 
     /**
-     * 更新购物车商品选中状态
-     * 购物车ID 状态
+     * 更新购物车商品数量
+     * 购物车ID 商品数量
      */
-    @Log("更新购物车选中状态")
+    @Log("更新购物车商品数量")
     @Transactional
-    @PostMapping("/updateShopCarCheckStatus")
-    public FebsResponse updateShopCarCheckStatus(String userShopCarId, int checkStatus) {
+    @PostMapping("/updateShopCarProductNumber")
+    public FebsResponse updateShopCarProductNumber(String userShopCarId, int productNumber) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -312,12 +312,12 @@ public class SUserShopCarController extends BaseController {
             SUserShopCar userShopCar = new SUserShopCar();
             userShopCar.setUserId(user.getId());
             userShopCar.setId(userShopCarId);
-            userShopCar.setCheckStatus(checkStatus);
+            userShopCar.setCount(productNumber);
 
             this.userShopCarService.updateById(userShopCar);
 
         } catch (Exception e) {
-            message = "更新购物车选中状态失败";
+            message = "更新购物车商品数量失败";
             response.put("code", 1);
             response.message(message);
             log.error( e.getMessage());
