@@ -584,7 +584,7 @@ public class SOrderController extends BaseController {
             this.orderService.saveOrUpdate(order);
 
             // 调起微信支付
-            JSONObject jsonObject = weChatPayUtil.weChatPay(String.valueOf(order.getId()),
+            JSONObject jsonObject = weChatPayUtil.weChatPay(order.getId(),
                     totalPayAmount.toString(),
                     user.getOpenId(),
                     request.getRemoteAddr(),

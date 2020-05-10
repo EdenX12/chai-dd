@@ -129,6 +129,9 @@ public class SUserShopCarController extends BaseController {
 
             Map<String, Object> newProductDetail = new HashMap<>();
 
+            // 购物车ID
+            newProductDetail.put("userShopCarId", userShopCarLoop.getId());
+
             // 所属店铺ID
             newProductDetail.put("shopId", productDetail.get("shopId"));
 
