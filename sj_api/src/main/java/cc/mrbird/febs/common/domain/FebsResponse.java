@@ -16,7 +16,7 @@ public class FebsResponse extends HashMap<String, Object> {
     
     public FebsResponse message(String message) {
         this.put("message", message);
-        this.put("code", 0);
+        this.put("code", 1);
         return this;
     }
     public FebsResponse warn(String message) {
