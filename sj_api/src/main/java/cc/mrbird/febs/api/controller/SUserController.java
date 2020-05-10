@@ -190,7 +190,7 @@ public class SUserController extends BaseController {
 
             Map<String, Object> returnInfo = this.generateUserInfo(jwtToken, suer);
             returnInfo.put("sessionKey", sessionKey);
-            return new FebsResponse().message("操作成功").data(returnInfo);
+            return new FebsResponse().message("操作成功").data(returnInfo).put("code", 0);
 
 		}
     }
@@ -254,7 +254,7 @@ public class SUserController extends BaseController {
         this.saveTokenToRedis(suer, jwtToken, request);
 
         Map<String, Object> returnInfo = this.generateUserInfo(jwtToken, suer);
-        return new FebsResponse().message("操作成功").data(returnInfo);
+        return new FebsResponse().message("操作成功").data(returnInfo).put("code", 0);
     }
     /**
      * 用户登录
