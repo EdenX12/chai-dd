@@ -79,16 +79,41 @@ public class SProductController extends BaseController {
 
         for (SProductType recommendProductType : recommendProductTypeList) {
 
-            Map<String, Object> productSmallTypeMap = new HashMap<>();
+            // 如果是大分类的话，取出其下面的所有小分类
+            if (recommendProductType.getLevel() == 1) {
 
-            // 分类ID
-            productSmallTypeMap.put("typeId", recommendProductType.getId());
-            // 分类名称
-            productSmallTypeMap.put("typeName", recommendProductType.getTypeName());
-            // 分类小图标
-            productSmallTypeMap.put("typeImg", recommendProductType.getTypeImg());
+                SProductType productType = new SProductType();
+                productType.setParentId(recommendProductType.getId());
+                productType.setLevel(2);
+                List<SProductType> productTypeList1 = this.productTypeService.findProductTypeList(productType);
 
-            productSmallTypeMapList.add(productSmallTypeMap);
+                for (SProductType productType1 : productTypeList1) {
+
+                    Map<String, Object> productSmallTypeMap = new HashMap<>();
+
+                    // 分类ID
+                    productSmallTypeMap.put("typeId", productType1.getId());
+                    // 分类名称
+                    productSmallTypeMap.put("typeName", productType1.getTypeName());
+                    // 分类小图标
+                    productSmallTypeMap.put("typeImg", productType1.getTypeImg());
+
+                    productSmallTypeMapList.add(productSmallTypeMap);
+                }
+
+            } else {
+
+                Map<String, Object> productSmallTypeMap = new HashMap<>();
+
+                // 分类ID
+                productSmallTypeMap.put("typeId", recommendProductType.getId());
+                // 分类名称
+                productSmallTypeMap.put("typeName", recommendProductType.getTypeName());
+                // 分类小图标
+                productSmallTypeMap.put("typeImg", recommendProductType.getTypeImg());
+
+                productSmallTypeMapList.add(productSmallTypeMap);
+            }
         }
         productTypeMap.put("productSmallType", productSmallTypeMapList);
         productTypeList.add(productTypeMap);
