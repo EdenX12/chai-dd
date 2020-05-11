@@ -890,9 +890,18 @@ public class SOrderController extends BaseController {
                             // 上一级用户
                             SUser userSuperOne = this.userService.getById(userMe.getParentId());
 
+                            userBonusLog = new SUserBonusLog();
+                            userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                            userBonusLog.setTaskLineId(taskLineOne.getId());
+                            userBonusLog.setUserTaskLineId(null);
+                            userBonusLog.setProductId(orderProduct.getProductId());
+                            userBonusLog.setCreateTime(new Date());
+                            userBonusLog.setUpdateTime(new Date());
+                            userBonusLog.setStatus(0);
                             userBonusLog.setUserId(userSuperOne.getId());
                             userBonusLog.setBonusType(4);
                             userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate1));
+
                             this.userBonusLogService.save(userBonusLog);
 
                             // 奖励金额到冻结（冻结+）
@@ -904,6 +913,14 @@ public class SOrderController extends BaseController {
                                 // 上二级用户
                                 SUser userSuperTwo = this.userService.getById(userSuperOne.getParentId());
 
+                                userBonusLog = new SUserBonusLog();
+                                userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                                userBonusLog.setTaskLineId(taskLineOne.getId());
+                                userBonusLog.setUserTaskLineId(null);
+                                userBonusLog.setProductId(orderProduct.getProductId());
+                                userBonusLog.setCreateTime(new Date());
+                                userBonusLog.setUpdateTime(new Date());
+                                userBonusLog.setStatus(0);
                                 userBonusLog.setUserId(userSuperTwo.getId());
                                 userBonusLog.setBonusType(4);
                                 userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate2));
@@ -918,6 +935,14 @@ public class SOrderController extends BaseController {
                                     // 上三级用户
                                     SUser userSuperThree = this.userService.getById(userSuperTwo.getParentId());
 
+                                    userBonusLog = new SUserBonusLog();
+                                    userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                                    userBonusLog.setTaskLineId(taskLineOne.getId());
+                                    userBonusLog.setUserTaskLineId(null);
+                                    userBonusLog.setProductId(orderProduct.getProductId());
+                                    userBonusLog.setCreateTime(new Date());
+                                    userBonusLog.setUpdateTime(new Date());
+                                    userBonusLog.setStatus(0);
                                     userBonusLog.setUserId(userSuperThree.getId());
                                     userBonusLog.setBonusType(4);
                                     userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate3));
@@ -936,6 +961,15 @@ public class SOrderController extends BaseController {
                             userRelation.setUnionId(userMe.getUnionId());
                             SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
                             if (userRelationOne != null) {
+
+                                userBonusLog = new SUserBonusLog();
+                                userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
+                                userBonusLog.setTaskLineId(taskLineOne.getId());
+                                userBonusLog.setUserTaskLineId(null);
+                                userBonusLog.setProductId(orderProduct.getProductId());
+                                userBonusLog.setCreateTime(new Date());
+                                userBonusLog.setUpdateTime(new Date());
+                                userBonusLog.setStatus(0);
                                 userBonusLog.setUserId(userRelationOne.getParentId());
                                 userBonusLog.setBonusType(4);
                                 userBonusLog.setBonusAmount(orderProduct.getTotalReward().multiply(upperVertical1Rate0));
@@ -954,8 +988,11 @@ public class SOrderController extends BaseController {
                         List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
 
                         // 同组任务线上的拆家（X人）均分
-                        BigDecimal sameGroup = orderProduct.getTotalReward().multiply(sameGroupRate).divide(
-                                new BigDecimal(userTaskLineList.size()), 2, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal sameGroup = new BigDecimal(0);
+                        if (userTaskLineList.size() != 0) {
+                            sameGroup = orderProduct.getTotalReward().multiply(sameGroupRate).divide(
+                                    new BigDecimal(userTaskLineList.size()), 2, BigDecimal.ROUND_HALF_UP);
+                        }
 
                         int taskUserSuperCnt = 0;
                         // 计算同组任务线上的每个拆家对应的上级个数（横向上级）
@@ -980,6 +1017,7 @@ public class SOrderController extends BaseController {
                             this.userTaskLineService.updateById(userTaskLineOne);
 
                             // 任务躺赢 (同组任务线上的拆家（X人）均分40%)
+                            userBonusLog = new SUserBonusLog();
                             userBonusLog.setUserId(userTaskLineOne.getUserId());
                             userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
                             userBonusLog.setTaskLineId(taskLineOne.getId());
@@ -1001,6 +1039,7 @@ public class SOrderController extends BaseController {
                             SUser taskUser = this.userService.getById(userTaskLineOne.getUserId());
                             if (taskUser.getParentId() != null) {
 
+                                userBonusLog = new SUserBonusLog();
                                 userBonusLog.setUserId(taskUser.getParentId());
                                 userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
                                 userBonusLog.setTaskLineId(taskLineOne.getId());
@@ -1020,6 +1059,7 @@ public class SOrderController extends BaseController {
                             }
 
                             // 平台返回任务金
+                            userBonusLog = new SUserBonusLog();
                             userBonusLog.setUserId(userTaskLineOne.getUserId());
                             userBonusLog.setOrderDetailId(orderDetailPaySuccess.getId());
                             userBonusLog.setTaskLineId(taskLineOne.getId());
