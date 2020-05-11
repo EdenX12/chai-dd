@@ -87,7 +87,7 @@
         WHERE od.id = #{orderDetailId}
     </select>
 
-    <select id="queryOrderPaySuccessList" resultType="java.util.Map">
+    <select id="queryOrderPaySuccessList" resultType="sOrder">
         SELECT  id,
                 user_id userId,
                 payment_type paymentType,

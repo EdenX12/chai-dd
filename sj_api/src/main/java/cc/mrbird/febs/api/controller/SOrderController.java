@@ -805,6 +805,7 @@ public class SOrderController extends BaseController {
      * 2分钟执行一次 (支付成功时间超过5分钟的订单处理)
      */
     @Scheduled(cron = "0 */2 * * * ?")
+    @Transactional
     public void orderPaySuccessTask() {
 
         // 支付成功超过5分钟订单
@@ -964,8 +965,12 @@ public class SOrderController extends BaseController {
                                 taskUserSuperCnt = taskUserSuperCnt + 1;
                             }
                         }
-                        BigDecimal upperHorizontal = orderProduct.getTotalReward().multiply(upperHorizontalRate).divide(
-                                new BigDecimal(taskUserSuperCnt), 2, BigDecimal.ROUND_HALF_UP);
+
+                        BigDecimal upperHorizontal = new BigDecimal(0);
+                        if (taskUserSuperCnt != 0) {
+                            upperHorizontal = orderProduct.getTotalReward().multiply(upperHorizontalRate).divide(
+                                    new BigDecimal(taskUserSuperCnt), 2, BigDecimal.ROUND_HALF_UP);
+                        }
 
                         for (SUserTaskLine userTaskLineOne : userTaskLineList) {
 
