@@ -804,7 +804,7 @@ public class SOrderController extends BaseController {
      * 订单支付成功后计算奖励金额到冻结
      * 2分钟执行一次 (支付成功时间超过5分钟的订单处理)
      */
-    @Scheduled(cron = "0 0/2 0 * * ?")
+    @Scheduled(cron = "0 */2 * * * ?")
     public void orderPaySuccessTask() {
 
         // 支付成功超过5分钟订单

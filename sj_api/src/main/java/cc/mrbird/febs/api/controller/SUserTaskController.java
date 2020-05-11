@@ -469,7 +469,7 @@ public class SUserTaskController extends BaseController {
      * 任务支付失败时 锁定去除 修改状态为 3-不支付[取消或超期] 并且修改任务线 锁定任务数
      * 2分钟执行一次 (支付失败时间超过5分钟的任务处理)
      */
-    @Scheduled(cron = "0 0/2 0 * * ?")
+    @Scheduled(cron = "0 */2 * * * ?")
     public void unLockPayFailTask() {
 
         // 抽取s_user_task中 支付状态（锁定） 支付时间大于5分钟的 数据 修改状态为 3-不支付[取消或超期]
