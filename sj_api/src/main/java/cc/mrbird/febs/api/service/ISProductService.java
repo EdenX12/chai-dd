@@ -23,6 +23,22 @@ public interface ISProductService extends IService<SProduct> {
     IPage<Map> findProductListByProductName(String productName, QueryRequest request);
 
     /**
+     * 检索新手商品列表
+     *
+     * @param request queryRequest
+     * @return IPage
+     */
+    IPage<Map> findNewProductList(QueryRequest request);
+
+    /**
+     * 检索活动区商品列表
+     *
+     * @param request queryRequest
+     * @return IPage
+     */
+    IPage<Map> findActivityProductList(String activityId, QueryRequest request);
+
+    /**
      * 根据商品大分类查询商品列表
      *
      * @param product SProduct

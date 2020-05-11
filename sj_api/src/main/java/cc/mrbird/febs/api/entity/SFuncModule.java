@@ -47,6 +47,11 @@ public class SFuncModule implements Serializable {
     private Integer moduleStatus;
 
     /**
+     * 功能跳转类型
+     */
+    private Integer moduleType;
+
+    /**
      * 显示顺序
      */
     private Integer sOrder;

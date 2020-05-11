@@ -59,6 +59,40 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
     }
 
     @Override
+    public IPage<Map> findNewProductList(QueryRequest request) {
+
+        try {
+
+            Page<SProduct> page = new Page<>();
+
+            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+
+            return this.baseMapper.findNewProductDetail(page);
+
+        } catch (Exception e) {
+            log.error("检索新手商品异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public IPage<Map> findActivityProductList(String activityId, QueryRequest request) {
+
+        try {
+
+            Page<SProduct> page = new Page<>();
+
+            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+
+            return this.baseMapper.findActivityProductDetail(page, activityId);
+
+        } catch (Exception e) {
+            log.error("模糊查询全部商品异常", e);
+            return null;
+        }
+    }
+
+    @Override
     public IPage<Map> findProductListByBigTypeId(SProduct product, QueryRequest request) {
 
         try {
