@@ -382,7 +382,7 @@ public class SUserTaskController extends BaseController {
             // 调起微信支付
             if (needPayAmt.compareTo(BigDecimal.ZERO) > 0) {
                 JSONObject jsonObject = this.weChatPayUtil.weChatPay(String.valueOf(userTask.getId()),
-                        product.getTaskPrice().multiply(needPayAmt).toString(),
+                        needPayAmt.toString(),
                         user.getOpenId(),
                         request.getRemoteAddr(),
                         "1",
