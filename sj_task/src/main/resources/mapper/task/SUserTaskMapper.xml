@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.task.mapper.SUserTaskMapper">
+
+    <update id="updateTaskForUnLock">
+        UPDATE s_user_task
+           SET pay_status = 3,
+               update_time = now()
+         WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
+           AND pay_status = 0
+    </update>
+
+    <update id="updateTaskLineFailBatch">
+        UPDATE s_task_line
+           SET lock_task = lock_task - 1,
+               update_time = now()
+         WHERE id IN (SELECT task_line_id
+                        FROM s_user_task_line
+                       WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
+                         AND pay_status = 0
+                     )
+    </update>
+
+    <update id="updateUserTaskLineFailBatch">
+        UPDATE s_user_task_line
+           SET pay_status = 3,
+               update_time = now()
+         WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
+           AND pay_status = 0
+    </update>
+
+</mapper>

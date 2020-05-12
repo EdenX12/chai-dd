@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.task.mapper.STaskLineMapper">
+
+    <select id="queryTaskLineCount" resultType="java.lang.Integer">
+      SELECT count(*) taskLineCnt
+        FROM s_task_line
+       WHERE product_id=#{productId}
+         AND line_status = 0
+         AND settle_status = 0
+         AND lock_task + received_task &lt; total_task
+    </select>
+
+    <select id="queryMinLineOrder" resultType="java.lang.Integer">
+        SELECT min(line_order) minLineOrder
+          FROM s_task_line
+         WHERE product_id=#{productId}
+           AND line_status = 0
+           AND settle_status = 0
+           AND lock_task + received_task &lt; total_task
+    </select>
+
+    <select id="queryIdByLineOrder" resultType="java.lang.String">
+        SELECT id
+          FROM s_task_line
+         WHERE product_id=#{productId}
+           AND line_order=#{lineOrder}
+    </select>
+
+    <update id="updateUserTaskLineForSettle" parameterType="list">
+        UPDATE s_user_task_line
+           SET status=3
+         WHERE task_line_id in (
+        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
+            #{item}
+        </foreach>
+        )
+    </update>
+
+</mapper>

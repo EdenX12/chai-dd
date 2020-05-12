@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.task.mapper.SOrderMapper">
+
+    <select id="queryOrderPaySuccessList" resultType="sOrder">
+        SELECT  id,
+                user_id userId,
+                payment_type paymentType,
+                payment_state paymentState,
+                payment_time paymentTime,
+                pay_amount payAmount,
+                channel,
+                create_time createTime
+        FROM s_order
+        WHERE payment_state = 1
+          AND TIMESTAMPDIFF(MINUTE, payment_time, NOW()) >= 5
+    </select>
+</mapper>
