@@ -138,7 +138,7 @@ public class SUserController extends BaseController {
      */
     @PostMapping("/wxLogin")
     @Limit(key = "wxLogin", period = 60, count = 20, name = "登录接口", prefix = "limit")
-    public FebsResponse wxLogin(HttpServletRequest request, String wxcode,String nickName,String avatarUrl,String sex) throws Exception {
+    public FebsResponse wxLogin(HttpServletRequest request, String wxcode,String nickName,String avatarUrl,String sex,String encryptedData,String iv) throws Exception {
     	System.out.println(wxcode);
     	System.out.println(appId);
     	System.out.println(appSecret);
@@ -151,6 +151,12 @@ public class SUserController extends BaseController {
 		if(userInfo.containsKey("unionid")) {
 			//按理说应该都有 因为暂时没绑定 先临时加个判断
 		 unionid=userInfo.getString("unionid");
+		}else {
+			String info1=this.decryptWeChatRunInfo(sessionKey, encryptedData, iv);
+	    	JSONObject jo=JSONObject.parseObject(info1);
+	    	System.out.println(info1);
+	    	unionid=jo.getString("unionId");
+			
 		}
 		LambdaQueryWrapper<SUser> queryWrapper=new LambdaQueryWrapper<SUser>();
 		//先根据unionid判断用户是不是存在
