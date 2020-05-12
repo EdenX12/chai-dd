@@ -415,7 +415,7 @@ public class SProductController extends BaseController {
             returnMap.put("buyerReturnAmt", buyerReturnAmt);
 
             // 躺赢奖励
-            BigDecimal taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal taskReturnAmt = taskNumber==null||taskNumber.compareTo(BigDecimal.ZERO)==0?BigDecimal.ZERO:(totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP));
             returnMap.put("taskReturnAmt", taskReturnAmt);
 
             SUser user = FebsUtil.getCurrentUser();
