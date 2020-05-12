@@ -31,4 +31,9 @@ public interface ISUserService extends IService<SUser> {
 	 * @param parentIds List
 	 */
 	List<SUser> findByParentId(List parentIds);
+
+	/**
+	 * 批量更新userLevel
+	 */
+	void updateForUserLevel();
 }

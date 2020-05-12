@@ -42,4 +42,9 @@ public class SUserServiceImpl extends ServiceImpl<SUserMapper, SUser> implements
 
 		return this.baseMapper.selectList(queryWrapper);
 	}
+
+	@Override
+	public void updateForUserLevel() {
+		this.baseMapper.updateForUserLevel();
+	}
 }

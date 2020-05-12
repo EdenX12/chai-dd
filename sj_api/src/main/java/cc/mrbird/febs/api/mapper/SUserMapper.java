@@ -8,5 +8,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author MrBird
  */
 public interface SUserMapper extends BaseMapper<SUser> {
+    void updateForUserLevel();
 
 }

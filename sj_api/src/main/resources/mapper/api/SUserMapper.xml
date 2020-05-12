@@ -2,4 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserMapper">
 
+    <update id="updateForUserLevel">
+        update  s_user su,s_user_level u set su.user_level_type=u.level_type
+        where u.min_number <![CDATA[ <= ]]> su.reward_bean and u.max_number > su.reward_bean
+    </update>
+
 </mapper>
