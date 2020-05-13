@@ -42,6 +42,11 @@ public class SProductImg implements Serializable {
     private String shopId;
 
     /**
+     * 1-缩略图 2-主题图
+     */
+    private Integer imgType;
+
+    /**
      * 创建日期
      */
     private Date createTime;
