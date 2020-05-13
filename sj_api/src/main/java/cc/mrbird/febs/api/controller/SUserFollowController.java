@@ -78,11 +78,11 @@ public class SUserFollowController extends BaseController {
             userBeanLog.setChangeTime(new Date());
             userBeanLog.setRelationId(userFollow.getId());
             userBeanLog.setRemark("关联用户关注ID");
-            userBeanLog.setOldAmount(user.getCanuseBean());
+            userBeanLog.setOldAmount(user.getRewardBean());
             this.userBeanLogService.save(userBeanLog);
 
             // 每关注一个任务（任务广场，转让中心），（+拆豆1颗）
-            user.setCanuseBean(user.getCanuseBean() + followBeanCnt);
+            user.setRewardBean(user.getRewardBean() + followBeanCnt);
             this.userService.updateById(user);
 
         } catch (Exception e) {
@@ -128,11 +128,11 @@ public class SUserFollowController extends BaseController {
             userBeanLog.setChangeTime(new Date());
             userBeanLog.setRelationId(userFollow.getId());
             userBeanLog.setRemark("关联用户关注ID");
-            userBeanLog.setOldAmount(user.getCanuseBean());
+            userBeanLog.setOldAmount(user.getRewardBean());
             this.userBeanLogService.save(userBeanLog);
 
             // 每取消一个任务（任务广场，转让中心），（-1颗）
-            user.setCanuseBean(user.getCanuseBean() - followBeanCnt);
+            user.setRewardBean(user.getRewardBean() - followBeanCnt);
             this.userService.updateById(user);
 
         } catch (Exception e) {

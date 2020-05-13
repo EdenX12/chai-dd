@@ -79,11 +79,11 @@ public class SUserShareController extends BaseController {
                 userBeanLog.setChangeTime(new Date());
                 userBeanLog.setRelationId(userShare.getId());
                 userBeanLog.setRemark("转发分享商品ID");
-                userBeanLog.setOldAmount(user.getCanuseBean());
+                userBeanLog.setOldAmount(user.getRewardBean());
                 this.userBeanLogService.save(userBeanLog);
 
                 // 转发分享商品详情
-                user.setCanuseBean(user.getCanuseBean() + shareBeanCnt);
+                user.setRewardBean(user.getRewardBean() + shareBeanCnt);
                 this.userService.updateById(user);
             }
 

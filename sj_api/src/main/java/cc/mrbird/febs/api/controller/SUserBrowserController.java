@@ -94,11 +94,11 @@ public class SUserBrowserController extends BaseController {
                 userBeanLog.setChangeTime(new Date());
                 userBeanLog.setRelationId(userBrowser.getId());
                 userBeanLog.setRemark("点击阅读转发内容");
-                userBeanLog.setOldAmount(user.getCanuseBean());
+                userBeanLog.setOldAmount(user.getRewardBean());
                 this.userBeanLogService.save(userBeanLog);
 
                 // 点击阅读转发内容
-                user.setCanuseBean(user.getCanuseBean() + browserBeanCnt);
+                user.setRewardBean(user.getRewardBean() + browserBeanCnt);
                 this.userService.updateById(user);
 
                 // 关系追加 (预备队关系)

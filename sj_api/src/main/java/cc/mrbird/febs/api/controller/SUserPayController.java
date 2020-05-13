@@ -239,7 +239,7 @@ public class SUserPayController extends BaseController {
                     userBeanLog.setChangeTime(new Date());
                     userBeanLog.setRelationId(userTask.getId());
                     userBeanLog.setRemark("领取任务ID");
-                    userBeanLog.setOldAmount(user.getCanuseBean());
+                    userBeanLog.setOldAmount(user.getRewardBean());
                     this.userBeanLogService.save(userBeanLog);
 
                     user.setRewardBean(user.getRewardBean() + orderBeanCnt);
@@ -375,7 +375,7 @@ public class SUserPayController extends BaseController {
                         userBeanLog.setChangeTime(new Date());
                         userBeanLog.setRelationId(orderDetailPaySuccess.getId());
                         userBeanLog.setRemark("购买商品订单明细ID");
-                        userBeanLog.setOldAmount(user.getCanuseBean());
+                        userBeanLog.setOldAmount(user.getRewardBean());
                         this.userBeanLogService.save(userBeanLog);
 
                         user.setRewardBean(user.getRewardBean() + productBeanCnt);
