@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +18,9 @@ public class SUserShopCarServiceImpl extends ServiceImpl<SUserShopCarMapper, SUs
 
     @Override
     public SUserShopCar addUserShopCar(SUserShopCar userShopCar) {
+
+        userShopCar.setCreateTime(new Date());
+        userShopCar.setUpdateTime(new Date());
 
         this.baseMapper.insert(userShopCar);
 
