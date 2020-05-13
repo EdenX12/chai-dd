@@ -38,7 +38,23 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
             if (pathMatcher.match(u, httpServletRequest.getRequestURI()))
                 match = true;
         }
-        if (match) return true;
+        if (match) {
+        	//如果是免认证的 登录还让他登录 但是用户信息要待着
+        	HttpServletRequest req = (HttpServletRequest) request;
+            String token = req.getHeader(TOKEN);
+            if(token==null) {
+            	return true;
+            }else {
+                JWTToken jwtToken = new JWTToken(FebsUtil.decryptToken(token));
+                try {
+                    getSubject(request, response).login(jwtToken);
+                    return true;
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    return true;
+                }
+            }
+        }
         if (isLoginAttempt(request, response)) {
             return executeLogin(request, response);
         }
