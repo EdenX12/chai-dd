@@ -666,8 +666,7 @@ public class SOrderController extends BaseController {
             SOrderDetail orderDetail = new SOrderDetail();
             orderDetail = this.orderDetailService.getById(orderDetailId);
             orderDetail.setUserId(user.getId());
-            // 确认收货
-            orderDetail.setOrderStatus(3);
+           
 
             if (orderDetail.getPaymentState() != 1 && orderDetail.getPaymentState() != 9) {
                 message = "此订单还没有完成支付！";
@@ -682,7 +681,8 @@ public class SOrderController extends BaseController {
                 response.message(message);
                 return response;
             }
-
+            // 确认收货
+            orderDetail.setOrderStatus(3);
             this.orderDetailService.updateById(orderDetail);
 
             // 任务线状态修改为 结算状态  【2： 已分润】 用户任务线状态 修改为 【5 佣金已入账】
