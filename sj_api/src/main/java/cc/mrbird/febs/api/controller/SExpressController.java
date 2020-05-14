@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 @RestController
 @RequestMapping("/api/express")
-public class ExpressController {
+public class SExpressController {
 
     @Autowired
     private ISOrderDetailService orderDetailService;
@@ -47,11 +47,11 @@ public class ExpressController {
             String respData = HttpUtil.sendPost("http://poll.kuaidi100.com/poll/query.do",
                     "param="+JSONObject.toJSONString(param)+"&sign="+sign+"&customer="+customer);
             if(StringUtils.isNotBlank(respData)){
-                response.data((JSONObject.parseObject(respData)).get("data"));
+                //1： 已发货   0 7：运输中  5：派件中  3：已签收
+                response.data((JSONObject.parseObject(respData)));
                 response.put("code", 0);
                 return response;
             }else{
-                response.data((JSONObject.parseObject(respData)).get("data"));
                 response.put("code", 1);
                 response.message("没有查询到物流信息");
                 return response;
