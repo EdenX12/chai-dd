@@ -713,7 +713,9 @@ public class SOrderController extends BaseController {
 
                 }
             }
+            if(updateTaskLineList!=null&&updateTaskLineList.size()>0)
             this.taskLineService.updateBatchById(updateTaskLineList);
+            if(updateUserTaskLineList!=null&&updateUserTaskLineList.size()>0)
             this.userTaskLineService.updateBatchById(updateUserTaskLineList);
 
             // 冻结金额 -> 余额
@@ -777,7 +779,9 @@ public class SOrderController extends BaseController {
                 userBonusLogOne.setUpdateTime(new Date());
                 updateUserBonusLogList.add(userBonusLogOne);
             }
+            if(updateUserBonusLogList!=null&&updateUserBonusLogList.size()>0)
             this.userBonusLogService.updateBatchById(updateUserBonusLogList);
+            if(saveUserAmountLogList!=null&&saveUserAmountLogList.size()>0)
             this.userAmountLogService.saveBatch(saveUserAmountLogList);
 
             SUserMsg userMsg = new SUserMsg();
