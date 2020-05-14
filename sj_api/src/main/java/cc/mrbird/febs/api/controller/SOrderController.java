@@ -669,7 +669,7 @@ public class SOrderController extends BaseController {
             // 确认收货
             orderDetail.setOrderStatus(3);
 
-            if (orderDetail.getPaymentState() != 1) {
+            if (orderDetail.getPaymentState() != 1 && orderDetail.getPaymentState() != 9) {
                 message = "此订单还没有完成支付！";
                 response.put("code", 1);
                 response.message(message);
