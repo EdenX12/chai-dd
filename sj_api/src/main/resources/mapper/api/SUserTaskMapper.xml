@@ -27,7 +27,7 @@
           FROM s_user_follow
          WHERE status = 1
            AND follow_type = 0
-           AND follow.user_id = #{userId}
+           AND user_id = #{userId}
          ORDER BY create_time desc
     </select>
 
