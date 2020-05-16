@@ -49,7 +49,7 @@ public class SUserBankController {
      */
     @PostMapping("/bindBankCard")
     @Limit(key = "bindBankCard", period = 60, count = 20, name = "绑定银行卡接口", prefix = "limit")
-    public FebsResponse getUserAddressList(@RequestBody SUserBank sUserBank) {
+    public FebsResponse bindBankCard(@RequestBody SUserBank sUserBank) {
 
         FebsResponse response = new FebsResponse();
 
@@ -94,7 +94,7 @@ public class SUserBankController {
 
     @PostMapping("/myBankCarList")
     @Limit(key = "myBankCarList", period = 60, count = 20, name = "检索我的银行卡列表接口", prefix = "limit")
-    public FebsResponse getUserAddressList() {
+    public FebsResponse myBankCarList() {
         FebsResponse response = new FebsResponse();
         SUser user = FebsUtil.getCurrentUser();
         List<SUserBank> userBanks = userBankService.findUserBankList(user.getId());
