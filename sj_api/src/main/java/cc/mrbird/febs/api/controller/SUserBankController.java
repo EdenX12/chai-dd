@@ -2,20 +2,17 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.SBank;
 import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.entity.SUserAddress;
 import cc.mrbird.febs.api.entity.SUserBank;
 import cc.mrbird.febs.api.service.ISBankService;
 import cc.mrbird.febs.api.service.ISUserBankService;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.domain.FebsResponse;
-import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author pq
@@ -31,7 +28,7 @@ public class SUserBankController {
     private ISUserBankService userBankService;
 
     /**
-     *   银行卡列表
+     *   银行列表
      */
     @GetMapping("/getBankList")
     @Limit(key = "getBankList", period = 60, count = 20, name = "银行卡列表接口", prefix = "limit")
