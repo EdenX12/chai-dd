@@ -21,7 +21,7 @@ public class SUserBank implements Serializable {
      * 主键ID
      */
     @TableId(value = "id", type= IdType.UUID)
-    private Integer id;
+    private String id;
     private String userId;//用户id
     private Integer bankId;//银行id
     private String realName;//真实姓名
