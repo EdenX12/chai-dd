@@ -4,12 +4,12 @@
     <select id="getCancleList" resultType="java.lang.String">
         SELECT id   from  s_order_detail od where od.order_status = 0
         and  od.create_time  is not null
-        and  86400-TIMESTAMPDIFF(SECOND ,NOW(), od.create_time)<![CDATA[ <= ]]>0
+        and  86400-TIMESTAMPDIFF(SECOND , od.create_time,NOW())<![CDATA[ <= ]]>0
     </select>
     <select id="getShippingList" resultType="java.lang.String">
         SELECT id   from  s_order_detail od where od.order_status = 2
         and od.shipping_time is not null
-        and  604800- TIMESTAMPDIFF(SECOND ,NOW(), od.shipping_time)<![CDATA[ <= ]]>0
+        and  604800- TIMESTAMPDIFF(SECOND , od.shipping_time,NOW())<![CDATA[ <= ]]>0
     </select>
 
 

@@ -83,10 +83,10 @@
             od.coupon_amount couponAmount,                      <!-- 优惠金额 -->
             case
             when (od.order_status = 0 and od.create_time is not null )
-            then 86400-TIMESTAMPDIFF(SECOND ,NOW(), od.create_time)  else null end  as cancleRemain,
+            then 86400-TIMESTAMPDIFF(SECOND , od.create_time,NOW())  else null end  as cancleRemain,
             case
             when (od.order_status = 2 and od.shipping_time is not null )
-            then 604800- TIMESTAMPDIFF(SECOND ,NOW(), od.shipping_time)  else null end  as shipingRemain
+            then 604800- TIMESTAMPDIFF(SECOND , od.shipping_time,NOW())  else null end  as shipingRemain
         FROM
             s_order_detail od
         LEFT JOIN s_shop ss ON ss.id = od.shop_id
