@@ -48,4 +48,14 @@ public class SOrderDetailServiceImpl extends ServiceImpl<SOrderDetailMapper, SOr
         return this.baseMapper.selectList(queryWrapper);
     }
 
+    @Override
+    public List<String> getCancleList() {
+        return this.baseMapper.getCancleList();
+    }
+
+    @Override
+    public List<String> getShippingList() {
+        return this.baseMapper.getShippingList();
+    }
+
 }

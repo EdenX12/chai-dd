@@ -12,4 +12,8 @@ import java.util.Map;
  */
 public interface SOrderDetailMapper extends BaseMapper<SOrderDetail> {
 
+    List<String>  getCancleList();
+
+    List<String>  getShippingList();
+
 }

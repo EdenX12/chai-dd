@@ -15,13 +15,7 @@
         when od.order_status = 2            then '待收货'
         when od.order_status = 4            then '售后中'
         when od.order_status in(3, 5, -1, 6)   then '已完成'
-        end as orderStatusName,
-        case
-        when (od.order_status = 0 and od.create_time <![CDATA[ <> ]]> null )
-        then 86400-TIMESTAMPDIFF(SECOND ,NOW(), od.create_time)  else null end  as cancleRemain,
-        case
-        when (od.order_status = 2 and od.shipping_time <![CDATA[ <> ]]> null )
-        then 604800- TIMESTAMPDIFF(SECOND ,NOW(), od.shipping_time)  else null end  as shipingRemain
+        end as orderStatusName
         FROM
         s_order_detail od
         LEFT JOIN s_shop ss on ss.id = od.shop_id
@@ -105,5 +99,17 @@
         FROM s_order
         WHERE payment_state = 1
           AND TIMESTAMPDIFF(MINUTE, payment_time, NOW()) >= 5
+    </select>
+
+    <select id="getReaminTime" resultType="java.util.Map">
+        SELECT
+        case
+        when (od.order_status = 0 and od.create_time <![CDATA[ <> ]]> null )
+        then 86400-TIMESTAMPDIFF(SECOND ,NOW(), od.create_time)  else null end  as cancleRemain,
+        case
+        when (od.order_status = 2 and od.shipping_time <![CDATA[ <> ]]> null )
+        then 604800- TIMESTAMPDIFF(SECOND ,NOW(), od.shipping_time)  else null end  as shipingRemain
+        FROM s_order_detail od
+        where od.id=#{orderDetailId}
     </select>
 </mapper>

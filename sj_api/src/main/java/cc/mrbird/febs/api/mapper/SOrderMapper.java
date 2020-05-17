@@ -41,4 +41,11 @@ public interface SOrderMapper extends BaseMapper<SOrder> {
      * @return
      */
     List<SOrder> queryOrderPaySuccessList();
+
+    /**
+     * 剩余自动收货和取消订单得时间
+     * @param orderDetailId
+     * @return
+     */
+    Map<String, Object> getReaminTime(String orderDetailId);
 }

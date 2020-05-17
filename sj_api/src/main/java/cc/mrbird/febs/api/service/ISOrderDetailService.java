@@ -24,4 +24,16 @@ public interface ISOrderDetailService extends IService<SOrderDetail> {
      * @param orderDetail SOrderDetail
      */
     List<SOrderDetail> findOrderDetailList(SOrderDetail orderDetail);
+
+    /**
+     * 需要取消得单子
+     * @return
+     */
+    List<String>  getCancleList();
+
+    /**
+     * 自动收货得单子
+     * @return
+     */
+    List<String>  getShippingList();
 }

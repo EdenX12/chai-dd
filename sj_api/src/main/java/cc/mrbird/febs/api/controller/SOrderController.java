@@ -667,8 +667,7 @@ public class SOrderController extends BaseController {
             SOrderDetail orderDetail = new SOrderDetail();
             orderDetail = this.orderDetailService.getById(orderDetailId);
             orderDetail.setUserId(user.getId());
-           
-
+            finishOrder(orderDetail);
             if (orderDetail.getPaymentState() != 1 && orderDetail.getPaymentState() != 9) {
                 message = "此订单还没有完成支付！";
                 response.put("code", 1);
@@ -682,118 +681,7 @@ public class SOrderController extends BaseController {
                 response.message(message);
                 return response;
             }
-            // 确认收货
-            orderDetail.setOrderStatus(3);
-            this.orderDetailService.updateById(orderDetail);
 
-            // 任务线状态修改为 结算状态  【2： 已分润】 用户任务线状态 修改为 【5 佣金已入账】
-            List<STaskLine> updateTaskLineList = Lists.newArrayList();
-            List<SUserTaskLine> updateUserTaskLineList = Lists.newArrayList();
-            List<SOrderProduct> orderProductList = this.orderProductService.findOrderProductList(orderDetail.getId());
-            for (SOrderProduct orderProduct : orderProductList) {
-
-                STaskLine taskLine = new STaskLine();
-                taskLine.setOrderProductId(orderProduct.getId());
-                List<STaskLine> taskLineList = this.taskLineService.findTaskLineList(taskLine);
-
-                for (STaskLine taskLineOne : taskLineList) {
-                    taskLineOne.setSettleStatus(2);
-                    taskLineOne.setUpdateTime(new Date());
-                    updateTaskLineList.add(taskLineOne);
-
-                    // 用户任务线状态 修改为 【5 佣金已入账】
-                    SUserTaskLine userTaskLine = new SUserTaskLine();
-                    userTaskLine.setTaskLineId(taskLineOne.getId());
-                    List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
-
-                    for (SUserTaskLine userTaskLineOne : userTaskLineList) {
-                        userTaskLineOne.setStatus(5);
-                        userTaskLineOne.setUpdateTime(new Date());
-                        updateUserTaskLineList.add(userTaskLineOne);
-                    }
-
-                }
-            }
-            if(updateTaskLineList!=null&&updateTaskLineList.size()>0)
-            this.taskLineService.updateBatchById(updateTaskLineList);
-            if(updateUserTaskLineList!=null&&updateUserTaskLineList.size()>0)
-            this.userTaskLineService.updateBatchById(updateUserTaskLineList);
-
-            // 冻结金额 -> 余额
-            List<SUserBonusLog> updateUserBonusLogList = Lists.newArrayList();
-            List<SUserAmountLog> saveUserAmountLogList = Lists.newArrayList();
-
-            String buyUserName = "";
-            BigDecimal buyBonusAmt = new BigDecimal(0);
-            BigDecimal taskBonusAmt = new BigDecimal(0);
-
-            SUserBonusLog userBonusLog = new SUserBonusLog();
-            userBonusLog.setOrderDetailId(orderDetail.getId());
-            List<SUserBonusLog> userBonusLogList = this.userBonusLogService.findUserBonusList(userBonusLog);
-
-            for (SUserBonusLog userBonusLogOne : userBonusLogList) {
-
-                SUser userOne = this.userService.getById(userBonusLogOne.getUserId());
-
-                // 金额流水插入
-                SUserAmountLog userAmountLog = new SUserAmountLog();
-                userAmountLog.setUserId(userBonusLogOne.getUserId());
-
-                // 类型 1-买家独赢;2-任务躺赢;3-横向躺赢;4-纵向躺赢;5-平台返回任务金;
-                // 变动类型 3 买家独赢 31 纵向躺赢 4 任务躺赢 41 横向躺赢 9 任务解冻金额
-                if (userBonusLogOne.getBonusType() == 1) {
-                    userAmountLog.setChangeType(3);
-
-                    // 买家
-                    buyUserName = userOne.getNickName();
-                    buyBonusAmt = buyBonusAmt.add(userBonusLogOne.getBonusAmount());
-
-                } else if (userBonusLogOne.getBonusType() == 2) {
-                    userAmountLog.setChangeType(4);
-                    taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
-                } else if (userBonusLogOne.getBonusType() == 3) {
-                    userAmountLog.setChangeType(41);
-                    taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
-                } else if (userBonusLogOne.getBonusType() == 4) {
-                    userAmountLog.setChangeType(31);
-                    taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
-                } else if (userBonusLogOne.getBonusType() == 5) {
-                    userAmountLog.setChangeType(9);
-                }
-
-                userAmountLog.setChangeAmount(userBonusLogOne.getBonusAmount());
-                userAmountLog.setChangeTime(new Date());
-                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
-                userAmountLog.setRemark("关联购买订单ID");
-                userAmountLog.setOldAmount(userOne.getTotalAmount());
-
-                saveUserAmountLogList.add(userAmountLog);
-
-                // 冻结-
-                userOne.setLockAmount(userOne.getLockAmount().subtract(userBonusLogOne.getBonusAmount()));
-                // 余额+
-                userOne.setTotalAmount(userOne.getTotalAmount().add(userBonusLogOne.getBonusAmount()));
-                this.userService.updateById(userOne);
-
-                // 结算完成
-                userBonusLogOne.setStatus(1);
-                userBonusLogOne.setUpdateTime(new Date());
-                updateUserBonusLogList.add(userBonusLogOne);
-            }
-            if(updateUserBonusLogList!=null&&updateUserBonusLogList.size()>0)
-            this.userBonusLogService.updateBatchById(updateUserBonusLogList);
-            if(saveUserAmountLogList!=null&&saveUserAmountLogList.size()>0)
-            this.userAmountLogService.saveBatch(saveUserAmountLogList);
-
-            SUserMsg userMsg = new SUserMsg();
-            userMsg.setUserId(null);
-            userMsg.setMsgTime(new Date());
-            userMsg.setMsgType(0);
-            userMsg.setStatus(0);
-            userMsg.setMsgTitle("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
-            userMsg.setMsgInfo("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
-
-            userMsgService.save(userMsg);
 
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";
@@ -803,6 +691,121 @@ public class SOrderController extends BaseController {
         }
 
         return response;
+    }
+
+    private void finishOrder(SOrderDetail orderDetail){
+        // 确认收货
+        orderDetail.setOrderStatus(3);
+        this.orderDetailService.updateById(orderDetail);
+
+        // 任务线状态修改为 结算状态  【2： 已分润】 用户任务线状态 修改为 【5 佣金已入账】
+        List<STaskLine> updateTaskLineList = Lists.newArrayList();
+        List<SUserTaskLine> updateUserTaskLineList = Lists.newArrayList();
+        List<SOrderProduct> orderProductList = this.orderProductService.findOrderProductList(orderDetail.getId());
+        for (SOrderProduct orderProduct : orderProductList) {
+
+            STaskLine taskLine = new STaskLine();
+            taskLine.setOrderProductId(orderProduct.getId());
+            List<STaskLine> taskLineList = this.taskLineService.findTaskLineList(taskLine);
+
+            for (STaskLine taskLineOne : taskLineList) {
+                taskLineOne.setSettleStatus(2);
+                taskLineOne.setUpdateTime(new Date());
+                updateTaskLineList.add(taskLineOne);
+
+                // 用户任务线状态 修改为 【5 佣金已入账】
+                SUserTaskLine userTaskLine = new SUserTaskLine();
+                userTaskLine.setTaskLineId(taskLineOne.getId());
+                List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
+
+                for (SUserTaskLine userTaskLineOne : userTaskLineList) {
+                    userTaskLineOne.setStatus(5);
+                    userTaskLineOne.setUpdateTime(new Date());
+                    updateUserTaskLineList.add(userTaskLineOne);
+                }
+
+            }
+        }
+        if(updateTaskLineList!=null&&updateTaskLineList.size()>0)
+            this.taskLineService.updateBatchById(updateTaskLineList);
+        if(updateUserTaskLineList!=null&&updateUserTaskLineList.size()>0)
+            this.userTaskLineService.updateBatchById(updateUserTaskLineList);
+
+        // 冻结金额 -> 余额
+        List<SUserBonusLog> updateUserBonusLogList = Lists.newArrayList();
+        List<SUserAmountLog> saveUserAmountLogList = Lists.newArrayList();
+
+        String buyUserName = "";
+        BigDecimal buyBonusAmt = new BigDecimal(0);
+        BigDecimal taskBonusAmt = new BigDecimal(0);
+
+        SUserBonusLog userBonusLog = new SUserBonusLog();
+        userBonusLog.setOrderDetailId(orderDetail.getId());
+        List<SUserBonusLog> userBonusLogList = this.userBonusLogService.findUserBonusList(userBonusLog);
+
+        for (SUserBonusLog userBonusLogOne : userBonusLogList) {
+
+            SUser userOne = this.userService.getById(userBonusLogOne.getUserId());
+
+            // 金额流水插入
+            SUserAmountLog userAmountLog = new SUserAmountLog();
+            userAmountLog.setUserId(userBonusLogOne.getUserId());
+
+            // 类型 1-买家独赢;2-任务躺赢;3-横向躺赢;4-纵向躺赢;5-平台返回任务金;
+            // 变动类型 3 买家独赢 31 纵向躺赢 4 任务躺赢 41 横向躺赢 9 任务解冻金额
+            if (userBonusLogOne.getBonusType() == 1) {
+                userAmountLog.setChangeType(3);
+
+                // 买家
+                buyUserName = userOne.getNickName();
+                buyBonusAmt = buyBonusAmt.add(userBonusLogOne.getBonusAmount());
+
+            } else if (userBonusLogOne.getBonusType() == 2) {
+                userAmountLog.setChangeType(4);
+                taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
+            } else if (userBonusLogOne.getBonusType() == 3) {
+                userAmountLog.setChangeType(41);
+                taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
+            } else if (userBonusLogOne.getBonusType() == 4) {
+                userAmountLog.setChangeType(31);
+                taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
+            } else if (userBonusLogOne.getBonusType() == 5) {
+                userAmountLog.setChangeType(9);
+            }
+
+            userAmountLog.setChangeAmount(userBonusLogOne.getBonusAmount());
+            userAmountLog.setChangeTime(new Date());
+            userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
+            userAmountLog.setRemark("关联购买订单ID");
+            userAmountLog.setOldAmount(userOne.getTotalAmount());
+
+            saveUserAmountLogList.add(userAmountLog);
+
+            // 冻结-
+            userOne.setLockAmount(userOne.getLockAmount().subtract(userBonusLogOne.getBonusAmount()));
+            // 余额+
+            userOne.setTotalAmount(userOne.getTotalAmount().add(userBonusLogOne.getBonusAmount()));
+            this.userService.updateById(userOne);
+
+            // 结算完成
+            userBonusLogOne.setStatus(1);
+            userBonusLogOne.setUpdateTime(new Date());
+            updateUserBonusLogList.add(userBonusLogOne);
+        }
+        if(updateUserBonusLogList!=null&&updateUserBonusLogList.size()>0)
+            this.userBonusLogService.updateBatchById(updateUserBonusLogList);
+        if(saveUserAmountLogList!=null&&saveUserAmountLogList.size()>0)
+            this.userAmountLogService.saveBatch(saveUserAmountLogList);
+
+        SUserMsg userMsg = new SUserMsg();
+        userMsg.setUserId(null);
+        userMsg.setMsgTime(new Date());
+        userMsg.setMsgType(0);
+        userMsg.setStatus(0);
+        userMsg.setMsgTitle("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
+        userMsg.setMsgInfo("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
+
+        userMsgService.save(userMsg);
     }
 
     /**
@@ -1112,5 +1115,34 @@ public class SOrderController extends BaseController {
         orderDetailService.updateById(orderDetail);
         response.put("code", 0);
         return response;
+    }
+
+    /**
+     * 自动取消订单定时任务
+     */
+    @Scheduled(cron="0 */10 * * * ?")
+    public void cancleOrderTask(){
+        List<String> orderDetailIds =  orderDetailService.getCancleList();
+        if(orderDetailIds != null && orderDetailIds.size() > 0 ){
+            for(String id :  orderDetailIds){
+                SOrderDetail orderDetail = orderDetailService.getById(id);
+                orderDetail.setOrderStatus(-1);
+                orderDetailService.updateById(orderDetail);
+            }
+        }
+    }
+
+    /**
+     * 自动收货定时任务
+     */
+    @Scheduled(cron="2 */10 * * * ?")
+    public void shippingOrderTask(){
+        List<String> orderDetailIds =  orderDetailService.getShippingList();
+        if(orderDetailIds != null && orderDetailIds.size() > 0 ){
+            for(String id :  orderDetailIds){
+                SOrderDetail orderDetail = orderDetailService.getById(id);
+                this.finishOrder(orderDetail);
+            }
+        }
     }
 }

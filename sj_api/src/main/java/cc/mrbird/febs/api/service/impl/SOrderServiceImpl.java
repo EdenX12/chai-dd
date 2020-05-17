@@ -83,8 +83,11 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
 
         Map<String, Object> result = this.baseMapper.queryOrderDetail(orderDetailId);
 
-        if (result != null) {
 
+        if (result != null) {
+            Map<String, Object> reaminTimeMap = this.baseMapper.getReaminTime(orderDetailId);
+            result.put("cancleRemain",reaminTimeMap.get("cancleRemain"));
+            result.put("shipingRemain",reaminTimeMap.get("shipingRemain"));
             List<Map> productList = this.baseMapper.queryProductDetailId(orderDetailId);
             result.put("productList", productList);
 
@@ -128,6 +131,7 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
 
         return this.baseMapper.queryOrderPaySuccessList();
     }
+
 
     @Override
     public SOrder updateOrder(SOrder order) {
