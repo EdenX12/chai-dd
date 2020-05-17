@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.service.*;
+import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
@@ -44,6 +45,7 @@ public class SUserShareController extends BaseController {
     @Log("转发分享商品")
     @Transactional
     @PostMapping("/addShare")
+    @Limit(key = "addShare", period = 60, count = 2000, name = "转发分享商品接口", prefix = "limit")
     public FebsResponse addShare(String productId, String parentId, String shareId) {
 
         FebsResponse response = new FebsResponse();

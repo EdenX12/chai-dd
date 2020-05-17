@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.SOrderDetail;
 import cc.mrbird.febs.api.service.ISOrderDetailService;
+import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.utils.HttpUtil;
 import cc.mrbird.febs.common.utils.MD5;
@@ -22,6 +23,7 @@ public class SExpressController {
     private ISOrderDetailService orderDetailService;
 
     @GetMapping("/queryExpressInfo")
+    @Limit(key = "getAreaList", period = 60, count = 2000, name = "检索所有地区列表接口", prefix = "limit")
     public FebsResponse queryExpressInfo(String orderDetailId) {
         FebsResponse response = new FebsResponse();
 

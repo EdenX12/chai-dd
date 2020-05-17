@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.service.*;
+import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
@@ -90,6 +91,7 @@ public class SUserPayController extends BaseController {
     @Log("新增用户支付")
     @Transactional
     @PostMapping("/addUserPay")
+    @Limit(key = "addUserPay", period = 60, count = 2000, name = "新增用户支付接口", prefix = "limit")
     public FebsResponse addUserPay(@Valid SUserPay userPay) {
 
         FebsResponse response = new FebsResponse();

@@ -137,7 +137,7 @@ public class SUserController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/wxLogin")
-    @Limit(key = "wxLogin", period = 60, count = 20, name = "登录接口", prefix = "limit")
+    @Limit(key = "wxLogin", period = 60, count = 2000, name = "登录接口", prefix = "limit")
     public FebsResponse wxLogin(HttpServletRequest request, String wxcode,String nickName,String avatarUrl,String sex,String encryptedData,String iv) throws Exception {
     	System.out.println(wxcode);
     	System.out.println(appId);
@@ -210,6 +210,7 @@ public class SUserController extends BaseController {
      */
     @RequestMapping("/updateTelePhone")
     @ResponseBody
+    @Limit(key = "updateTelePhone", period = 60, count = 2000, name = " 解析手机号码接口", prefix = "limit")
     public FebsResponse updateTelePhone(HttpServletRequest request,String unionid,String encryptedData, String iv,String sessionKey )throws Exception{
     	String info=this.decryptWeChatRunInfo(sessionKey, encryptedData, iv);
     	JSONObject jo=JSONObject.parseObject(info);
@@ -268,7 +269,7 @@ public class SUserController extends BaseController {
      * @throws Exception 
      */
 	@PostMapping("/login")
-    @Limit(key = "login", period = 60, count = 20, name = "登录接口", prefix = "limit")
+    @Limit(key = "login", period = 60, count = 2000, name = "登录接口", prefix = "limit")
     public FebsResponse login(HttpServletRequest request, String code) throws Exception {
 
         FebsResponse response = new FebsResponse();
@@ -347,7 +348,7 @@ public class SUserController extends BaseController {
     }
 
     @PostMapping("/getJsInfo")
-    @Limit(key = "getJsInfo", period = 60, count = 20, name = "获取jssdk加密信息", prefix = "limit")
+    @Limit(key = "getJsInfo", period = 60, count = 2000, name = "获取jssdk加密信息", prefix = "limit")
 	public FebsResponse getJsInfo(String url) throws Exception {
 
 		 // 先url解码
@@ -372,7 +373,7 @@ public class SUserController extends BaseController {
      * @return SUser
      */
     @PostMapping("/getUser")
-    @Limit(key = "getUser", period = 60, count = 20, name = "检索个人信息接口", prefix = "limit")
+    @Limit(key = "getUser", period = 60, count = 2000, name = "检索个人信息接口", prefix = "limit")
     public FebsResponse getUser() {
 
         FebsResponse response = new FebsResponse();

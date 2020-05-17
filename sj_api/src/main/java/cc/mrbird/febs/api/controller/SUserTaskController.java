@@ -95,6 +95,7 @@ public class SUserTaskController extends BaseController {
      */
     @Log("确认拆单")
     @PostMapping("/confirmUserTask")
+    @Limit(key = "confirmUserTask", period = 60, count = 2000, name = "确认拆单数量", prefix = "limit")
     public FebsResponse confirmUserTask(HttpServletRequest request,
                                         @NotNull(message="商品ID不可空") String productId,
                                         @NotNull(message="商品ID不可空")Integer taskNumber,
@@ -199,6 +200,7 @@ public class SUserTaskController extends BaseController {
     @Log("确认支付领取任务")
     @Transactional
     @PostMapping("/payUserTask")
+    @Limit(key = "payUserTask", period = 60, count = 2000, name = "确认支付领取任务接口", prefix = "limit")
     public FebsResponse payUserTask(HttpServletRequest request,
                                     String productId,
                                     Integer taskNumber,
@@ -412,6 +414,7 @@ public class SUserTaskController extends BaseController {
      */
     @Log("支付领取任务成功页面")
     @PostMapping("/payUserTaskSuccess")
+    @Limit(key = "payUserTaskSuccess", period = 60, count = 2000, name = "支付领取任务成功页面接口", prefix = "limit")
     public FebsResponse payUserTaskSuccess(HttpServletRequest request,
                                     String userTaskId) {
 
@@ -488,7 +491,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getUserTaskingList")
-    @Limit(key = "getUserTaskingList", period = 60, count = 20, name = "检索我的任务【进行中】接口", prefix = "limit")
+    @Limit(key = "getUserTaskingList", period = 60, count = 2000, name = "检索我的任务【进行中】接口", prefix = "limit")
     public FebsResponse getUserTaskingList(QueryRequest queryRequest) {
 
         FebsResponse response = new FebsResponse();
@@ -524,7 +527,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getUserTaskFollowList")
-    @Limit(key = "getUserTaskFollowList", period = 60, count = 20, name = "检索我的任务【已关注】接口", prefix = "limit")
+    @Limit(key = "getUserTaskFollowList", period = 60, count = 2000, name = "检索我的任务【已关注】接口", prefix = "limit")
     public FebsResponse getUserTaskFollowList(QueryRequest queryRequest) {
 
         FebsResponse response = new FebsResponse();
@@ -560,7 +563,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getUserTaskEndList")
-    @Limit(key = "getUserTaskEndList", period = 60, count = 20, name = "检索我的任务【已完成】接口", prefix = "limit")
+    @Limit(key = "getUserTaskEndList", period = 60, count = 2000, name = "检索我的任务【已完成】接口", prefix = "limit")
     public FebsResponse getUserTaskEndList(QueryRequest queryRequest) {
 
         FebsResponse response = new FebsResponse();
@@ -596,7 +599,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getTaskSettlementList")
-    @Limit(key = "getTaskSettlementList", period = 60, count = 20, name = "检索我的任务【结算中】接口", prefix = "limit")
+    @Limit(key = "getTaskSettlementList", period = 60, count = 2000, name = "检索我的任务【结算中】接口", prefix = "limit")
     public FebsResponse getTaskSettlementList(QueryRequest queryRequest) {
 
         FebsResponse response = new FebsResponse();
@@ -632,7 +635,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getUserTaskOutingList")
-    @Limit(key = "getUserTaskOutingList", period = 60, count = 20, name = "检索我的任务【转出中】接口", prefix = "limit")
+    @Limit(key = "getUserTaskOutingList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
     public FebsResponse getUserTaskOutingList(QueryRequest queryRequest, SUserTask userTask) {
 
         FebsResponse response = new FebsResponse();
@@ -653,7 +656,7 @@ public class SUserTaskController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getUserTaskOfferingList")
-    @Limit(key = "getUserTaskOfferingList", period = 60, count = 20, name = "检索我的任务【收购中】接口", prefix = "limit")
+    @Limit(key = "getUserTaskOfferingList", period = 60, count = 2000, name = "检索我的任务【收购中】接口", prefix = "limit")
     public FebsResponse getUserTaskOfferingList(QueryRequest queryRequest, SUserTask userTask) {
 
         FebsResponse response = new FebsResponse();
@@ -671,7 +674,7 @@ public class SUserTaskController extends BaseController {
     }
 
     @PostMapping("/getTaskDetail")
-    @Limit(key = "getTaskDetail", period = 60, count = 20, name = "查询拆单详情", prefix = "limit")
+    @Limit(key = "getTaskDetail", period = 60, count = 2000, name = "查询拆单详情", prefix = "limit")
     public FebsResponse getTaskDetail(@NotEmpty(message = "任务ID不可为空") String userTaskId) {
         FebsResponse response = new FebsResponse();
 

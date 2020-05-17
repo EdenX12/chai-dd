@@ -49,6 +49,7 @@ public class SUserShopCarController extends BaseController {
     @Log("商品加入购物车")
     @Transactional
     @PostMapping("/addShopCar")
+    @Limit(key = "addShopCar", period = 60, count = 2000, name = "商品加入购物车接口", prefix = "limit")
     public FebsResponse addShopCar(@Valid SUserShopCar userShopCar) {
 
         FebsResponse response = new FebsResponse();
@@ -102,7 +103,7 @@ public class SUserShopCarController extends BaseController {
      * @return List<SUserMsg>
      */
     @PostMapping("/getUserShopCar")
-    @Limit(key = "getUserShopCar", period = 60, count = 20, name = "检索我的购物车接口", prefix = "limit")
+    @Limit(key = "getUserShopCar", period = 60, count = 2000, name = "检索我的购物车接口", prefix = "limit")
     public FebsResponse getUserShopCar()  {
 
         FebsResponse response = new FebsResponse();
@@ -268,6 +269,7 @@ public class SUserShopCarController extends BaseController {
     @Log("删除购物车商品")
     @Transactional
     @PostMapping("/deleteShopCar")
+    @Limit(key = "deleteShopCar", period = 60, count = 2000, name = "删除购物车商品接口", prefix = "limit")
     public FebsResponse deleteShopCar(@RequestParam(value ="userShopCarIds") List<String> userShopCarIds) {
 
         FebsResponse response = new FebsResponse();
@@ -303,6 +305,7 @@ public class SUserShopCarController extends BaseController {
     @Log("更新购物车商品数量")
     @Transactional
     @PostMapping("/updateShopCarProductNumber")
+    @Limit(key = "updateShopCarProductNumber", period = 60, count = 2000, name = "更新购物车商品数量", prefix = "limit")
     public FebsResponse updateShopCarProductNumber(String userShopCarId, int productNumber) {
 
         FebsResponse response = new FebsResponse();

@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.controller;
 
 import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.service.*;
+import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
@@ -50,6 +51,7 @@ public class SUserBrowserController extends BaseController {
     @Log("点击阅读转发内容")
     @Transactional
     @PostMapping("/addBrowser")
+    @Limit(key = "addBrowser", period = 60, count = 2000, name = "点击阅读转发内容口", prefix = "limit")
     public FebsResponse addBrowser(String shareId) {
 
         FebsResponse response = new FebsResponse();

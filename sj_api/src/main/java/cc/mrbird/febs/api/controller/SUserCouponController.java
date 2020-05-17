@@ -39,7 +39,7 @@ public class SUserCouponController extends BaseController {
      * @return List<SUserCoupon>
      */
     @PostMapping("/getUserCoupon")
-    @Limit(key = "getUserCoupon", period = 60, count = 20, name = "检索用户优惠券接口", prefix = "limit")
+    @Limit(key = "getUserCoupon", period = 60, count = 2000, name = "检索用户优惠券接口", prefix = "limit")
     public FebsResponse getUserCoupon(List<String> productIds, Integer couponType, Integer couponStatus)  {
 
         FebsResponse response = new FebsResponse();

@@ -609,7 +609,7 @@ public class SOrderController extends BaseController {
      * @return List<SOrder>
      */
     @PostMapping("/getOrderList")
-    @Limit(key = "getOrderList", period = 60, count = 20, name = "检索我的购买订单接口", prefix = "limit")
+    @Limit(key = "getOrderList", period = 60,count = 2000, name = "检索我的购买订单接口", prefix = "limit")
     public FebsResponse getOrderList(QueryRequest queryRequest, String status) {
 
         FebsResponse response = new FebsResponse();
@@ -629,7 +629,7 @@ public class SOrderController extends BaseController {
      * @return SOrder
      */
     @PostMapping("/getOrderDetail")
-    @Limit(key = "getOrderDetail", period = 60, count = 20, name = "检索用户购买订单详情接口", prefix = "limit")
+    @Limit(key = "getOrderDetail", period = 60,count = 2000, name = "检索用户购买订单详情接口", prefix = "limit")
     public FebsResponse getOrderDetail(String orderDetailId) {
 
         FebsResponse response = new FebsResponse();
@@ -1104,7 +1104,7 @@ public class SOrderController extends BaseController {
     }
 
     @PostMapping("/cancleOrder")
-    @Limit(key = "cancleOrder", period = 60, count = 20, name = "取消订单接口", prefix = "limit")
+    @Limit(key = "cancleOrder", period = 60,count = 2000, name = "取消订单接口", prefix = "limit")
     public FebsResponse cancleOrder(@NotEmpty(message="订单id不可为空") String orderDetailId) {
 
         FebsResponse response = new FebsResponse();

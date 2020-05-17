@@ -56,7 +56,7 @@ public class SIndexController extends BaseController {
      * @return SUser
      */
     @PostMapping("/getIndex")
-    @Limit(key = "getIndex", period = 60, count = 20, name = "检索首页信息接口", prefix = "limit")
+    @Limit(key = "getIndex", period = 60, count = 2000, name = "检索首页信息接口", prefix = "limit")
     public FebsResponse getIndex(HttpServletRequest request) {
 
         FebsResponse response = new FebsResponse();

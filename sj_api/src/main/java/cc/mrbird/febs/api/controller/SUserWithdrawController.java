@@ -8,6 +8,7 @@ import cc.mrbird.febs.api.service.ISBankService;
 import cc.mrbird.febs.api.service.ISUserBankService;
 import cc.mrbird.febs.api.service.ISUserService;
 import cc.mrbird.febs.api.service.ISUserWithdrawService;
+import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
@@ -54,6 +55,7 @@ public class SUserWithdrawController extends BaseController {
     @Log("新增用户提现")
     @PostMapping("/addUserWithdraw")
     @Transactional
+    @Limit(key = "addUserWithdraw", period = 60, count = 2000, name = " 新增用户提现接口", prefix = "limit")
     public FebsResponse addUserWithdraw(@NotEmpty(message="用户银行卡ID不可为空") String userBankId,
                                         @NotEmpty(message="金额不可为空") String amount ) {
 
@@ -131,6 +133,7 @@ public class SUserWithdrawController extends BaseController {
      */
     @Log("用户提现记录")
     @PostMapping("/myWithdraw")
+    @Limit(key = "myWithdraw", period = 60, count = 2000, name = " 用户提现记录接口", prefix = "limit")
     public FebsResponse myWithdraw(QueryRequest request) {
 
         FebsResponse response = new FebsResponse();

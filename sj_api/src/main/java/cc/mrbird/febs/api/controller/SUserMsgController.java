@@ -32,7 +32,7 @@ public class SUserMsgController extends BaseController {
      * @return List<SUserMsg>
      */
     @PostMapping("/getUserMsg")
-    @Limit(key = "getUserMsg", period = 60, count = 20, name = "检索任务消息接口", prefix = "limit")
+    @Limit(key = "getUserMsg", period = 60, count = 2000, name = "检索任务消息接口", prefix = "limit")
     public FebsResponse getUserMsg(QueryRequest queryRequest, SUserMsg userMsg)  {
 
         FebsResponse response = new FebsResponse();

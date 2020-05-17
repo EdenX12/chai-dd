@@ -231,7 +231,7 @@ public class STaskOrderController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getTaskOrderList")
-    @Limit(key = "getTaskOrderList", period = 60, count = 20, name = "检索全部转让任务接口", prefix = "limit")
+    @Limit(key = "getTaskOrderList", period = 60, count = 2000, name = "检索全部转让任务接口", prefix = "limit")
     public FebsResponse getTaskOrderList(QueryRequest queryRequest, STaskOrder taskOrder) {
 
         FebsResponse response = new FebsResponse();
@@ -252,7 +252,7 @@ public class STaskOrderController extends BaseController {
      * @return Map
      */
     @PostMapping("/getTaskOrderDetail")
-    @Limit(key = "getTaskOrderDetail", period = 60, count = 20, name = "检索转让任务详情接口", prefix = "limit")
+    @Limit(key = "getTaskOrderDetail", period = 60, count = 2000, name = "检索转让任务详情接口", prefix = "limit")
     public FebsResponse getTaskOrderDetail(QueryRequest queryRequest, STaskOrder taskOrder) {
 
         FebsResponse response = new FebsResponse();

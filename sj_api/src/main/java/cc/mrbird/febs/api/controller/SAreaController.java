@@ -27,7 +27,7 @@ public class SAreaController extends BaseController {
      * @return List<SArea>
      */
     @PostMapping("/getAreaList")
-    @Limit(key = "getAreaList", period = 60, count = 20, name = "检索所有地区列表接口", prefix = "limit")
+    @Limit(key = "getAreaList", period = 60, count = 2000, name = "检索所有地区列表接口", prefix = "limit")
     public FebsResponse getAreaList(SArea area) {
 
         FebsResponse response = new FebsResponse();

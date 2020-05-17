@@ -57,7 +57,7 @@ public class SProductController extends BaseController {
      * @return List<SProductType>
      */
     @PostMapping("/getProductType")
-    @Limit(key = "getProductType", period = 60, count = 20, name = "检索商品分类接口", prefix = "limit")
+    @Limit(key = "getProductType", period = 60, count = 2000, name = "检索商品分类接口", prefix = "limit")
     public FebsResponse getProductType() {
 
         FebsResponse response = new FebsResponse();
@@ -173,7 +173,7 @@ public class SProductController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/getProductListByTypeId")
-    @Limit(key = "getProductListByTypeId", period = 60, count = 20, name = "检索全部商品接口", prefix = "limit")
+    @Limit(key = "getProductListByTypeId", period = 60, count = 2000, name = "检索全部商品接口", prefix = "limit")
     public FebsResponse getProductListByTypeId(QueryRequest queryRequest, String typeId) {
 
         FebsResponse response = new FebsResponse();
@@ -306,7 +306,7 @@ public class SProductController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/selectProductList")
-    @Limit(key = "selectProductList", period = 60, count = 20, name = "全文模糊检索接口", prefix = "limit")
+    @Limit(key = "selectProductList", period = 60, count = 2000, name = "全文模糊检索接口", prefix = "limit")
     public FebsResponse selectProductList(QueryRequest queryRequest, String productName) {
 
         FebsResponse response = new FebsResponse();
@@ -378,7 +378,7 @@ public class SProductController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/selectNewProductList")
-    @Limit(key = "selectNewProductList", period = 60, count = 20, name = "新手商品检索接口", prefix = "limit")
+    @Limit(key = "selectNewProductList", period = 60, count = 2000, name = "新手商品检索接口", prefix = "limit")
     public FebsResponse selectNewProductList(QueryRequest queryRequest) {
 
         FebsResponse response = new FebsResponse();
@@ -450,7 +450,7 @@ public class SProductController extends BaseController {
      * @return List<Map>
      */
     @PostMapping("/selectActivityProductList")
-    @Limit(key = "selectActivityProductList", period = 60, count = 20, name = "活动区商品检索接口", prefix = "limit")
+    @Limit(key = "selectActivityProductList", period = 60, count = 2000, name = "活动区商品检索接口", prefix = "limit")
     public FebsResponse selectActivityProductList(QueryRequest queryRequest, String activityId) {
 
         FebsResponse response = new FebsResponse();
@@ -522,7 +522,7 @@ public class SProductController extends BaseController {
      * @return SProduct
      */
     @PostMapping("/getProductDetail")
-    @Limit(key = "getProductDetail", period = 60, count = 20, name = "检索商品详情接口", prefix = "limit")
+    @Limit(key = "getProductDetail", period = 60, count = 2000, name = "检索商品详情接口", prefix = "limit")
     public FebsResponse getProductDetail(String productId) {
 
         FebsResponse response = new FebsResponse();

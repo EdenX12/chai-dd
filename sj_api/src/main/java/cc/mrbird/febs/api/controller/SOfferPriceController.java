@@ -214,7 +214,7 @@ public class SOfferPriceController extends BaseController {
      * @return List<SOfferPrice>
      */
     @PostMapping("/getOfferPriceList")
-    @Limit(key = "getOfferPriceList", period = 60, count = 20, name = "检索转让任务报价接口", prefix = "limit")
+    @Limit(key = "getOfferPriceList", period = 60, count = 2000, name = "检索转让任务报价接口", prefix = "limit")
     public FebsResponse getOfferPriceList(SOfferPrice offerPrice) {
 
         FebsResponse response = new FebsResponse();
@@ -232,7 +232,7 @@ public class SOfferPriceController extends BaseController {
      * @return SProduct
      */
     @PostMapping("/getOfferPriceDetail")
-    @Limit(key = "getOfferPriceDetail", period = 60, count = 20, name = "检索转让任务用户最后报价详情接口", prefix = "limit")
+    @Limit(key = "getOfferPriceDetail", period = 60, count = 2000, name = "检索转让任务用户最后报价详情接口", prefix = "limit")
     public FebsResponse getOfferPriceDetail(SOfferPrice offerPrice) {
 
         FebsResponse response = new FebsResponse();

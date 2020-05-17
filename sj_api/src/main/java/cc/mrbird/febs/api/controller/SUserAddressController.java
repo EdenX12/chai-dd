@@ -37,7 +37,7 @@ public class SUserAddressController extends BaseController {
      * @return List<SUserAddress>
      */
     @PostMapping("/getUserAddressList")
-    @Limit(key = "getUserAddressList", period = 60, count = 20, name = "检索用户收货地址接口", prefix = "limit")
+    @Limit(key = "getUserAddressList", period = 60, count = 2000, name = "检索用户收货地址接口", prefix = "limit")
     public FebsResponse getUserAddressList(QueryRequest queryRequest, SUserAddress userAddress) {
 
         FebsResponse response = new FebsResponse();
@@ -58,6 +58,7 @@ public class SUserAddressController extends BaseController {
      */
     @Log("新增用户收货地址")
     @PostMapping("/addUserAddress")
+    @Limit(key = "addUserAddress", period = 60, count = 2000, name = "新增用户收货地址接口", prefix = "limit")
     public FebsResponse addUserAddress(@Valid SUserAddress userAddress) {
 
         FebsResponse response = new FebsResponse();
@@ -136,7 +137,7 @@ public class SUserAddressController extends BaseController {
      * @return SUserAddress
      */
     @PostMapping("/getUserAddress")
-    @Limit(key = "getUserAddress", period = 60, count = 20, name = "检索用户收货地址详情接口", prefix = "limit")
+    @Limit(key = "getUserAddress", period = 60, count = 2000, name = "检索用户收货地址详情接口", prefix = "limit")
     public FebsResponse getUserAddress(SUserAddress userAddress) {
 
         FebsResponse response = new FebsResponse();

@@ -35,7 +35,7 @@ public class SUserBankController {
      *   银行列表
      */
     @GetMapping("/getBankList")
-    @Limit(key = "getBankList", period = 60, count = 20, name = "银行卡列表接口", prefix = "limit")
+    @Limit(key = "getBankList", period = 60, count = 2000, name = "银行卡列表接口", prefix = "limit")
     public FebsResponse getBankList() {
 
         FebsResponse response = new FebsResponse();
@@ -50,7 +50,7 @@ public class SUserBankController {
      *  绑定银行卡
      */
     @PostMapping("/bindBankCard")
-    @Limit(key = "bindBankCard", period = 60, count = 20, name = "绑定银行卡接口", prefix = "limit")
+    @Limit(key = "bindBankCard", period = 60, count = 2000, name = "绑定银行卡接口", prefix = "limit")
     public FebsResponse bindBankCard(@RequestBody SUserBank sUserBank) {
 
         FebsResponse response = new FebsResponse();
@@ -69,7 +69,7 @@ public class SUserBankController {
      *  解绑银行卡
      */
     @PostMapping("/unboundBankCard")
-    @Limit(key = "unboundBankCard", period = 60, count = 20, name = "检索解绑银行卡接口", prefix = "limit")
+    @Limit(key = "unboundBankCard", period = 60, count = 2000, name = "检索解绑银行卡接口", prefix = "limit")
     public FebsResponse unboundBankCard(Integer userBankId) {
 
         FebsResponse response = new FebsResponse();
@@ -107,7 +107,7 @@ public class SUserBankController {
      * 我的银行卡列表
      */
     @PostMapping("/myBankCarList")
-    @Limit(key = "myBankCarList", period = 60, count = 20, name = "检索我的银行卡列表接口", prefix = "limit")
+    @Limit(key = "myBankCarList", period = 60, count = 2000, name = "我的银行卡列表接口", prefix = "limit")
     public FebsResponse myBankCarList() {
 
         FebsResponse response = new FebsResponse();

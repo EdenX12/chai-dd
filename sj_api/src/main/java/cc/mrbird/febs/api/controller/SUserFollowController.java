@@ -8,6 +8,7 @@ import cc.mrbird.febs.api.service.ISParamsService;
 import cc.mrbird.febs.api.service.ISUserBeanLogService;
 import cc.mrbird.febs.api.service.ISUserFollowService;
 import cc.mrbird.febs.api.service.ISUserService;
+import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
@@ -52,6 +53,7 @@ public class SUserFollowController extends BaseController {
     @Log("新增用户关注")
     @Transactional
     @PostMapping("/addFollow")
+    @Limit(key = "addFollow", period = 60, count = 2000, name = "关注接口", prefix = "limit")
     public FebsResponse addFollow(@Valid SUserFollow userFollow) {
 
         FebsResponse response = new FebsResponse();
@@ -102,6 +104,7 @@ public class SUserFollowController extends BaseController {
     @Log("取消用户关注")
     @Transactional
     @PostMapping("/cancelFollow")
+    @Limit(key = "cancelFollow", period = 60, count = 2000, name = " 取消关注接口", prefix = "limit")
     public FebsResponse cancelFollow(@Valid SUserFollow userFollow) {
 
         FebsResponse response = new FebsResponse();
