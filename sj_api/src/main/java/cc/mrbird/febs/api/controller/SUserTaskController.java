@@ -260,6 +260,7 @@ public class SUserTaskController extends BaseController {
             userTask.setUpdateTime(new Date());
             userTask.setTaskNumber(taskNumber);
             userTask.setOrderSn("T"+System.currentTimeMillis());
+            userTask.setProductId(productId);
             userTask = userTaskService.createUserTask(userTask);
 
             // 根据商品ID、任务数从s_task_line表中分配N条任务线
