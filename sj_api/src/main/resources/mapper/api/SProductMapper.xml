@@ -38,7 +38,7 @@
         AND SP.product_name LIKE CONCAT('%',#{productName},'%')
         AND SP.delete_flag = 0
         AND SP.product_status = 1
-
+        order  by  SP.s_order asc, sp.create_time desc
     </select>
 
 
@@ -78,7 +78,7 @@
         AND SP.product_type = 1
         AND SP.delete_flag = 0
         AND SP.product_status = 1
-
+        order  by  SP.s_order asc, sp.create_time desc
     </select>
 
     <select id="findActivityProductDetail" resultType="java.util.Map">
@@ -118,7 +118,7 @@
         AND SA.id = #{activityId}
         AND SP.delete_flag = 0
         AND SP.product_status = 1
-
+        order  by  SP.s_order asc, sp.create_time desc
     </select>
 
     <select id="findProductDetailBySmallTypeId" resultType="java.util.Map" parameterType="sProduct">
@@ -165,7 +165,7 @@
 
         AND SP.delete_flag = 0
         AND SP.product_status = 1
-
+        order  by  SP.s_order asc, sp.create_time desc
     </select>
 
     <select id="findProductDetailByBigTypeId" resultType="java.util.Map" parameterType="sProduct">
@@ -209,7 +209,7 @@
         <if test="sProduct.productType != null and sProduct.productType != ''">
             AND SP.product_type = #{sProduct.productType}
         </if>
-
+        order  by  SP.s_order asc, sp.create_time desc
     </select>
 
     <select id="findProductDetail" resultType="java.util.Map">
