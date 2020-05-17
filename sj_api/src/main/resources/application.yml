@@ -1,7 +1,7 @@
 spring:
   # 环境 dev|test|prod
   profiles:
-    active: test
+    active: prod
 
 #mybatis plus 设置
 mybatis-plus:
