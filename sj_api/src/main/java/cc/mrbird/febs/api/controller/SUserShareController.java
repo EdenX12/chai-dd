@@ -44,7 +44,7 @@ public class SUserShareController extends BaseController {
     @Log("转发分享商品")
     @Transactional
     @PostMapping("/addShare")
-    public FebsResponse addShare(String productId, String parentId) {
+    public FebsResponse addShare(String productId, String parentId, String shareId) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -58,6 +58,9 @@ public class SUserShareController extends BaseController {
             if (shareCnt == 0) {
 
                 SUserShare userShare = new SUserShare();
+
+                // 分享ID 前端传参
+                userShare.setId(shareId);
 
                 userShare.setUserId(user.getId());
                 userShare.setProductId(productId);

@@ -360,12 +360,15 @@ public class SUserPayController extends BaseController {
                     }
 
                     // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
-                    Integer productBeanCnt = 0;
-                    SParams params = this.paramsService.queryBykeyForOne("product_bean_cnt");
-                    if (params != null) {
-                        productBeanCnt = Integer.valueOf(params.getPValue());
-                    }
-                    productBeanCnt = productBeanCnt * totalProductNumber;
+//                    Integer productBeanCnt = 0;
+//                    SParams params = this.paramsService.queryBykeyForOne("product_bean_cnt");
+//                    if (params != null) {
+//                        productBeanCnt = Integer.valueOf(params.getPValue());
+//                    }
+//                    productBeanCnt = productBeanCnt * totalProductNumber;
+
+                    // 暂时变更为商品价格*10
+                    Integer productBeanCnt = total.multiply(new BigDecimal(10)).intValue();
 
                     if (productBeanCnt != null && productBeanCnt > 0) {
                         SUserBeanLog userBeanLog = new SUserBeanLog();
