@@ -653,7 +653,6 @@ public class SOrderController extends BaseController {
      * 用户ID 订单ID 状态
      */
     @Log("用户确认收货")
-    @Transactional
     @PostMapping("/confirmFinishOrder")
     public FebsResponse confirmFinishOrder(@Valid String orderDetailId) {
 
@@ -667,7 +666,10 @@ public class SOrderController extends BaseController {
             SOrderDetail orderDetail = new SOrderDetail();
             orderDetail = this.orderDetailService.getById(orderDetailId);
             orderDetail.setUserId(user.getId());
-            finishOrder(orderDetail);
+
+            // 确认收货处理
+            this.finishOrder(orderDetail);
+
             if (orderDetail.getPaymentState() != 1 && orderDetail.getPaymentState() != 9) {
                 message = "此订单还没有完成支付！";
                 response.put("code", 1);
@@ -693,7 +695,9 @@ public class SOrderController extends BaseController {
         return response;
     }
 
-    private void finishOrder(SOrderDetail orderDetail){
+    @Transactional
+    public void finishOrder(SOrderDetail orderDetail) {
+
         // 确认收货
         orderDetail.setOrderStatus(3);
         this.orderDetailService.updateById(orderDetail);
@@ -726,10 +730,14 @@ public class SOrderController extends BaseController {
 
             }
         }
-        if(updateTaskLineList!=null&&updateTaskLineList.size()>0)
+
+        if (updateTaskLineList!=null&&updateTaskLineList.size()>0) {
             this.taskLineService.updateBatchById(updateTaskLineList);
-        if(updateUserTaskLineList!=null&&updateUserTaskLineList.size()>0)
+        }
+
+        if (updateUserTaskLineList!=null&&updateUserTaskLineList.size()>0) {
             this.userTaskLineService.updateBatchById(updateUserTaskLineList);
+        }
 
         // 冻结金额 -> 余额
         List<SUserBonusLog> updateUserBonusLogList = Lists.newArrayList();
@@ -792,10 +800,14 @@ public class SOrderController extends BaseController {
             userBonusLogOne.setUpdateTime(new Date());
             updateUserBonusLogList.add(userBonusLogOne);
         }
-        if(updateUserBonusLogList!=null&&updateUserBonusLogList.size()>0)
+
+        if (updateUserBonusLogList != null && updateUserBonusLogList.size()>0) {
             this.userBonusLogService.updateBatchById(updateUserBonusLogList);
-        if(saveUserAmountLogList!=null&&saveUserAmountLogList.size()>0)
+        }
+
+        if (saveUserAmountLogList!=null&&saveUserAmountLogList.size()>0) {
             this.userAmountLogService.saveBatch(saveUserAmountLogList);
+        }
 
         SUserMsg userMsg = new SUserMsg();
         userMsg.setUserId(null);
@@ -805,7 +817,7 @@ public class SOrderController extends BaseController {
         userMsg.setMsgTitle("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
         userMsg.setMsgInfo("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
 
-        userMsgService.save(userMsg);
+        this.userMsgService.save(userMsg);
     }
 
     /**
@@ -1096,7 +1108,7 @@ public class SOrderController extends BaseController {
     public FebsResponse cancleOrder(@NotEmpty(message="订单id不可为空") String orderDetailId) {
 
         FebsResponse response = new FebsResponse();
-        SOrderDetail orderDetail = orderDetailService.getById(orderDetailId);
+        SOrderDetail orderDetail = this.orderDetailService.getById(orderDetailId);
 
         if (orderDetail == null) {
             response.put("code", 1);
@@ -1113,6 +1125,7 @@ public class SOrderController extends BaseController {
         // 订单状态  0未付款  1已付款待发货  2已发货  3已确认收货 4 申请退货退款 5 已退货退款 6 超时关闭 -1 已取消
         orderDetail.setOrderStatus(-1);
         orderDetailService.updateById(orderDetail);
+
         response.put("code", 0);
         return response;
     }
@@ -1121,13 +1134,15 @@ public class SOrderController extends BaseController {
      * 自动取消订单定时任务
      */
     @Scheduled(cron="0 */10 * * * ?")
-    public void cancleOrderTask(){
-        List<String> orderDetailIds =  orderDetailService.getCancleList();
+    @Transactional
+    public void cancleOrderTask() {
+
+        List<String> orderDetailIds =  this.orderDetailService.getCancleList();
         if(orderDetailIds != null && orderDetailIds.size() > 0 ){
             for(String id :  orderDetailIds){
-                SOrderDetail orderDetail = orderDetailService.getById(id);
+                SOrderDetail orderDetail = this.orderDetailService.getById(id);
                 orderDetail.setOrderStatus(-1);
-                orderDetailService.updateById(orderDetail);
+                this.orderDetailService.updateById(orderDetail);
             }
         }
     }
@@ -1137,10 +1152,12 @@ public class SOrderController extends BaseController {
      */
     @Scheduled(cron="2 */10 * * * ?")
     public void shippingOrderTask(){
-        List<String> orderDetailIds =  orderDetailService.getShippingList();
-        if(orderDetailIds != null && orderDetailIds.size() > 0 ){
+
+        List<String> orderDetailIds =  this.orderDetailService.getShippingList();
+
+        if (orderDetailIds != null && orderDetailIds.size() > 0 ) {
             for(String id :  orderDetailIds){
-                SOrderDetail orderDetail = orderDetailService.getById(id);
+                SOrderDetail orderDetail = this.orderDetailService.getById(id);
                 this.finishOrder(orderDetail);
             }
         }
