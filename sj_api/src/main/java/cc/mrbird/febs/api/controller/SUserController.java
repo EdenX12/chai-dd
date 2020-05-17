@@ -429,7 +429,7 @@ public class SUserController extends BaseController {
         returnMap.put("userRelationTodayCnt", userRelationTodayCnt);
 
         // 战队贡献累计收益 （横向+纵向 躺赢收益）
-        BigDecimal totalBonus = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), null);
+        BigDecimal totalBonus = this.userBonusLogService.findUserBonusOrgRewardSum1(user.getId(), null);
 
         // 战队贡献今日收益
         BigDecimal todayBonus = this.userBonusLogService.findUserBonusOrgRewardTodaySum(user.getId());

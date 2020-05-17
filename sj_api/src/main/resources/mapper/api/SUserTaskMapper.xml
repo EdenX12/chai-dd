@@ -16,7 +16,16 @@
            FROM s_user_task_line
            WHERE user_id = #{userId}
             AND pay_status = 1
-            AND status = #{status}
+
+            <choose>
+                <when test="status == 0">
+                    AND status IN (0, 3)
+                </when>
+                <otherwise>
+                    AND status = #{status}
+                </otherwise>
+            </choose>
+
             GROUP BY  product_id) SUTL1
         LEFT JOIN (SELECT  product_id, count(*) totalTaskLine FROM s_user_task_line where  user_id=#{userId} AND pay_status = 1 GROUP BY  product_id) SUTL2
         ON  SUTL2.product_id = SUTL1.product_id

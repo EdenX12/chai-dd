@@ -11,11 +11,18 @@ import java.math.BigDecimal;
  */
 public interface SUserBonusLogMapper extends BaseMapper<SUserBonusLog> {
 
-    BigDecimal findUserBonusOrgRewardSum(@Param("userId") String userId, @Param("productId") String productId);
-
     BigDecimal findUserBonusOrgRewardTodaySum(@Param("userId") String userId);
 
-    BigDecimal findUserBonusTaskRewardSum(@Param("userId") String userId, @Param("productId") String productId);
+    BigDecimal findUserBonusOrgRewardSum0(@Param("userId") String userId, @Param("productId") String productId);
 
-    BigDecimal findUserBonusBuyerRewardSum(@Param("userId") String userId, @Param("productId") String productId);
+    BigDecimal findUserBonusTaskRewardSum0(@Param("userId") String userId, @Param("productId") String productId);
+
+    BigDecimal findUserBonusBuyerRewardSum0(@Param("userId") String userId, @Param("productId") String productId);
+
+    BigDecimal findUserBonusOrgRewardSum1(@Param("userId") String userId, @Param("productId") String productId);
+
+    BigDecimal findUserBonusTaskRewardSum1(@Param("userId") String userId, @Param("productId") String productId);
+
+    BigDecimal findUserBonusBuyerRewardSum1(@Param("userId") String userId, @Param("productId") String productId);
+
 }

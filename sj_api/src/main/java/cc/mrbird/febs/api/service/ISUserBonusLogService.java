@@ -21,14 +21,6 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
     List<SUserBonusLog> findUserBonusList(SUserBonusLog userBonusLog);
 
     /**
-     * 战队累计收益
-     *
-     * @param userId String
-     * @return BigDecimal
-     */
-    BigDecimal findUserBonusOrgRewardSum(@Param("userId") String userId, @Param("productId") String productId);
-
-    /**
      * 战队今日累计收益
      *
      * @param userId String
@@ -42,7 +34,15 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
      * @param userId String
      * @return BigDecimal
      */
-    BigDecimal findUserBonusTaskRewardSum(@Param("userId") String userId, @Param("productId") String productId);
+    BigDecimal findUserBonusTaskRewardSum0(@Param("userId") String userId, @Param("productId") String productId);
+
+    /**
+     * 战队累计收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusOrgRewardSum0(@Param("userId") String userId, @Param("productId") String productId);
 
     /**
      * 买家返收益
@@ -50,5 +50,29 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
      * @param userId String
      * @return BigDecimal
      */
-    BigDecimal findUserBonusBuyerRewardSum(@Param("userId") String userId, @Param("productId") String productId);
+    BigDecimal findUserBonusBuyerRewardSum0(@Param("userId") String userId, @Param("productId") String productId);
+
+    /**
+     * 任务躺赢收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusTaskRewardSum1(@Param("userId") String userId, @Param("productId") String productId);
+
+    /**
+     * 战队累计收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusOrgRewardSum1(@Param("userId") String userId, @Param("productId") String productId);
+
+    /**
+     * 买家返收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusBuyerRewardSum1(@Param("userId") String userId, @Param("productId") String productId);
 }

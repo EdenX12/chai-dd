@@ -162,17 +162,29 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
                 returnMap.put("followFlag", false);
             } else {
 
-                // 任务躺赢（实际）  【结算中 已完成 状态显示】 根据userId productId从bonusLog中读取
-                BigDecimal taskTaskRewardAmt = this.userBonusLogService.findUserBonusTaskRewardSum(user.getId(), productId);
-                returnMap.put("taskTaskRewardAmt", taskTaskRewardAmt);
+                // 任务躺赢（实际）  【结算中状态显示】 根据userId productId从bonusLog中读取
+                BigDecimal taskTaskRewardAmt0 = this.userBonusLogService.findUserBonusTaskRewardSum0(user.getId(), productId);
+                returnMap.put("taskTaskRewardAmt0", taskTaskRewardAmt0);
 
-                // 组织躺赢（纵向+横向 实际）【结算中 已完成 状态显示】
-                BigDecimal taskOrgRewardAmt = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), productId);
-                returnMap.put("taskOrgRewardAmt", taskOrgRewardAmt);
+                // 组织躺赢（纵向+横向 实际）【结算中状态显示】
+                BigDecimal taskOrgRewardAmt0 = this.userBonusLogService.findUserBonusOrgRewardSum0(user.getId(), productId);
+                returnMap.put("taskOrgRewardAmt0", taskOrgRewardAmt0);
 
-                // 买家返 实际）【结算中 已完成 状态显示】
-                BigDecimal taskBuyerRewardAmt = this.userBonusLogService.findUserBonusBuyerRewardSum(user.getId(), productId);
-                returnMap.put("taskBuyerRewardAmt", taskBuyerRewardAmt);
+                // 买家返 （实际）【结算中状态显示】
+                BigDecimal taskBuyerRewardAmt0 = this.userBonusLogService.findUserBonusBuyerRewardSum0(user.getId(), productId);
+                returnMap.put("taskBuyerRewardAmt0", taskBuyerRewardAmt0);
+
+                // 任务躺赢（实际）  【已完成 状态显示】 根据userId productId从bonusLog中读取
+                BigDecimal taskTaskRewardAmt1 = this.userBonusLogService.findUserBonusTaskRewardSum1(user.getId(), productId);
+                returnMap.put("taskTaskRewardAmt1", taskTaskRewardAmt1);
+
+                // 组织躺赢（纵向+横向 实际）【已完成 状态显示】
+                BigDecimal taskOrgRewardAmt1 = this.userBonusLogService.findUserBonusOrgRewardSum1(user.getId(), productId);
+                returnMap.put("taskOrgRewardAmt1", taskOrgRewardAmt1);
+
+                // 买家返 （实际）【已完成 状态显示】
+                BigDecimal taskBuyerRewardAmt1 = this.userBonusLogService.findUserBonusBuyerRewardSum1(user.getId(), productId);
+                returnMap.put("taskBuyerRewardAmt1", taskBuyerRewardAmt1);
 
                 // 是否已关注
                 SUserFollow userFollow = new SUserFollow();

@@ -60,26 +60,44 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
     }
 
     @Override
-    public BigDecimal findUserBonusOrgRewardSum(String userId, String productId) {
-
-        return this.baseMapper.findUserBonusOrgRewardSum(userId, productId);
-    }
-
-    @Override
     public BigDecimal findUserBonusOrgRewardTodaySum(String userId) {
 
         return this.baseMapper.findUserBonusOrgRewardTodaySum(userId);
     }
 
     @Override
-    public BigDecimal findUserBonusTaskRewardSum(String userId, String productId) {
+    public BigDecimal findUserBonusOrgRewardSum0(String userId, String productId) {
 
-        return this.baseMapper.findUserBonusTaskRewardSum(userId, productId);
+        return this.baseMapper.findUserBonusOrgRewardSum0(userId, productId);
     }
 
     @Override
-    public BigDecimal findUserBonusBuyerRewardSum(String userId, String productId) {
+    public BigDecimal findUserBonusTaskRewardSum0(String userId, String productId) {
 
-        return this.baseMapper.findUserBonusBuyerRewardSum(userId, productId);
+        return this.baseMapper.findUserBonusTaskRewardSum0(userId, productId);
+    }
+
+    @Override
+    public BigDecimal findUserBonusBuyerRewardSum0(String userId, String productId) {
+
+        return this.baseMapper.findUserBonusBuyerRewardSum0(userId, productId);
+    }
+
+    @Override
+    public BigDecimal findUserBonusOrgRewardSum1(String userId, String productId) {
+
+        return this.baseMapper.findUserBonusOrgRewardSum1(userId, productId);
+    }
+
+    @Override
+    public BigDecimal findUserBonusTaskRewardSum1(String userId, String productId) {
+
+        return this.baseMapper.findUserBonusTaskRewardSum1(userId, productId);
+    }
+
+    @Override
+    public BigDecimal findUserBonusBuyerRewardSum1(String userId, String productId) {
+
+        return this.baseMapper.findUserBonusBuyerRewardSum1(userId, productId);
     }
 }
