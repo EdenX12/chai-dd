@@ -414,6 +414,13 @@ public class SOrderController extends BaseController {
             userAddress.setId(addressId);
             userAddress = this.userAddressService.findUserAddress(userAddress);
 
+            if (userAddress == null) {
+                message = "请输入用户收货地址！";
+                response.put("code", 1);
+                response.message(message);
+                return response;
+            }
+
             // 支付方式  0 微信 1 支付宝 3 余额
             int paymentType = json.getIntValue("paymentType");
 
@@ -458,7 +465,7 @@ public class SOrderController extends BaseController {
                 // 生成订单明细表
                 SOrderDetail orderDetail = new SOrderDetail();
 
-                if (orderDetailId == null) {
+                if (StringUtils.isEmpty(orderDetailId)) {
 
                     orderDetail.setOrderId(order.getId());
                     orderDetail.setShopId(shopId);
