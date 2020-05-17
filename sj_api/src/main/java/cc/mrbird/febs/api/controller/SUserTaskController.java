@@ -713,9 +713,6 @@ public class SUserTaskController extends BaseController {
         if (StringUtils.isBlank(productId) || product == null || product.getProductStatus() != 1) {
             return "该商品状态不可购买，请重新选择商品！";
         }
-        if (userLevel.getLevelType() == 0 && product.getProductType() == 2) {
-            return "您现在只能在新手区领取新手任务！";
-        }
         if (userLevel.getLevelType() > 0 && product.getProductType() == 1) {
             return "您已经不能再次领取新手任务！";
         }
