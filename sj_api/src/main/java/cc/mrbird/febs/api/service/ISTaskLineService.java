@@ -13,9 +13,10 @@ public interface ISTaskLineService extends IService<STaskLine> {
     /**
      * 查询任务线上是否有足够任务
      * @param productId
+     * @param userId 
      * @return
      */
-    Integer queryTaskLineCount(String productId);
+    Integer queryTaskLineCount(String productId, String userId);
 
     /**
      *  查询产品的任务线未满的最小顺序

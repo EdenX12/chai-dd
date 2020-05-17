@@ -14,9 +14,10 @@ public interface STaskLineMapper extends BaseMapper<STaskLine> {
     /**
      * 查询任务线上是否有足够任务
      * @param productId
+     * @param userId 
      * @return
      */
-    Integer queryTaskLineCount(@Param("productId") String productId);
+    Integer queryTaskLineCount(@Param("productId") String productId,@Param("userId")  String userId);
 
     /**
      * 查询产品的任务线未满的最小顺序

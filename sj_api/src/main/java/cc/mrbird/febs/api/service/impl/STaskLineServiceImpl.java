@@ -16,8 +16,8 @@ import java.util.List;
 public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine> implements ISTaskLineService {
 
     @Override
-    public Integer queryTaskLineCount(String productId) {
-        return this.baseMapper.queryTaskLineCount(productId);
+    public Integer queryTaskLineCount(String productId,String userId) {
+        return this.baseMapper.queryTaskLineCount(productId,userId);
     }
 
     @Override
