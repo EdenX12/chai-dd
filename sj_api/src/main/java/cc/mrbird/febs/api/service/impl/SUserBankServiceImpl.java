@@ -12,13 +12,15 @@ import java.util.List;
 
 @Service
 public class SUserBankServiceImpl extends ServiceImpl<SUserBankMapper, SUserBank> implements ISUserBankService {
+
     @Override
     public List<SUserBank> findUserBankList(String userId) {
+
         LambdaQueryWrapper<SUserBank> queryWrapper = new LambdaQueryWrapper();
 
         queryWrapper.eq(SUserBank::getUserId, userId);
+        queryWrapper.eq(SUserBank::getStatus, 0);
 
-        queryWrapper.eq(SUserBank::getStatus, 1);
         return this.baseMapper.selectList(queryWrapper);
     }
 }

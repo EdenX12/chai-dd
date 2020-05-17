@@ -1087,24 +1087,28 @@ public class SOrderController extends BaseController {
             }
         }
     }
+
     @PostMapping("/cancleOrder")
-    @Limit(key = "cancleOrder", period = 60, count = 20, name = "检索用户购买订单详情接口", prefix = "limit")
+    @Limit(key = "cancleOrder", period = 60, count = 20, name = "取消订单接口", prefix = "limit")
     public FebsResponse cancleOrder(@NotEmpty(message="订单id不可为空") String orderDetailId) {
+
         FebsResponse response = new FebsResponse();
         SOrderDetail orderDetail = orderDetailService.getById(orderDetailId);
 
-        if(orderDetail == null){
+        if (orderDetail == null) {
             response.put("code", 1);
             response.message("订单不存在");
             return response;
         }
-        if(orderDetail.getOrderStatus() != 0){
+
+        if (orderDetail.getOrderStatus() != 0) {
             response.put("code", 1);
             response.message("订单当前状态不可取消");
             return response;
         }
-        //已付款待发货
-        orderDetail.setOrderStatus(1);
+
+        // 订单状态  0未付款  1已付款待发货  2已发货  3已确认收货 4 申请退货退款 5 已退货退款 6 超时关闭 -1 已取消
+        orderDetail.setOrderStatus(-1);
         orderDetailService.updateById(orderDetail);
         response.put("code", 0);
         return response;
