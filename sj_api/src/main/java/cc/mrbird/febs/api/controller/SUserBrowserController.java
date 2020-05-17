@@ -50,7 +50,7 @@ public class SUserBrowserController extends BaseController {
     @Log("点击阅读转发内容")
     @Transactional
     @PostMapping("/addBrowser")
-    public FebsResponse addBrowser(String unionId, String shareId) {
+    public FebsResponse addBrowser(String shareId) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -63,8 +63,9 @@ public class SUserBrowserController extends BaseController {
 
             if (user != null) {
                 userBrowser.setUserId(user.getId());
+                userBrowser.setUnionId(user.getUnionId());
             }
-            userBrowser.setUnionId(unionId);
+
             userBrowser.setShareId(shareId);
 
             SUserBrowser userBrowserOne = this.userBrowserService.findUserBrowser(userBrowser);
@@ -105,8 +106,8 @@ public class SUserBrowserController extends BaseController {
                 SUserRelation userRelation = new SUserRelation();
                 if (user != null) {
                     userRelation.setUserId(user.getId());
+                    userRelation.setUnionId(user.getUnionId());
                 }
-                userRelation.setUnionId(unionId);
                 userRelation.setParentId(userShare.getUserId());
                 SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
                 if (userRelationOne == null) {
