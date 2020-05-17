@@ -1,7 +1,5 @@
 package cc.mrbird.febs.api.service.impl;
 
-import cc.mrbird.febs.api.entity.SProduct;
-import cc.mrbird.febs.api.entity.SUserMsg;
 import cc.mrbird.febs.api.entity.SUserWithdraw;
 import cc.mrbird.febs.api.mapper.SUserWithdrawMapper;
 import cc.mrbird.febs.api.service.ISUserWithdrawService;
@@ -14,7 +12,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 
 /**
  * @author MrBird
@@ -27,7 +24,7 @@ public class SUserWithdrawServiceImpl extends ServiceImpl<SUserWithdrawMapper, S
 
         queryWrapper.eq(SUserWithdraw::getUserId, userId);
         Page<SUserWithdraw> page = new Page<>();
-        SortUtil.handlePageSort(request, page, "deal_time", FebsConstant.ORDER_DESC, false);
+        SortUtil.handlePageSort(request, page, "dealTime", FebsConstant.ORDER_DESC, false);
         return this.baseMapper.selectPage(page, queryWrapper);
     }
 
