@@ -77,4 +77,9 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
         return this.baseMapper.findUserBonusTaskRewardSum(userId, productId);
     }
 
+    @Override
+    public BigDecimal findUserBonusBuyerRewardSum(String userId, String productId) {
+
+        return this.baseMapper.findUserBonusBuyerRewardSum(userId, productId);
+    }
 }

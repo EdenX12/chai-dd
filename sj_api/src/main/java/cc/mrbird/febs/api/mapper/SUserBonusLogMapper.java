@@ -16,4 +16,6 @@ public interface SUserBonusLogMapper extends BaseMapper<SUserBonusLog> {
     BigDecimal findUserBonusOrgRewardTodaySum(@Param("userId") String userId);
 
     BigDecimal findUserBonusTaskRewardSum(@Param("userId") String userId, @Param("productId") String productId);
+
+    BigDecimal findUserBonusBuyerRewardSum(@Param("userId") String userId, @Param("productId") String productId);
 }

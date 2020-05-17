@@ -170,6 +170,10 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
                 BigDecimal taskOrgRewardAmt = this.userBonusLogService.findUserBonusOrgRewardSum(user.getId(), productId);
                 returnMap.put("taskOrgRewardAmt", taskOrgRewardAmt);
 
+                // 买家返 实际）【结算中 已完成 状态显示】
+                BigDecimal taskBuyerRewardAmt = this.userBonusLogService.findUserBonusBuyerRewardSum(user.getId(), productId);
+                returnMap.put("taskBuyerRewardAmt", taskBuyerRewardAmt);
+
                 // 是否已关注
                 SUserFollow userFollow = new SUserFollow();
                 userFollow.setUserId(user.getId());

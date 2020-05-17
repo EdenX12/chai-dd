@@ -43,4 +43,12 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
      * @return BigDecimal
      */
     BigDecimal findUserBonusTaskRewardSum(@Param("userId") String userId, @Param("productId") String productId);
+
+    /**
+     * 买家返收益
+     *
+     * @param userId String
+     * @return BigDecimal
+     */
+    BigDecimal findUserBonusBuyerRewardSum(@Param("userId") String userId, @Param("productId") String productId);
 }

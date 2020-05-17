@@ -36,4 +36,17 @@
         AND bonus_type IN (2)
         AND status IN (0, 1)
     </select>
+
+    <select id="findUserBonusBuyerRewardSum" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(bonus_amount),0) bonusAmount
+        FROM s_user_bonus_log
+        WHERE user_id=#{userId}
+
+        <if test="productId != null and productId != ''">
+            AND product_id = #{productId}
+        </if>
+
+        AND bonus_type IN (1)
+        AND status IN (0, 1)
+    </select>
 </mapper>
