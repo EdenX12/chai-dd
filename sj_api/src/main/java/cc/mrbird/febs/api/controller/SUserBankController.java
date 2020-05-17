@@ -120,6 +120,8 @@ public class SUserBankController {
 
         for (SUserBank userBank : userBanksList) {
 
+            resultMap = new HashMap<>();
+
             resultMap.put("id", userBank.getId());
             resultMap.put("bankId", userBank.getBankId());
 

@@ -35,9 +35,29 @@ public class SUserWithdraw implements Serializable {
     private String userId;
 
     /**
-     * 申请日期
+     * 银行名称
      */
-    private Date createTime;
+    private String bankName;
+
+    /**
+     * 银行编码
+     */
+    private String bankCode;
+
+    /**
+     * 真实姓名
+     */
+    private String realName;
+
+    /**
+     * 身份证号码
+     */
+    private String idCard;
+
+    /**
+     * 银行卡号
+     */
+    private String cardNum;
 
     /**
      * 提现金额
@@ -68,4 +88,9 @@ public class SUserWithdraw implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 申请日期
+     */
+    private Date createTime;
 }
