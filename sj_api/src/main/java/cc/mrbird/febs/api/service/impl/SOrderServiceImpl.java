@@ -85,9 +85,6 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
 
 
         if (result != null) {
-            Map<String, Object> reaminTimeMap = this.baseMapper.getReaminTime(orderDetailId);
-            result.put("cancleRemain",reaminTimeMap.get("cancleRemain"));
-            result.put("shipingRemain",reaminTimeMap.get("shipingRemain"));
             List<Map> productList = this.baseMapper.queryProductDetailId(orderDetailId);
             result.put("productList", productList);
 
