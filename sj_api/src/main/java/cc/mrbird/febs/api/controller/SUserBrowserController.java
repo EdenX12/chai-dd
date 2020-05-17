@@ -123,7 +123,7 @@ public class SUserBrowserController extends BaseController {
             message = "点击阅读转发内容";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;

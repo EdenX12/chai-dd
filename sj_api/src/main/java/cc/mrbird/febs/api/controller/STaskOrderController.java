@@ -144,7 +144,7 @@ public class STaskOrderController extends BaseController {
             message = "新增任务转让失败";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -220,7 +220,7 @@ public class STaskOrderController extends BaseController {
             message = "取消终止任务转让失败";
             response.put("code", 1);
             response.message(message);
-            log.error(message, e);
+            log.error( e.getMessage(),e);
         }
 
         return response;

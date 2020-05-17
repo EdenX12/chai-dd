@@ -362,7 +362,7 @@ public class SOrderController extends BaseController {
             message = "用户确认订单失败";
             response.put("code", 1);
             response.message(message);
-            log.error(e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -598,7 +598,7 @@ public class SOrderController extends BaseController {
             message = "购买订单失败";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -689,7 +689,7 @@ public class SOrderController extends BaseController {
             message = "更新用户购买订单状态失败";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;

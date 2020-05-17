@@ -122,7 +122,7 @@ public class SUserWithdrawController extends BaseController {
             message = "新增用户提现";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -151,7 +151,7 @@ public class SUserWithdrawController extends BaseController {
             message = "新增用户提现";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;

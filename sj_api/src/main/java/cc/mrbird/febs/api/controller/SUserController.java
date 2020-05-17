@@ -341,7 +341,7 @@ public class SUserController extends BaseController {
             message = "用户登录失败！";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;

@@ -135,7 +135,7 @@ public class SUserTaskController extends BaseController {
             message = "确认拆单失败！";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -402,7 +402,7 @@ public class SUserTaskController extends BaseController {
         } catch (Exception e) {
             response.put("code", 1);
             response.message("确认支付领取任务!");
-            log.error(message, e);
+            log.error( e.getMessage(),e);
         }
 
         return response;

@@ -92,7 +92,7 @@ public class SUserShopCarController extends BaseController {
             message = "商品加入购物车失败";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -292,7 +292,7 @@ public class SUserShopCarController extends BaseController {
             message = "删除购物车商品失败";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
@@ -326,7 +326,7 @@ public class SUserShopCarController extends BaseController {
             message = "更新购物车商品数量失败";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage());
+            log.error( e.getMessage(),e);
         }
 
         return response;
