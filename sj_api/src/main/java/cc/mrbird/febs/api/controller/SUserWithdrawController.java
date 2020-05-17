@@ -16,6 +16,7 @@ import cc.mrbird.febs.common.utils.FebsUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -52,6 +53,7 @@ public class SUserWithdrawController extends BaseController {
      */
     @Log("新增用户提现")
     @PostMapping("/addUserWithdraw")
+    @Transactional
     public FebsResponse addUserWithdraw(@NotEmpty(message="用户银行卡ID不可为空") String userBankId,
                                         @NotEmpty(message="金额不可为空") String amount ) {
 
