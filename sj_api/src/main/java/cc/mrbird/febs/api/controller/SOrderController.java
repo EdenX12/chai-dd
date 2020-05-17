@@ -696,7 +696,6 @@ public class SOrderController extends BaseController {
         return response;
     }
 
-    @Transactional
     private void finishOrder(SOrderDetail orderDetail){
 
         // 确认收货
@@ -1152,6 +1151,7 @@ public class SOrderController extends BaseController {
      * 自动收货定时任务
      */
     @Scheduled(cron="2 */10 * * * ?")
+    @Transactional
     public void shippingOrderTask(){
 
         List<String> orderDetailIds =  this.orderDetailService.getShippingList();
