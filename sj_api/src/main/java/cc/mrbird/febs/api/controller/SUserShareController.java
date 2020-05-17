@@ -55,20 +55,19 @@ public class SUserShareController extends BaseController {
 
             SUser user = FebsUtil.getCurrentUser();
 
+            SUserShare userShare = new SUserShare();
+
+            // 分享ID 前端传参
+            userShare.setId(shareId);
+            userShare.setUserId(user.getId());
+            userShare.setProductId(productId);
+            userShare.setParentId(parentId);
+
+            userShare = this.userShareService.createUserShare(userShare);
+
             int shareCnt = this.userShareService.findUserShareCount(user.getId(), productId);
 
             if (shareCnt == 0) {
-
-                SUserShare userShare = new SUserShare();
-
-                // 分享ID 前端传参
-                userShare.setId(shareId);
-
-                userShare.setUserId(user.getId());
-                userShare.setProductId(productId);
-                userShare.setParentId(parentId);
-
-                userShare = this.userShareService.createUserShare(userShare);
 
                 Integer shareBeanCnt = 0;
                 SParams params = this.paramsService.queryBykeyForOne("share_bean_cnt");
