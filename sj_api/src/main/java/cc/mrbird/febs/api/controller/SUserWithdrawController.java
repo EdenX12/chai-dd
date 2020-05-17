@@ -11,7 +11,9 @@ import cc.mrbird.febs.api.service.ISUserWithdrawService;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
+import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.FebsUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -105,11 +107,40 @@ public class SUserWithdrawController extends BaseController {
             userWithdraw.setCardNum(userBank.getCardNum());
             userWithdraw.setStatus(0);
             userWithdraw.setCreateTime(new Date());
+            userWithdraw.setDealTime(new Date());
             this.userWithdrawService.save(userWithdraw);
 
             // 用户余额减少
             user.setTotalAmount(user.getTotalAmount().subtract(userWithdraw.getAmount()));
             this.userService.updateById(user);
+
+        } catch (Exception e) {
+            message = "新增用户提现";
+            response.put("code", 1);
+            response.message(message);
+            log.error( e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * 用户提现记录
+     */
+    @Log("用户提现记录")
+    @PostMapping("/myWithdraw")
+    public FebsResponse myWithdraw(QueryRequest request) {
+
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        try {
+
+            SUser user = FebsUtil.getCurrentUser();
+
+            IPage<SUserWithdraw>  page = this.userWithdrawService.FindForPage(request,user.getId());
+            response.data(page);
+            response.put("code", 0);
 
         } catch (Exception e) {
             message = "新增用户提现";
