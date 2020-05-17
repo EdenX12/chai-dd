@@ -141,7 +141,7 @@ public class SUserWithdrawController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
 
             IPage<SUserWithdraw>  page = this.userWithdrawService.FindForPage(request,user.getId());
-            response.data(page);
+            response.data(getDataTable(page));
             response.put("code", 0);
 
         } catch (Exception e) {
