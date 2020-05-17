@@ -544,7 +544,12 @@ public class SProductController extends BaseController {
 
         List<Map> couponList = new ArrayList();
 
+        // 判断是否已登录
+        productDetail.put("userLoginFlag", 0);
+
         if (user != null) {
+
+            productDetail.put("userLoginFlag", 1);
 
             // 用户可用优惠券
             List<SUserCoupon> userCouponList = this.userCouponService.findUserCouponList(user.getId(), productId, 0, null);
