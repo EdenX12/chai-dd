@@ -48,7 +48,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
             return this.baseMapper.findProductDetailByProductName(page, productName);
 
@@ -65,7 +65,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
             return this.baseMapper.findNewProductDetail(page);
 
@@ -82,7 +82,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
             return this.baseMapper.findActivityProductDetail(page, activityId);
 
@@ -99,7 +99,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+           // SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
             return this.baseMapper.findProductDetailByBigTypeId(page, product);
 
@@ -116,7 +116,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
 
             return this.baseMapper.findProductDetailBySmallTypeId(page, product);
 
