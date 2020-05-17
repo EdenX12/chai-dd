@@ -4,18 +4,24 @@
 
     <select id="queryPage" resultType="java.util.Map">
         SELECT
-            ss.id shopId,
-            ss.shop_name shopName,
-            od.id orderDetailId,
-            od.order_id orderId,
-            od.order_status orderStatus,
-            case
-                when od.order_status = 0            then '待付款'
-                when od.order_status = 1            then '待发货'
-                when od.order_status = 2            then '待收货'
-                when od.order_status = 4            then '售后中'
-                when od.order_status in(3, 5, -1, 6)   then '已完成'
-            end as orderStatusName
+        ss.id shopId,
+        ss.shop_name shopName,
+        od.id orderDetailId,
+        od.order_id orderId,
+        od.order_status orderStatus,
+        case
+        when od.order_status = 0            then '待付款'
+        when od.order_status = 1            then '待发货'
+        when od.order_status = 2            then '待收货'
+        when od.order_status = 4            then '售后中'
+        when od.order_status in(3, 5, -1, 6)   then '已完成'
+        end as orderStatusName,
+        case
+        when (od.order_status = 0 and od.create_time <![CDATA[ <> ]]> null )
+        then 86400-TIMESTAMPDIFF(SECOND ,NOW(), od.create_time)  else null end  as cancleRemain,
+        case
+        when (od.order_status = 2 and od.shipping_time <![CDATA[ <> ]]> null )
+        then 604800- TIMESTAMPDIFF(SECOND ,NOW(), od.shipping_time)  else null end  as shipingRemain
         FROM
         s_order_detail od
         LEFT JOIN s_shop ss on ss.id = od.shop_id
