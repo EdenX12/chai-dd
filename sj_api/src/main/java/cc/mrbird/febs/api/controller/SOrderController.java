@@ -653,7 +653,6 @@ public class SOrderController extends BaseController {
      * 用户ID 订单ID 状态
      */
     @Log("用户确认收货")
-    @Transactional
     @PostMapping("/confirmFinishOrder")
     public FebsResponse confirmFinishOrder(@Valid String orderDetailId) {
 
@@ -696,7 +695,8 @@ public class SOrderController extends BaseController {
         return response;
     }
 
-    private void finishOrder(SOrderDetail orderDetail){
+    @Transactional
+    public void finishOrder(SOrderDetail orderDetail) {
 
         // 确认收货
         orderDetail.setOrderStatus(3);
@@ -1151,7 +1151,6 @@ public class SOrderController extends BaseController {
      * 自动收货定时任务
      */
     @Scheduled(cron="2 */10 * * * ?")
-    @Transactional
     public void shippingOrderTask(){
 
         List<String> orderDetailIds =  this.orderDetailService.getShippingList();
