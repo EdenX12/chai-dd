@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -51,7 +50,8 @@ public class SUserWithdrawController extends BaseController {
      */
     @Log("新增用户提现")
     @PostMapping("/addUserWithdraw")
-    public FebsResponse addUserWithdraw(@NotEmpty(message="用户银行卡ID不可为空") String userBankId, @NotEmpty(message="金额不可为空") String amount ) {
+    public FebsResponse addUserWithdraw(@NotEmpty(message="用户银行卡ID不可为空") String userBankId,
+                                        @NotEmpty(message="金额不可为空") String amount ) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -62,7 +62,7 @@ public class SUserWithdrawController extends BaseController {
 
             SUserBank userBank = userBankService.getById(userBankId);
             if(userBank == null){
-                message = "银行卡不存在！";
+                message = "用户银行卡不存在！";
                 response.put("code", 1);
                 response.message(message);
                 return response;
@@ -83,6 +83,7 @@ public class SUserWithdrawController extends BaseController {
                 response.message(message);
                 return response;
             }
+
             // 用户提现金额大于余额
             if (realAmount.compareTo(user.getTotalAmount()) > 0) {
 
@@ -92,7 +93,7 @@ public class SUserWithdrawController extends BaseController {
                 return response;
             }
 
-            SBank bank = bankService.getById(userBank.getBankId());
+            SBank bank = this.bankService.getById(userBank.getBankId());
 
             SUserWithdraw userWithdraw = new SUserWithdraw();
             userWithdraw.setUserId(user.getId());
@@ -106,7 +107,7 @@ public class SUserWithdrawController extends BaseController {
             userWithdraw.setCreateTime(new Date());
             this.userWithdrawService.save(userWithdraw);
 
-            // 用户冻结金额追加
+            // 用户余额减少
             user.setTotalAmount(user.getTotalAmount().subtract(userWithdraw.getAmount()));
             this.userService.updateById(user);
 
