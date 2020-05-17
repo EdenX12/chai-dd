@@ -674,9 +674,6 @@ public class SOrderController extends BaseController {
             orderDetail = this.orderDetailService.getById(orderDetailId);
             orderDetail.setUserId(user.getId());
 
-            // 确认收货处理
-            this.finishOrder(orderDetail);
-
             if (orderDetail.getPaymentState() != 1 && orderDetail.getPaymentState() != 9) {
                 message = "此订单还没有完成支付！";
                 response.put("code", 1);
@@ -691,6 +688,8 @@ public class SOrderController extends BaseController {
                 return response;
             }
 
+            // 确认收货处理
+            this.finishOrder(orderDetail);
 
         } catch (Exception e) {
             message = "更新用户购买订单状态失败";
