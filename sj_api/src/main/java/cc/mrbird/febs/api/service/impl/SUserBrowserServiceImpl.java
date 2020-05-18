@@ -1,5 +1,6 @@
 package cc.mrbird.febs.api.service.impl;
 
+import cc.mrbird.febs.api.entity.STaskLine;
 import cc.mrbird.febs.api.entity.SUserBrowser;
 import cc.mrbird.febs.api.mapper.SUserBrowserMapper;
 import cc.mrbird.febs.api.service.ISUserBrowserService;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author MrBird
@@ -53,7 +55,13 @@ public class SUserBrowserServiceImpl extends ServiceImpl<SUserBrowserMapper, SUs
 
         queryWrapper.orderByDesc(SUserBrowser::getCreateTime);
 
-        return this.baseMapper.selectOne(queryWrapper);
+        List<SUserBrowser> list = this.baseMapper.selectList(queryWrapper);
+
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 
 }
