@@ -215,15 +215,6 @@ public class SUserTaskController extends BaseController {
         Map<String, Object> resultData = new HashMap();
 
         try {
-        	//先判断有没有锁定的任务
-        	   // 抽取s_user_task中 支付状态（锁定） 的（自己的） 数据 修改状态为 3-不支付[取消或超期]
-           
-
-            // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
-        
-
-            // 同时把s_user_task_line中的相关数据也同样修改为 3-不支付[取消或超期]
-        	
 
             // 支付金额等详细额度
             Map<String, Object> taskAmtMap = new HashMap();
@@ -283,24 +274,28 @@ public class SUserTaskController extends BaseController {
 
             List<STaskLine> updateTaskLineList = Lists.newArrayList();
             List<SUserTaskLine> userTaskLineList = Lists.newArrayList();
-            int i=0; 
-            int x=0;
+
+            int i = 0;
+            int x = 0;
             while (i < taskNumber) {
             	
-            	QueryWrapper<SUserTaskLine> queryWrapper=new QueryWrapper<SUserTaskLine>();
-            	 String taskLineId = this.taskLineService.queryIdByLineOrder(productId,minLineOrder + x);
-            	 x++;
+                QueryWrapper<SUserTaskLine> queryWrapper = new QueryWrapper<SUserTaskLine>();
+                String taskLineId = this.taskLineService.queryIdByLineOrder(productId,minLineOrder + x);
+                x++;
+
+                // 到最后，退出
+                if (taskLineId == null) {
+                    break;
+                }
+
             	queryWrapper.eq("user_id", userId);
-            	queryWrapper.eq("task_line_id", taskLineId);
-            	queryWrapper.eq("pay_status",1);
-				//首先判断登录人是不是在这个任务线中
-            	int sl=userTaskLineService.count(queryWrapper);
-            	if(taskLineId==null) {
-            		break;
-            	}
-            	if(sl>0) {
-            		continue;
-            	}
+                queryWrapper.eq("task_line_id", taskLineId);
+                queryWrapper.eq("pay_status",1);
+                // 首先判断登录人是不是在这个任务线中
+                int count = this.userTaskLineService.count(queryWrapper);
+                if (count > 0) {
+                    continue;
+                }
             	i++;
                
                 STaskLine taskLine = this.taskLineService.getById(taskLineId);
@@ -435,7 +430,6 @@ public class SUserTaskController extends BaseController {
 
         return response;
     }
-
 
     /**
      * 支付领取任务成功页面
@@ -727,39 +721,43 @@ public class SUserTaskController extends BaseController {
     private String validateTask(SUser user,
                                 String productId,
                                 Integer taskNumber,
-                                String userCouponId){
-    	QueryWrapper<SUserTask> queryWrapper=new QueryWrapper<SUserTask>();
-		//先判断有没有锁定的任务
+                                String userCouponId) {
+
+        // 先判断有没有自己锁定的任务
+    	QueryWrapper<SUserTask> queryWrapper = new QueryWrapper<SUserTask>();
+
     	queryWrapper.eq("user_id", user.getId());
     	queryWrapper.eq("pay_status", 0);
-    	List<SUserTask> sulist=userTaskService.list(queryWrapper);
-    	for (SUserTask userTask : sulist) {
-    		 // 抽取s_user_task中 支付状态（锁定） 的（自己的） 数据 修改状态为 3-不支付[取消或超期]
+
+    	List<SUserTask> userTaskList = this.userTaskService.list(queryWrapper);
+
+    	for (SUserTask userTask : userTaskList) {
+
+    	    // 抽取s_user_task中 支付状态（锁定） 的（自己的） 数据 修改状态为 3-不支付[取消或超期]
     		userTask.setPayStatus(3);
-    		userTaskService.updateById(userTask);
-    		QueryWrapper<SUserTaskLine> queryWrapper1=new QueryWrapper<SUserTaskLine>();
-			// 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
+    		this.userTaskService.updateById(userTask);
+
+            // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
+    		QueryWrapper<SUserTaskLine> queryWrapper1 = new QueryWrapper<SUserTaskLine>();
     		queryWrapper1.eq("task_id", userTask.getId());
-    		List<SUserTaskLine> slList=userTaskLineService.list(queryWrapper1);
-    		 for(SUserTaskLine userTaskLine:slList) {
-    			// 同时把s_user_task_line中的相关数据也同样修改为 3-不支付[取消或超期]
-    	    		userTaskLine.setPayStatus(3);
-    	    		userTaskLineService.updateById(userTaskLine);
-    	    		UpdateWrapper<STaskLine> updateWrapper=new UpdateWrapper<STaskLine>();
-    	    		STaskLine tl=taskLineService.getById(userTaskLine.getTaskLineId());
-    	    		updateWrapper.set("lock_task", tl.getLockTask()-1);
-    	    		updateWrapper.eq("id", userTaskLine.getTaskLineId());
-					//-1
-    	    		taskLineService.update(updateWrapper);
-    		 }
 
-    	     
-    		
+    		List<SUserTaskLine> userTaskLineList = this.userTaskLineService.list(queryWrapper1);
+
+    	    for(SUserTaskLine userTaskLine : userTaskLineList) {
+
+                // 同时把s_user_task_line中的相关数据也同样修改为 3-不支付[取消或超期]
+                userTaskLine.setPayStatus(3);
+                this.userTaskLineService.updateById(userTaskLine);
+
+                UpdateWrapper<STaskLine> updateWrapper = new UpdateWrapper<STaskLine>();
+                STaskLine taskLine = this.taskLineService.getById(userTaskLine.getTaskLineId());
+
+                updateWrapper.set("lock_task", taskLine.getLockTask() - 1);
+                updateWrapper.eq("id", userTaskLine.getTaskLineId());
+
+                this.taskLineService.update(updateWrapper);
+    	    }
     	}
- 	  
-    
-
-     
 
         // 判断任务数量（输入数量必须大于0）
         if(taskNumber == null || taskNumber <= 0){
@@ -772,7 +770,7 @@ public class SUserTaskController extends BaseController {
             return "您已超过此商品领取任务上限!";
         }
 
-        // 新手只能购买新手区商品  其他只能购买非新手区商品
+        // 老手只能购买非新手区商品
         SProduct product = this.productService.getById(productId);
         if (StringUtils.isBlank(productId) || product == null || product.getProductStatus() != 1) {
             return "该商品状态不可购买，请重新选择商品！";
@@ -782,8 +780,8 @@ public class SUserTaskController extends BaseController {
         }
 
         // 判断任务线上是否有足够任务 （抽出数据count(*) 必须大于等于任务数量）
-        // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表
-        Integer taskLineCount = this.taskLineService.queryTaskLineCount(productId,user.getId());
+        // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表  并且不包含自己已经领取任务
+        Integer taskLineCount = this.taskLineService.queryTaskLineCount(productId, user.getId());
         if (taskLineCount < taskNumber) {
             return "现在只能领取" + taskLineCount + "个任务，请修改数量！";
         }

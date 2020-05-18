@@ -9,6 +9,7 @@
          AND line_status = 0
          AND settle_status = 0
          AND lock_task + received_task &lt; total_task
+         AND id not in (select task_line_id from s_user_task_line where user_id = #{userId} and pay_status = 1)
     </select>
 
     <select id="queryMinLineOrder" resultType="java.lang.Integer">

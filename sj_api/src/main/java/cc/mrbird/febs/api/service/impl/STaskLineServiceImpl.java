@@ -17,7 +17,7 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
 
     @Override
     public Integer queryTaskLineCount(String productId,String userId) {
-        return this.baseMapper.queryTaskLineCount(productId,userId);
+        return this.baseMapper.queryTaskLineCount(productId, userId);
     }
 
     @Override
