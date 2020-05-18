@@ -115,8 +115,8 @@ public class SUserBrowserController extends BaseController {
                 if (userRelationOne == null) {
                     // 预备队
                     userRelation.setRelationType(0);
+                    this.userRelationService.createUserRelation(userRelation);
                 }
-                this.userRelationService.createUserRelation(userRelation);
             }
 
         } catch (Exception e) {
