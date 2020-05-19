@@ -278,6 +278,25 @@ public class SUserPayController extends BaseController {
                             // 由预备队修改为禁卫军
                             userRelationOne.setRelationType(1);
                             this.userRelationService.updateById(userRelationOne);
+
+                            //赠送豆
+                            SParams paramsBean = paramsService.queryBykeyForOne("children_bean_cnt");
+                            Integer beanCnt = Integer.parseInt(params.getPValue());
+                            if (paramsBean != null && beanCnt > 0) {
+                                SUser parentUser = this.userService.getById(userShare.getUserId());
+                                SUserBeanLog userBeanLog = new SUserBeanLog();
+                                userBeanLog.setUserId(parentUser.getId());
+                                userBeanLog.setChangeType(2);
+                                userBeanLog.setChangeAmount(beanCnt);
+                                userBeanLog.setChangeTime(new Date());
+                                userBeanLog.setRelationId(userRelationOne.getId());
+                                userBeanLog.setRemark("新增禁卫军");
+                                userBeanLog.setOldAmount(parentUser.getRewardBean());
+                                this.userBeanLogService.save(userBeanLog);
+
+                                parentUser.setRewardBean(parentUser.getRewardBean() + beanCnt);
+                                this.userService.updateById(parentUser);
+                            }
                         }
                     }
                 }
