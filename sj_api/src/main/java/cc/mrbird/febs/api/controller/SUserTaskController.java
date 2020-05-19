@@ -416,7 +416,7 @@ public class SUserTaskController extends BaseController {
                                 userBeanLog.setOldAmount(parentUser.getRewardBean());
                                 this.userBeanLogService.save(userBeanLog);
 
-                                parentUser.setRewardBean(parentUser.getRewardBean() + orderBeanCnt);
+                                parentUser.setRewardBean(parentUser.getRewardBean() + beanCnt);
                                 this.userService.updateById(parentUser);
                             }
                         }

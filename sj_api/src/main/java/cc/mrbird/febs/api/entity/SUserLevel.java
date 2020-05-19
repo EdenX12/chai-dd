@@ -57,5 +57,5 @@ public class SUserLevel implements Serializable {
     /**
      * 图片
      */
-    private String image;
+    private String levelImage;
 }
