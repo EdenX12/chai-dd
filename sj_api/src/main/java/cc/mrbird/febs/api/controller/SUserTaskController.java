@@ -97,6 +97,7 @@ public class SUserTaskController extends BaseController {
      */
     @Log("确认拆单")
     @PostMapping("/confirmUserTask")
+    @Transactional
     @Limit(key = "confirmUserTask", period = 60, count = 2000, name = "确认拆单数量", prefix = "limit")
     public FebsResponse confirmUserTask(HttpServletRequest request,
                                         @NotNull(message="商品ID不可空") String productId,

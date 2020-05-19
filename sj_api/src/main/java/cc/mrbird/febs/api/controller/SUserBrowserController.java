@@ -77,6 +77,12 @@ public class SUserBrowserController extends BaseController {
 
                 SUserShare userShare = this.userShareService.getById(shareId);
 
+                // 正常数据不会出现此种情况
+                if (userShare == null) {
+                    log.error("shareId:===" + shareId);
+                    return response;
+                }
+
                 // 0-APP,1-微信公众号,2-小程序
                 userBrowser.setChannel(2);
                 userBrowser.setProductId(userShare.getProductId());
