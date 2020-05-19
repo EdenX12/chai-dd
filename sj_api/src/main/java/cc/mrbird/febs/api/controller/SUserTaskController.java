@@ -566,6 +566,9 @@ public class SUserTaskController extends BaseController {
                 Map<String, Object> productDetail = this.productService.findProductDetail(
                         userTask.get("productId").toString(), user);
 
+                // 关注中 默认数量为1
+                productDetail.put("taskingCnt", 1);
+
                 userTask.put("productDetail", productDetail);
             }
 
