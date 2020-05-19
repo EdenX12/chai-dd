@@ -408,7 +408,7 @@ public class SUserTaskController extends BaseController {
                                 SUser parentUser = this.userService.getById(userShare.getUserId());
                                 SUserBeanLog userBeanLog = new SUserBeanLog();
                                 userBeanLog.setUserId(parentUser.getId());
-                                userBeanLog.setChangeType(2);
+                                userBeanLog.setChangeType(9);
                                 userBeanLog.setChangeAmount(beanCnt);
                                 userBeanLog.setChangeTime(new Date());
                                 userBeanLog.setRelationId(userRelationOne.getId());
