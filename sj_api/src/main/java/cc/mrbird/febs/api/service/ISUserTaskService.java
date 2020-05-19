@@ -99,5 +99,5 @@ public interface ISUserTaskService extends IService<SUserTask> {
     /**
      * 支付成功后更新为 锁定数量->已接任务数量
      */
-    void updateTaskLineSuccessBatch(String taskId);
+    void updateTaskLineSuccessBatch(String taskLineId);
 }

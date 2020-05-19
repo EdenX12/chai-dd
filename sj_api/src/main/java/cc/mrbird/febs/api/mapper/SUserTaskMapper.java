@@ -30,7 +30,7 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
 
     void updateTaskLineFailBatch();
 
-    void updateUserTaskLineSuccessBatch(String taskId);
+    void updateUserTaskLineSuccessBatch(@Param("taskId") String taskId);
 
-    void updateTaskLineSuccessBatch(String taskId);
+    void updateTaskLineSuccessBatch(@Param("taskLineId") String taskLineId);
 }

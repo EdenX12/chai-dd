@@ -44,6 +44,9 @@ public class SUserPayController extends BaseController {
     private ISUserTaskService userTaskService;
 
     @Autowired
+    private ISUserTaskLineService userTaskLineService;
+
+    @Autowired
     private ISOrderService orderService;
 
     @Autowired
@@ -203,7 +206,12 @@ public class SUserPayController extends BaseController {
                 this.userTaskService.updateUserTaskLineSuccessBatch(relationId);
 
                 // 修改s_task_line 锁定任务数量-1  已领取任务数量+1
-                this.userTaskService.updateTaskLineSuccessBatch(relationId);
+                SUserTaskLine userTaskLine = new SUserTaskLine();
+                userTaskLine.setTaskId(relationId);
+                List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
+                for (SUserTaskLine userTaskLineSuccess : userTaskLineList) {
+                    this.userTaskService.updateTaskLineSuccessBatch(userTaskLineSuccess.getTaskLineId());
+                }
 
                 // 修改优惠券状态(已使用) 及 流水记录(s_user_coupon_log)追加
                 if (StringUtils.isNotBlank(userTask.getUserCouponId())) {

@@ -209,10 +209,7 @@
                received_task = received_task + 1,
                line_status = (case when received_task &gt;= total_task then 1 else 0 end),
                update_time = now()
-         WHERE id IN (SELECT task_line_id
-                        FROM s_user_task_line
-                       WHERE task_id = #{taskId}
-                     )
+         WHERE id = #{taskLineId}
     </update>
 
     <update id="updateUserTaskLineSuccessBatch" parameterType="java.lang.String">

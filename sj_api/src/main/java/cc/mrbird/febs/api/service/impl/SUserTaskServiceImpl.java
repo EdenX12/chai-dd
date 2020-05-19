@@ -158,7 +158,7 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     }
 
     @Override
-    public void updateTaskLineSuccessBatch(String taskId) {
-        this.baseMapper.updateTaskLineSuccessBatch(taskId);
+    public void updateTaskLineSuccessBatch(String taskLineId) {
+        this.baseMapper.updateTaskLineSuccessBatch(taskLineId);
     }
 }
