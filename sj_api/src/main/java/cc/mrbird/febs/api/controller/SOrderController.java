@@ -243,8 +243,8 @@ public class SOrderController extends BaseController {
             // 赠送拆豆总数
             int totalBeanCnt = 0;
 
-            SParams params = this.paramsService.queryBykeyForOne("product_bean_cnt");
-            Integer productBeanCnt = Integer.valueOf(params.getPValue());
+//            SParams params = this.paramsService.queryBykeyForOne("product_bean_cnt");
+//            Integer productBeanCnt = Integer.valueOf(params.getPValue());
 
             // 拆单显示（不同的商户 显示到不同的订单）
             for (Map productMap : productList) {
@@ -283,7 +283,9 @@ public class SOrderController extends BaseController {
                     // 商家订单快递费用
                     orderExpressAmt = new BigDecimal(productMap.get("expressFee").toString());
                     // 商家订单赠送拆豆
-                    orderBeanCnt =  (int) productMap.get("productNumber") * productBeanCnt;
+//                    orderBeanCnt =  (int) productMap.get("productNumber") * productBeanCnt;
+                    // 商品数量* 商品价格 * 10
+                    orderBeanCnt = new BigDecimal(productMap.get("productPrice").toString()).multiply(new BigDecimal(productMap.get("productNumber").toString())).multiply(new BigDecimal(10)).intValue();
 
                 } else {
 
@@ -291,8 +293,10 @@ public class SOrderController extends BaseController {
                     orderReturnAmt = orderReturnAmt.add( (new BigDecimal(productMap.get("buyerReturnAmt").toString())).multiply(new BigDecimal(productMap.get("productNumber").toString())) );
                     // 商家订单快递费用
                     orderExpressAmt = orderExpressAmt.add( (new BigDecimal(productMap.get("expressFee").toString())).multiply(new BigDecimal(productMap.get("productNumber").toString())) );
-                    // 商家订单赠送拆豆
-                    orderBeanCnt = orderBeanCnt + (int) productMap.get("productNumber") * productBeanCnt;
+//                    // 商家订单赠送拆豆
+//                    orderBeanCnt = orderBeanCnt + (int) productMap.get("productNumber") * productBeanCnt;
+                    // 商品数量* 商品价格 * 10
+                    orderBeanCnt = orderBeanCnt + new BigDecimal(productMap.get("productPrice").toString()).multiply(new BigDecimal(productMap.get("productNumber").toString())).multiply(new BigDecimal(10)).intValue();
 
                     orderProductList.add(productMap);
                 }
@@ -309,8 +313,12 @@ public class SOrderController extends BaseController {
                 // 总订单快递费用
                 totalExpressAmt = totalExpressAmt.add( (new BigDecimal(productMap.get("expressFee").toString())).multiply(new BigDecimal(productMap.get("productNumber").toString())) );
 
-                // 赠送拆豆总数 (数量 * 8)
-                totalBeanCnt = totalBeanCnt +  (int) productMap.get("productNumber") * productBeanCnt;
+//                // 赠送拆豆总数 (数量 * 8)
+//                totalBeanCnt = totalBeanCnt +  (int) productMap.get("productNumber") * productBeanCnt;
+
+                // 商品数量* 商品价格 * 10
+                totalBeanCnt = totalBeanCnt + new BigDecimal(productMap.get("productPrice").toString()).multiply(new BigDecimal(productMap.get("productNumber").toString())).multiply(new BigDecimal(10)).intValue();
+
             }
             orderMap.put("orderProduct", orderProductList);
             // 商家订单返还金额

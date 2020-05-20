@@ -78,8 +78,8 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
         params = this.paramsService.queryBykeyForOne("buyer_rate");
         BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
 
-        params = this.paramsService.queryBykeyForOne("product_bean_cnt");
-        Integer productBeanCnt = Integer.valueOf(params.getPValue());
+//        params = this.paramsService.queryBykeyForOne("product_bean_cnt");
+//        Integer productBeanCnt = Integer.valueOf(params.getPValue());
 
         Map<String, Object> result = this.baseMapper.queryOrderDetail(orderDetailId);
 
