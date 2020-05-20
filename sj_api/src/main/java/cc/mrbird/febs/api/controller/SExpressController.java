@@ -41,8 +41,13 @@ public class SExpressController {
         HashMap param = new HashMap();
         param.put("com",orderDetail.getShippingExpressCode());
         param.put("num",orderDetail.getShippingCode());
-        String customer ="4C890F45F67888047E8B10C29DA539A5";
-        String key = "aTZePbkA8749";
+        String customer ="38E2F9F4D77D8A3B03C7562B06049549";
+        String key = "TRjsfeJT8443";
+        //授权KEY：TRjsfeJT8443
+        //customer：38E2F9F4D77D8A3B03C7562B06049549
+        //secret：6f733036acd8463b9dc1a5b54f5956f7
+        //userid：df293828f26645ab9c0bdde9139d7201
+        //智能判断：TRjsfeJT8443
         String sign = MD5.encode(JSONObject.toJSONString(param)+key+customer);
 
         try {
