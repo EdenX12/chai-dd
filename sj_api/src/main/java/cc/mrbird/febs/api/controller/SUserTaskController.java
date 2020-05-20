@@ -303,6 +303,7 @@ public class SUserTaskController extends BaseController {
                 if (needPayAmt.compareTo(BigDecimal.ZERO) > 0) {
                     // 锁定任务数+1
                     taskLine.setLockTask(taskLine.getLockTask() + 1);
+                    log.info("taskLine="+taskLine.getId()+"新增一个锁定");
                 } else {
                     // 已领取任务数+1
                     taskLine.setReceivedTask(taskLine.getReceivedTask() + 1);
@@ -521,7 +522,8 @@ public class SUserTaskController extends BaseController {
         this.userTaskService.updateTaskForUnLock();
 
         // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
-        userTaskService.updateTaskLineFailBatch();
+        Integer count = userTaskService.updateTaskLineFailBatch();
+        log.info("定时任务本次解冻了"+count+"个任务线");
 
         // 同时把s_user_task_line中的相关数据也同样修改为 3-不支付[取消或超期]
         userTaskService.updateUserTaskLineFailBatch();
@@ -778,6 +780,7 @@ public class SUserTaskController extends BaseController {
                 updateWrapper.eq("id", userTaskLine.getTaskLineId());
 
                 this.taskLineService.update(updateWrapper);
+                log.info("LockTask更新之前数量 "+taskLine.getLockTask() +"|||taskLineId="+userTaskLine.getTaskLineId()+"userTaskLineId="+userTaskLine.getId());
     	    }
     	}
 

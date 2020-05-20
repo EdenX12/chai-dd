@@ -89,7 +89,7 @@ public interface ISUserTaskService extends IService<SUserTask> {
     /**
      * 定时更新 锁定 批量更新任务线锁定数量
      */
-    void updateTaskLineFailBatch();
+    Integer updateTaskLineFailBatch();
 
     /**
      * 支付成功后更新为 已支付
@@ -99,5 +99,5 @@ public interface ISUserTaskService extends IService<SUserTask> {
     /**
      * 支付成功后更新为 锁定数量->已接任务数量
      */
-    void updateTaskLineSuccessBatch(String taskLineId);
+    Integer updateTaskLineSuccessBatch(String taskLineId);
 }
