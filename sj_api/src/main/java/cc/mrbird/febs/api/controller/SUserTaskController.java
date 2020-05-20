@@ -409,7 +409,7 @@ public class SUserTaskController extends BaseController {
                                 SUser parentUser = this.userService.getById(userShare.getUserId());
                                 SUserBeanLog userBeanLog = new SUserBeanLog();
                                 userBeanLog.setUserId(parentUser.getId());
-                                userBeanLog.setChangeType(2);
+                                userBeanLog.setChangeType(9);
                                 userBeanLog.setChangeAmount(beanCnt);
                                 userBeanLog.setChangeTime(new Date());
                                 userBeanLog.setRelationId(userRelationOne.getId());
@@ -516,6 +516,7 @@ public class SUserTaskController extends BaseController {
      * 2分钟执行一次 (支付失败时间超过5分钟的任务处理)
      */
     @Scheduled(cron = "0 */2 * * * ?")
+    @Transactional
     public void unLockPayFailTask() {
 
         // 抽取s_user_task中 支付状态（锁定） 支付时间大于5分钟的 数据 修改状态为 3-不支付[取消或超期]
@@ -588,7 +589,7 @@ public class SUserTaskController extends BaseController {
                         userTask.get("productId").toString(), user);
 
                 // 关注中 默认数量为1
-                productDetail.put("taskingCnt", 1);
+                userTask.put("taskingCnt", 1);
 
                 userTask.put("productDetail", productDetail);
             }

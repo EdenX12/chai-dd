@@ -23,7 +23,7 @@ public class SExpressController {
     private ISOrderDetailService orderDetailService;
 
     @GetMapping("/queryExpressInfo")
-    @Limit(key = "getAreaList", period = 60, count = 2000, name = "检索所有地区列表接口", prefix = "limit")
+    @Limit(key = "queryExpressInfo", period = 60, count = 2000, name = "物流查询接口", prefix = "limit")
     public FebsResponse queryExpressInfo(String orderDetailId) {
         FebsResponse response = new FebsResponse();
 
