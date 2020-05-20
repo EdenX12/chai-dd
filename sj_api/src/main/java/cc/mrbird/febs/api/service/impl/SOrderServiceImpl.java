@@ -109,9 +109,12 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
                 // 买家立返
                 buyerReturnAmt = buyerReturnAmt.add(totalReward.multiply(buyerRate).multiply(productNumber));
 
-                // 赠送拆豆
-                rewardBean = rewardBean + productBeanCnt * Integer.parseInt(productMap.get("productNumber").toString());
+//                // 赠送拆豆
+//                rewardBean = rewardBean + productBeanCnt * Integer.parseInt(productMap.get("productNumber").toString());
             }
+
+            // 赠送拆豆 暂时变更为商品价格*10
+            rewardBean = new BigDecimal(result.get("payAmount").toString()).multiply(new BigDecimal(10)).intValue();
 
             // 计算返现合计
             result.put("buyerReturnAmt", buyerReturnAmt);

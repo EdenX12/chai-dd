@@ -53,7 +53,15 @@ public class SUserRelationServiceImpl extends ServiceImpl<SUserRelationMapper, S
             queryWrapper.eq(SUserRelation::getRelationType, userRelation.getRelationType());
         }
 
-        return this.baseMapper.selectOne(queryWrapper);
+        queryWrapper.orderByDesc(SUserRelation::getCreateTime);
+
+        List<SUserRelation> list = this.baseMapper.selectList(queryWrapper);
+
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override

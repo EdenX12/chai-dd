@@ -400,6 +400,9 @@ public class SUserController extends BaseController {
         // 等级名称
         SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
         returnMap.put("levelName", userLevel.getLevelName());
+        // 等级图片
+        returnMap.put("levelImage", userLevel.getLevelImage());
+
         // 每件商品最高任务线数
         returnMap.put("buyNumber", userLevel.getBuyNumber());
         // 最多并行商品件数

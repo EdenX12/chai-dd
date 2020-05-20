@@ -185,14 +185,15 @@
     </update>
 
     <update id="updateTaskLineFailBatch">
-        UPDATE (SELECT task_line_id,
+        UPDATE s_task_line b
+             LEFT JOIN
+               (SELECT task_line_id,
                        count(*) cnt
                   FROM s_user_task_line
-                 WHERE TIMESTAMPDIFF(MINUTE, pay_time, NOW()) >= 5
-                   AND pay_status = 0
+                  where pay_status = 0
               GROUP BY task_line_id) a
-             LEFT JOIN s_task_line b ON a.task_line_id = b.id
-                   SET b.lock_task = b.lock_task - a.cnt
+              ON a.task_line_id = b.id
+                   SET b.lock_task = IFNULL(a.cnt, 0)
     </update>
 
     <update id="updateUserTaskLineFailBatch">
