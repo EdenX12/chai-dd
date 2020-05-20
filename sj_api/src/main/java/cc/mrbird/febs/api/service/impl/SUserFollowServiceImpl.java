@@ -34,6 +34,7 @@ public class SUserFollowServiceImpl extends ServiceImpl<SUserFollowMapper, SUser
         }
 
         queryWrapper.eq(SUserFollow::getFollowType, userFollow.getFollowType());
+        queryWrapper.last("limit 1");
 
         return this.baseMapper.selectOne(queryWrapper);
     }
