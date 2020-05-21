@@ -703,9 +703,9 @@ public class SUserTaskController extends BaseController {
      * @param userTask
      * @return
      */
-    @PostMapping("/getUserTasList")
-    @Limit(key = "getUserTasList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
-    public FebsResponse getUserTasList(QueryRequest queryRequest, String type) {
+    @PostMapping("/getUserTaskList")
+    @Limit(key = "getUserTaskList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
+    public FebsResponse getUserTaskList(QueryRequest queryRequest, String type) {
 
         FebsResponse response = new FebsResponse();
         SUser user = FebsUtil.getCurrentUser();
