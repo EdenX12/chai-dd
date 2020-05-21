@@ -698,6 +698,63 @@ public class SUserTaskController extends BaseController {
     }
 
     /**
+     * 我的任务列表
+     * @param queryRequest
+     * @param userTask
+     * @return
+     */
+    @PostMapping("/getUserTasList")
+    @Limit(key = "getUserTasList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
+    public FebsResponse getUserTasList(QueryRequest queryRequest, String type) {
+
+        FebsResponse response = new FebsResponse();
+        SUser user = FebsUtil.getCurrentUser();
+        Map<String, Object> userTaskPageList = null;
+        IPage<Map> result = null;
+        switch (type)
+        {
+            //进行中
+            case "1" :
+                result = this.userTaskService.findTaskDetailByStatus(
+                        queryRequest, user.getId(),0);break;
+            //已完成
+            case "2" :
+                result = this.userTaskService.findTaskDetailByStatus(
+                        queryRequest, user.getId(),5);break;
+             //已关注
+            case "3" : result = this.userTaskService.findUserTaskFollowList(
+                    queryRequest, user.getId());break;
+            //结算中
+            case "4" :
+                result = this.userTaskService.findTaskDetailByStatus(
+                    queryRequest, user.getId(),4);break;
+             //转让中
+            case "5" :
+                SUserTask userTask = new SUserTask();
+                userTask.setUserId(user.getId());
+                result = this.userTaskService.findUserTaskOutList(userTask, queryRequest);break;
+
+        }
+        if (result != null) {
+            List<Map> userTaskList = result.getRecords();
+            for (Map userTask : userTaskList) {
+                Map<String, Object> productDetail = this.productService.findProductDetail(
+                        userTask.get("productId").toString(), user);
+
+                userTask.put("productDetail", productDetail);
+            }
+
+            result.setRecords(userTaskList);
+        }
+
+        userTaskPageList =  getDataTable(result);
+        response.put("code", 0);
+        response.data(userTaskPageList);
+
+        return response;
+    }
+
+    /**
      * 取得我的任务【收购中】列表信息
      * @return List<Map>
      */
