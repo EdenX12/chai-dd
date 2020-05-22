@@ -1,7 +1,6 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SOrder;
-import cc.mrbird.febs.api.entity.SParams;
 import cc.mrbird.febs.api.entity.SProductImg;
 import cc.mrbird.febs.api.mapper.SOrderMapper;
 import cc.mrbird.febs.api.service.ISOrderService;

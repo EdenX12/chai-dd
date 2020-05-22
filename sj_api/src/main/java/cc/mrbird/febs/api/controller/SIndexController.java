@@ -82,7 +82,7 @@ public class SIndexController extends BaseController {
 
         List<Map> recommendProductList = new ArrayList();
 
-        // 买家立返佣金比例 （后续调整到Redis缓存读取）
+        // 买家立返佣金比例 （从Redis缓存读取）
         String value = this.paramsService.queryBykeyForOne("buyer_rate");
         BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 

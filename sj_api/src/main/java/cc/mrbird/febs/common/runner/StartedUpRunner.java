@@ -31,6 +31,8 @@ public class StartedUpRunner implements ApplicationRunner {
             log.info("                                                      ");
             log.info("FEBS 启动完毕，时间：" + LocalDateTime.now());
         }
-        paramsService.cacheParams();
+
+        // 数据字典到Redis缓存
+        this.paramsService.cacheParams();
     }
 }

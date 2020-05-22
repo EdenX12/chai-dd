@@ -12,19 +12,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
-
 /**
  * @author MrBird
  */
 @Service
 public class SUserWithdrawServiceImpl extends ServiceImpl<SUserWithdrawMapper, SUserWithdraw> implements ISUserWithdrawService {
+
     @Override
     public IPage<SUserWithdraw> FindForPage(QueryRequest request,String userId) {
+
         LambdaQueryWrapper<SUserWithdraw> queryWrapper = new LambdaQueryWrapper();
 
         queryWrapper.eq(SUserWithdraw::getUserId, userId);
         Page<SUserWithdraw> page = new Page<>();
         SortUtil.handlePageSort(request, page, "dealTime", FebsConstant.ORDER_DESC, false);
+
         return this.baseMapper.selectPage(page, queryWrapper);
     }
 
