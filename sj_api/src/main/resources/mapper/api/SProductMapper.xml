@@ -236,17 +236,17 @@
         FROM s_product SP
         LEFT JOIN s_shop SS
         ON SS.id = sp.shop_id
-        LEFT JOIN (SELECT product_id, count(*) notOverCnt FROM s_task_line WHERE line_status = 0 AND settle_status = 0 GROUP BY product_id) STL1
+        LEFT JOIN (SELECT product_id, count(*) notOverCnt FROM s_task_line WHERE line_status = 0 AND settle_status = 0 AND product_id = #{productId}) STL1
         ON STL1.product_id = SP.id
-        LEFT JOIN (SELECT product_id, MIN(line_order) AS minOrder FROM s_task_line WHERE line_status = 0 AND settle_status = 0 GROUP BY product_id) STL2
+        LEFT JOIN (SELECT product_id, MIN(line_order) AS minOrder FROM s_task_line WHERE line_status = 0 AND settle_status = 0 AND product_id = #{productId}) STL2
         ON STL2.product_id = SP.id
         LEFT JOIN s_task_line STL3
         ON STL3.product_id = STL2.product_id AND STL3.line_order = STL2.minOrder
-        LEFT JOIN (SELECT product_id, count(*) taskUserCnt FROM (SELECT product_id, user_id FROM s_user_task WHERE pay_status = 1 group by product_id, user_id) temp GROUP BY product_id) SUT
+        LEFT JOIN (SELECT product_id, count(*) taskUserCnt FROM (SELECT product_id, user_id FROM s_user_task WHERE pay_status = 1 AND product_id = #{productId} group by product_id, user_id) temp GROUP BY product_id) SUT
         ON SUT.product_id = SP.id
-        LEFT JOIN (select product_id, count(*) followCnt from s_user_follow where follow_type = 0 and status = 1 group by product_id) SUF
+        LEFT JOIN (select product_id, count(*) followCnt from s_user_follow where follow_type = 0 and status = 1 AND product_id = #{productId}) SUF
         ON SUF.product_id = SP.id
-        LEFT JOIN (select product_id, count(*) browserCnt from s_user_browser group by product_id) SUB
+        LEFT JOIN (select product_id, count(*) browserCnt from s_user_browser WHERE product_id = #{productId}) SUB
         ON SUB.product_id = SP.id
         WHERE 1 = 1
         AND SP.id = #{productId}
