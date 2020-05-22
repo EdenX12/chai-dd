@@ -237,9 +237,9 @@ public class SUserPayController extends BaseController {
 
                 // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
                 Integer orderBeanCnt = 0;
-                SParams params = this.paramsService.queryBykeyForOne("order_bean_cnt");
-                if (params != null) {
-                    orderBeanCnt = Integer.valueOf(params.getPValue());
+                String value = this.paramsService.queryBykeyForOne("order_bean_cnt");
+                if (value != null) {
+                    orderBeanCnt = Integer.valueOf(value);
                 }
                 if (orderBeanCnt != null && orderBeanCnt > 0) {
                     SUserBeanLog userBeanLog = new SUserBeanLog();
@@ -280,8 +280,8 @@ public class SUserPayController extends BaseController {
                             this.userRelationService.updateById(userRelationOne);
 
                             //赠送豆
-                            SParams paramsBean = paramsService.queryBykeyForOne("children_bean_cnt");
-                            Integer beanCnt = Integer.parseInt(params.getPValue());
+                            String paramsBean = paramsService.queryBykeyForOne("children_bean_cnt");
+                            Integer beanCnt = Integer.parseInt(paramsBean);
                             if (paramsBean != null && beanCnt > 0) {
                                 SUser parentUser = this.userService.getById(userShare.getUserId());
                                 SUserBeanLog userBeanLog = new SUserBeanLog();

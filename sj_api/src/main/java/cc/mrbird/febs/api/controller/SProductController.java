@@ -186,13 +186,12 @@ public class SProductController extends BaseController {
         product.setTypeId(typeId);
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value =  this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 同组任务躺赢佣金比例
-        params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        value = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 级别（1、2）
         if (productType.getLevel() == 1) {
@@ -314,13 +313,12 @@ public class SProductController extends BaseController {
         Map<String, Object> productPageList = new HashMap<>();
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 同组任务躺赢佣金比例
-        params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        value = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 模糊检索商品列表
         IPage<Map> returnPage = this.productService.findProductListByProductName(productName, queryRequest);
@@ -386,13 +384,12 @@ public class SProductController extends BaseController {
         Map<String, Object> productPageList = new HashMap<>();
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 同组任务躺赢佣金比例
-        params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        value = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 模糊检索商品列表
         IPage<Map> returnPage = this.productService.findNewProductList(queryRequest);
@@ -458,13 +455,12 @@ public class SProductController extends BaseController {
         Map<String, Object> productPageList = new HashMap<>();
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 同组任务躺赢佣金比例
-        params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        value = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 模糊检索商品列表
         IPage<Map> returnPage = this.productService.findActivityProductList(activityId, queryRequest);

@@ -70,9 +70,9 @@ public class SUserShareController extends BaseController {
             if (shareCnt == 0) {
 
                 Integer shareBeanCnt = 0;
-                SParams params = this.paramsService.queryBykeyForOne("share_bean_cnt");
+                String params = this.paramsService.queryBykeyForOne("share_bean_cnt");
                 if (params != null) {
-                    shareBeanCnt = Integer.valueOf(params.getPValue());
+                    shareBeanCnt = Integer.valueOf(params);
                 }
 
                 // 猎豆流水插入

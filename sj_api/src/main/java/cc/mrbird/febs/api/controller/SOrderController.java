@@ -846,27 +846,26 @@ public class SOrderController extends BaseController {
         List<SOrder> orderPaySuccessList = this.orderService.findOrderPaySuccessList();
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String params =  this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params));
         // 同组任务躺赢佣金比例
         params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params));
         // 横向上级躺赢佣金比例
         params = this.paramsService.queryBykeyForOne("upper_horizontal_rate");
-        BigDecimal upperHorizontalRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        BigDecimal upperHorizontalRate = BigDecimal.valueOf(Double.parseDouble(params));
         // 纵向上级1躺赢佣金比例
         params = this.paramsService.queryBykeyForOne("upper_vertical1_rate1");
-        BigDecimal upperVertical1Rate1 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        BigDecimal upperVertical1Rate1 = BigDecimal.valueOf(Double.parseDouble(params));
         // 纵向上级2躺赢佣金比例
         params = this.paramsService.queryBykeyForOne("upper_vertical1_rate2");
-        BigDecimal upperVertical1Rate2 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        BigDecimal upperVertical1Rate2 = BigDecimal.valueOf(Double.parseDouble(params));
         // 纵向上级3躺赢佣金比例
         params = this.paramsService.queryBykeyForOne("upper_vertical1_rate3");
-        BigDecimal upperVertical1Rate3 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        BigDecimal upperVertical1Rate3 = BigDecimal.valueOf(Double.parseDouble(params));
         // 纵向上级0躺赢佣金比例
         params = this.paramsService.queryBykeyForOne("upper_vertical1_rate0");
-        BigDecimal upperVertical1Rate0 = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        BigDecimal upperVertical1Rate0 = BigDecimal.valueOf(Double.parseDouble(params));
 
         for (SOrder order : orderPaySuccessList) {
 

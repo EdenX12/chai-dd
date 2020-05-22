@@ -74,9 +74,8 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
     public Map<String, Object> queryOrderDetail(String orderDetailId) {
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
 //        params = this.paramsService.queryBykeyForOne("product_bean_cnt");
 //        Integer productBeanCnt = Integer.valueOf(params.getPValue());

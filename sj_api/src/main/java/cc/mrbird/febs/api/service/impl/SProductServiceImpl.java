@@ -132,13 +132,12 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
             Map returnMap = this.baseMapper.findProductDetail(productId);
 
             // 买家立返佣金比例 （后续调整到Redis缓存读取）
-            SParams params = new SParams();
-            params = this.paramsService.queryBykeyForOne("buyer_rate");
-            BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+            String value  = this.paramsService.queryBykeyForOne("buyer_rate");
+            BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
             // 同组任务躺赢佣金比例
-            params = this.paramsService.queryBykeyForOne("same_group_rate");
-            BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+            value = this.paramsService.queryBykeyForOne("same_group_rate");
+            BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
             // 商品图片
             List<SProductImg> productImgList = this.productImgService.findProductImgList((String)returnMap.get("productId"));

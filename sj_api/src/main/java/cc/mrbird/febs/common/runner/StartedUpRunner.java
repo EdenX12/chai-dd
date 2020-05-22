@@ -1,5 +1,6 @@
 package cc.mrbird.febs.common.runner;
 
+import cc.mrbird.febs.api.service.ISParamsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -18,6 +19,9 @@ public class StartedUpRunner implements ApplicationRunner {
     @Autowired
     private ConfigurableApplicationContext context;
 
+    @Autowired
+    ISParamsService paramsService;
+
     @Override
     public void run(ApplicationArguments args) {
         if (context.isActive()) {
@@ -27,5 +31,6 @@ public class StartedUpRunner implements ApplicationRunner {
             log.info("                                                      ");
             log.info("FEBS 启动完毕，时间：" + LocalDateTime.now());
         }
+        paramsService.cacheParams();
     }
 }

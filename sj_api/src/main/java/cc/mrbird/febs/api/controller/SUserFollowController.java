@@ -67,9 +67,9 @@ public class SUserFollowController extends BaseController {
             userFollow = this.userFollowService.createUserFollow(userFollow);
 
             Integer followBeanCnt = 0;
-            SParams params = this.paramsService.queryBykeyForOne("follow_bean_cnt");
+            String params = this.paramsService.queryBykeyForOne("follow_bean_cnt");
             if (params != null) {
-                followBeanCnt = Integer.valueOf(params.getPValue());
+                followBeanCnt = Integer.valueOf(params);
             }
 
             // 猎豆流水插入
@@ -118,9 +118,9 @@ public class SUserFollowController extends BaseController {
             userFollow = this.userFollowService.updateUserFollow(userFollow);
 
             Integer followBeanCnt = 0;
-            SParams params = this.paramsService.queryBykeyForOne("follow_bean_cnt");
+            String params = this.paramsService.queryBykeyForOne("follow_bean_cnt");
             if (params != null) {
-                followBeanCnt = Integer.valueOf(params.getPValue());
+                followBeanCnt = Integer.valueOf(params);
             }
 
             // 猎豆流水插入

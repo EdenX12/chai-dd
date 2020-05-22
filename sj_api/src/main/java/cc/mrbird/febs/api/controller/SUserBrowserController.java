@@ -90,9 +90,9 @@ public class SUserBrowserController extends BaseController {
                 userBrowser = this.userBrowserService.createUserBrowser(userBrowser);
 
                 Integer browserBeanCnt = 0;
-                SParams params = this.paramsService.queryBykeyForOne("browser_bean_cnt");
-                if (params != null) {
-                    browserBeanCnt = Integer.valueOf(params.getPValue());
+                String value =  this.paramsService.queryBykeyForOne("browser_bean_cnt");
+                if (value != null) {
+                    browserBeanCnt = Integer.valueOf(value);
                 }
 
                 // 猎豆流水插入

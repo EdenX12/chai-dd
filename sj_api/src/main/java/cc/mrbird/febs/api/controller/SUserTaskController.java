@@ -190,9 +190,9 @@ public class SUserTaskController extends BaseController {
 
         // 赠送拆豆取得
         Integer orderBeanCnt = 0;
-        SParams params = this.paramsService.queryBykeyForOne("order_bean_cnt");
-        if (params != null) {
-            orderBeanCnt = Integer.valueOf(params.getPValue());
+        String value  = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        if (value != null) {
+            orderBeanCnt = Integer.valueOf(value);
         }
         resultData.put("orderBeanCnt", orderBeanCnt);
     }
@@ -403,8 +403,8 @@ public class SUserTaskController extends BaseController {
                             this.userRelationService.updateById(userRelationOne);
 
                             //赠送豆
-                            SParams params = paramsService.queryBykeyForOne("children_bean_cnt");
-                            Integer beanCnt = Integer.parseInt(params.getPValue());
+                            String value = this.paramsService.queryBykeyForOne("children_bean_cnt");
+                            Integer beanCnt = Integer.parseInt(value);
                             if (beanCnt != null && beanCnt > 0) {
                                 SUser parentUser = this.userService.getById(userShare.getUserId());
                                 SUserBeanLog userBeanLog = new SUserBeanLog();
@@ -485,12 +485,12 @@ public class SUserTaskController extends BaseController {
         SProduct product = this.productService.getById(productId);
 
         // 同组任务躺赢佣金比例
-        SParams  params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value =  this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 赠送拆豆取得
-        params = this.paramsService.queryBykeyForOne("order_bean_cnt");
-        Integer orderBeanCnt = Integer.valueOf(params.getPValue());
+        value = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        Integer orderBeanCnt = Integer.valueOf(value);
 
         // 总佣金
         BigDecimal totalReward = product.getTotalReward();

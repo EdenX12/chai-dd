@@ -83,13 +83,12 @@ public class SIndexController extends BaseController {
         List<Map> recommendProductList = new ArrayList();
 
         // 买家立返佣金比例 （后续调整到Redis缓存读取）
-        SParams params = new SParams();
-        params = this.paramsService.queryBykeyForOne("buyer_rate");
-        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        String value = this.paramsService.queryBykeyForOne("buyer_rate");
+        BigDecimal buyerRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 同组任务躺赢佣金比例
-        params = this.paramsService.queryBykeyForOne("same_group_rate");
-        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(params.getPValue()));
+        value = this.paramsService.queryBykeyForOne("same_group_rate");
+        BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 推荐类别检索
         List<SRecommendType> recommendTypeList = this.recommendTypeService.findRecommendTypeList();
