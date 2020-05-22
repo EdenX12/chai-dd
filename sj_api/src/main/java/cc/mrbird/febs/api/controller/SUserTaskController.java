@@ -795,6 +795,26 @@ public class SUserTaskController extends BaseController {
         return response;
     }
 
+
+    @PostMapping("/getTotalTaskCount")
+    @Limit(key = "getTotalTaskCount", period = 60, count = 2000, name = "查询拆单总数", prefix = "limit")
+    public FebsResponse getTotalTaskCount() {
+        FebsResponse response = new FebsResponse();
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        Integer taskingCount = this.userTaskService.queryProductCount(user.getId());
+        IPage<Map> followList = this.userTaskService.findUserTaskFollowList(
+                null, user.getId());
+        taskingCount = taskingCount == null ? 0:  taskingCount;
+        if(followList != null && followList.getTotal() > 0){
+            response.data(taskingCount + followList.getTotal());
+        }else{
+            response.data(taskingCount);
+        }
+        response.put("code", 0);
+        return response;
+    }
     /**
      * 任务数量、优惠券检查
      * @return message String

@@ -161,4 +161,10 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     public Integer updateTaskLineSuccessBatch(String taskLineId) {
         return this.baseMapper.updateTaskLineSuccessBatch(taskLineId);
     }
+
+    @Override
+    public Integer queryTotalCount(String userId) {
+        return this.baseMapper.queryTotalCount(userId);
+    }
+
 }

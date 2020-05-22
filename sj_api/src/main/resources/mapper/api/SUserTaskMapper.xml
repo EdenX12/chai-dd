@@ -220,5 +220,15 @@
                update_time = now()
          WHERE task_id = #{taskId}
     </update>
-
+    <select id="queryTotalCount">
+        SELECT
+          count(1)
+        FROM
+            s_user_task_line
+        WHERE
+            user_id = #{userId}
+        AND pay_status = 1
+        GROUP BY
+        product_id
+    </select>
 </mapper>

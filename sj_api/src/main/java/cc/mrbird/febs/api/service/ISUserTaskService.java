@@ -100,4 +100,11 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * 支付成功后更新为 锁定数量->已接任务数量
      */
     Integer updateTaskLineSuccessBatch(String taskLineId);
+
+    /**
+     * 用户的所有任务
+     * @param userId
+     * @return
+     */
+    Integer queryTotalCount(String userId);
 }
