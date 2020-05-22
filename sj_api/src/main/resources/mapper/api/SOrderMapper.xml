@@ -49,8 +49,10 @@
             op.product_spec_id          productSpecId,
             op.product_spec_value_name  productSpecValueName,
             op.product_price            productPirce,
-            op.product_number           productNumber
+            op.product_number           productNumber,
+            o.order_sn                  orderSn
         FROM s_order_product op
+        LEFT JOIN s_order_detail o on  op.order_detail_id=o.id
         WHERE op.order_detail_id = #{orderDetailId}
     </select>
 
