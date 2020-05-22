@@ -8,6 +8,7 @@
         ss.shop_name shopName,
         od.id orderDetailId,
         od.order_id orderId,
+        od.order_sn orderSn,
         od.order_status orderStatus,
         case
         when od.order_status = 0            then '待付款'
@@ -49,10 +50,8 @@
             op.product_spec_id          productSpecId,
             op.product_spec_value_name  productSpecValueName,
             op.product_price            productPirce,
-            op.product_number           productNumber,
-            o.order_sn                  orderSn
+            op.product_number           productNumber
         FROM s_order_product op
-        LEFT JOIN s_order_detail o on  op.order_detail_id=o.id
         WHERE op.order_detail_id = #{orderDetailId}
     </select>
 

@@ -832,7 +832,7 @@ public class SOrderController extends BaseController {
         userMsg.setMsgInfo("恭喜" + buyUserName + "独赢" + buyBonusAmt + "元，其他人分配躺赢奖金" + taskBonusAmt + "元。");
 
         this.userMsgService.save(userMsg);
-    }
+}
 
     /**
      * 订单支付成功后计算奖励金额到冻结
