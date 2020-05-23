@@ -220,15 +220,15 @@
                update_time = now()
          WHERE task_id = #{taskId}
     </update>
-    <select id="queryTotalCount">
+    <select id="queryTotalCount" resultType="java.util.Map">
         SELECT
-          count(1)
+            count(DISTINCT product_id) totalCount ,status as type
         FROM
             s_user_task_line
         WHERE
             user_id = #{userId}
         AND pay_status = 1
         GROUP BY
-        product_id
+            status
     </select>
 </mapper>

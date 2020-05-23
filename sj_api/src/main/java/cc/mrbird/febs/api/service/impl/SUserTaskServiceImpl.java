@@ -163,7 +163,7 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     }
 
     @Override
-    public Integer queryTotalCount(String userId) {
+    public  List<Map<String,Object>>  queryTotalCount(String userId) {
         return this.baseMapper.queryTotalCount(userId);
     }
 

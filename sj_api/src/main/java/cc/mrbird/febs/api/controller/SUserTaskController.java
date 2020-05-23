@@ -706,7 +706,7 @@ public class SUserTaskController extends BaseController {
     @PostMapping("/getUserTaskList")
     @Limit(key = "getUserTaskList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
     public FebsResponse getUserTaskList(QueryRequest queryRequest, String type) {
-
+       // 0 已接任务 1 转让中 2 转让成功 3 任务完结 4 佣金已入账
         FebsResponse response = new FebsResponse();
         SUser user = FebsUtil.getCurrentUser();
         Map<String, Object> userTaskPageList = null;
@@ -714,26 +714,20 @@ public class SUserTaskController extends BaseController {
         switch (type)
         {
             //进行中
-            case "1" :
+            case "0" :
                 result = this.userTaskService.findTaskDetailByStatus(
                         queryRequest, user.getId(),0);break;
             //已完成
-            case "2" :
-                result = this.userTaskService.findTaskDetailByStatus(
-                        queryRequest, user.getId(),5);break;
-             //已关注
-            case "3" : result = this.userTaskService.findUserTaskFollowList(
-                    queryRequest, user.getId());break;
-            //结算中
             case "4" :
                 result = this.userTaskService.findTaskDetailByStatus(
-                    queryRequest, user.getId(),4);break;
-             //转让中
-            case "5" :
-                SUserTask userTask = new SUserTask();
-                userTask.setUserId(user.getId());
-                result = this.userTaskService.findUserTaskOutList(userTask, queryRequest);break;
-
+                        queryRequest, user.getId(),4);break;
+             //已关注
+            case "5" : result = this.userTaskService.findUserTaskFollowList(
+                    queryRequest, user.getId());break;
+            //结算中
+            case "3" :
+                result = this.userTaskService.findTaskDetailByStatus(
+                    queryRequest, user.getId(),3);break;
         }
         if (result != null) {
             List<Map> userTaskList = result.getRecords();
@@ -803,15 +797,19 @@ public class SUserTaskController extends BaseController {
 
         SUser user = FebsUtil.getCurrentUser();
 
-        Integer taskingCount = this.userTaskService.queryProductCount(user.getId());
+        List<Map<String,Object>>  taskingList = this.userTaskService.queryTotalCount(user.getId());
+        if(taskingList == null){
+            taskingList = Lists.newArrayList();
+        }
         IPage<Map> followList = this.userTaskService.findUserTaskFollowList(
                 null, user.getId());
-        taskingCount = taskingCount == null ? 0:  taskingCount;
         if(followList != null && followList.getTotal() > 0){
-            response.data(taskingCount + followList.getTotal());
-        }else{
-            response.data(taskingCount);
+            Map<String,Object> map = new HashMap<>();
+            map.put("type",5);
+            map.put("totalCount",followList.getTotal());
+                taskingList.add(map);
         }
+        response.data(taskingList);
         response.put("code", 0);
         return response;
     }

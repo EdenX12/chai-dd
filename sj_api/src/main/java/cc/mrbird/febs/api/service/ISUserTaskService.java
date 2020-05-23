@@ -106,5 +106,5 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @param userId
      * @return
      */
-    Integer queryTotalCount(String userId);
+    List<Map<String,Object>>  queryTotalCount(String userId);
 }

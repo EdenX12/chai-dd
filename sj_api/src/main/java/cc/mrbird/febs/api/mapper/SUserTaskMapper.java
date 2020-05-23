@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +35,6 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
 
     Integer updateTaskLineSuccessBatch(@Param("taskLineId") String taskLineId);
 
-    Integer queryTotalCount(@Param("userId") String userId);
+    List<Map<String,Object>> queryTotalCount(@Param("userId") String userId);
 
 }
