@@ -12,5 +12,5 @@ public interface ISUserTaskLineService extends IService<SUserTaskLine> {
 
     List<SUserTaskLine> findUserTaskLineList(SUserTaskLine userTaskLine);
 
-    List<SUserTaskLine> queryByTaskLineId(String taskLineId);
+    Integer queryCountByUserIdAndProductId(String userId, String productId);
 }
