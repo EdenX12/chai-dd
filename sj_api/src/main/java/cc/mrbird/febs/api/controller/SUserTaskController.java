@@ -700,7 +700,7 @@ public class SUserTaskController extends BaseController {
     /**
      * 我的任务列表
      * @param queryRequest
-     * @param userTask
+     * @param type
      * @return
      */
     @PostMapping("/getUserTaskList")
@@ -883,7 +883,13 @@ public class SUserTaskController extends BaseController {
         // 根据商品ID && 未满 && 结算未完成 && 冻结任务数+已领任务数<总任务数 抽取s_task_line表  并且不包含自己已经领取任务
         Integer taskLineCount = this.taskLineService.queryTaskLineCount(productId, user.getId());
         if (taskLineCount < taskNumber) {
-            return "现在只能领取" + taskLineCount + "个任务，请修改数量！";
+            return "您只能领取" + taskLineCount + "个任务，请修改数量！";
+        }
+
+        // 已领取任务数
+        Integer userTaskLineCount = this.userTaskLineService.queryCountByUserIdAndProductId(user.getId(), productId);
+        if (userTaskLineCount + taskNumber > userLevel.getBuyNumber()) {
+            return "您只能领取此商品" + String.valueOf(userLevel.getBuyNumber() -  userTaskLineCount) + "个任务，请修改数量！";
         }
 
         // 根据等级判断一个用户最多可以并行在多少件商品上领取任务

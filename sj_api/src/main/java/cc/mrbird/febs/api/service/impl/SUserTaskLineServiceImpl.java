@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,14 +45,23 @@ public class SUserTaskLineServiceImpl extends ServiceImpl<SUserTaskLineMapper, S
     }
 
     @Override
-    public List<SUserTaskLine> queryByTaskLineId(String taskLineId) {
+    public Integer queryCountByUserIdAndProductId(String userId, String productId) {
+
         LambdaQueryWrapper<SUserTaskLine> queryWrapper = new LambdaQueryWrapper();
 
-        if (taskLineId != null) {
-            queryWrapper.eq(SUserTaskLine::getTaskLineId, taskLineId);
-            queryWrapper.eq(SUserTaskLine::getPayStatus, 1);
-        }
-        return this.baseMapper.selectList(queryWrapper);
+        queryWrapper.eq(SUserTaskLine::getUserId, userId);
+        queryWrapper.eq(SUserTaskLine::getProductId, productId);
+        queryWrapper.eq(SUserTaskLine::getPayStatus, 1);
+
+        List<Integer> statusList = new ArrayList<>();
+        statusList.add(0);
+        statusList.add(1);
+        statusList.add(3);
+        statusList.add(4);
+
+        queryWrapper.in(SUserTaskLine::getStatus, statusList);
+
+        return this.baseMapper.selectCount(queryWrapper);
     }
 
 }
