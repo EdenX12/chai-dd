@@ -220,13 +220,13 @@
                update_time = now()
          WHERE task_id = #{taskId}
     </update>
+
     <select id="queryTotalCount" resultType="java.util.Map">
         SELECT
             count(DISTINCT product_id) totalCount ,
             case
             when status = 0 or status =3 then 1
             when status = 5 then 2
-            when status =1 then 5
             else 4 end  as type
         FROM
             s_user_task_line
@@ -235,7 +235,6 @@
         AND pay_status = 1
         GROUP BY IF(status=3, 0, status)
         UNION ALL
-
          SELECT  count(DISTINCT product_id) totalCount,3 as type
            FROM s_user_follow
         WHERE status = 1

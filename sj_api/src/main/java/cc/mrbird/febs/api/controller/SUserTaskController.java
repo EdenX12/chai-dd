@@ -527,174 +527,6 @@ public class SUserTaskController extends BaseController {
     }
 
     /**
-     * 取得我的任务【进行中】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskingList")
-    @Limit(key = "getUserTaskingList", period = 60, count = 2000, name = "检索我的任务【进行中】接口", prefix = "limit")
-    public FebsResponse getUserTaskingList(QueryRequest queryRequest) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-
-        // 我的进行中任务
-        IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
-                queryRequest, user.getId(),0);
-
-        if (result != null) {
-            List<Map> userTaskList = result.getRecords();
-            for (Map userTask : userTaskList) {
-                Map<String, Object> productDetail = this.productService.findProductDetail(
-                        userTask.get("productId").toString(), user);
-
-                userTask.put("productDetail", productDetail);
-            }
-
-            result.setRecords(userTaskList);
-        }
-
-        Map<String, Object> userTaskPageList = getDataTable(result);
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
-    /**
-     * 取得我的任务【已关注】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskFollowList")
-    @Limit(key = "getUserTaskFollowList", period = 60, count = 2000, name = "检索我的任务【已关注】接口", prefix = "limit")
-    public FebsResponse getUserTaskFollowList(QueryRequest queryRequest) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-
-        // 我的关注中任务
-        IPage<Map> result = this.userTaskService.findUserTaskFollowList(
-                queryRequest, user.getId());
-
-        if (result != null) {
-            List<Map> userTaskList = result.getRecords();
-            for (Map userTask : userTaskList) {
-                Map<String, Object> productDetail = this.productService.findProductDetail(
-                        userTask.get("productId").toString(), user);
-
-                // 关注中 默认数量为1
-                userTask.put("taskingCnt", 1);
-
-                userTask.put("productDetail", productDetail);
-            }
-
-            result.setRecords(userTaskList);
-        }
-
-        Map<String, Object> userTaskPageList = getDataTable(result);
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
-    /**
-     * 取得我的任务【已完成】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskEndList")
-    @Limit(key = "getUserTaskEndList", period = 60, count = 2000, name = "检索我的任务【已完成】接口", prefix = "limit")
-    public FebsResponse getUserTaskEndList(QueryRequest queryRequest) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-
-        // 我的完成中任务
-        IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
-                queryRequest, user.getId(),5);
-
-        if (result != null) {
-            List<Map> userTaskList = result.getRecords();
-            for (Map userTask : userTaskList) {
-                Map<String, Object> productDetail = this.productService.findProductDetail(
-                        userTask.get("productId").toString(), user);
-
-                userTask.put("productDetail", productDetail);
-            }
-
-            result.setRecords(userTaskList);
-        }
-
-        Map<String, Object> userTaskPageList = getDataTable(result);
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
-    /**
-     * 取得我的任务【结算中】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getTaskSettlementList")
-    @Limit(key = "getTaskSettlementList", period = 60, count = 2000, name = "检索我的任务【结算中】接口", prefix = "limit")
-    public FebsResponse getTaskSettlementList(QueryRequest queryRequest) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-
-        // 我的结算中任务
-        IPage<Map> result = this.userTaskService.findTaskDetailByStatus(
-                queryRequest, user.getId(),4);
-
-        if (result != null) {
-            List<Map> userTaskList = result.getRecords();
-            for (Map userTask : userTaskList) {
-                Map<String, Object> productDetail = this.productService.findProductDetail(
-                        userTask.get("productId").toString(), user);
-
-                userTask.put("productDetail", productDetail);
-            }
-
-            result.setRecords(userTaskList);
-        }
-
-        Map<String, Object> userTaskPageList = getDataTable(result);
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
-    /**
-     * 取得我的任务【转出中】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskOutingList")
-    @Limit(key = "getUserTaskOutingList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
-    public FebsResponse getUserTaskOutingList(QueryRequest queryRequest, SUserTask userTask) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-        userTask.setUserId(user.getId());
-
-        Map<String, Object> userTaskPageList = getDataTable(this.userTaskService.findUserTaskOutList(userTask, queryRequest));
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
-    /**
      * 我的任务列表
      * @param queryRequest
      * @param type
@@ -751,28 +583,6 @@ public class SUserTaskController extends BaseController {
         return response;
     }
 
-    /**
-     * 取得我的任务【收购中】列表信息
-     * @return List<Map>
-     */
-    @PostMapping("/getUserTaskOfferingList")
-    @Limit(key = "getUserTaskOfferingList", period = 60, count = 2000, name = "检索我的任务【收购中】接口", prefix = "limit")
-    public FebsResponse getUserTaskOfferingList(QueryRequest queryRequest, SUserTask userTask) {
-
-        FebsResponse response = new FebsResponse();
-
-        SUser user = FebsUtil.getCurrentUser();
-        userTask.setUserId(user.getId());
-
-        Map<String, Object> userTaskPageList = getDataTable(
-                this.userTaskService.findUserTaskOfferList(userTask, queryRequest));
-
-        response.put("code", 0);
-        response.data(userTaskPageList);
-
-        return response;
-    }
-
     @PostMapping("/getTaskDetail")
     @Limit(key = "getTaskDetail", period = 60, count = 2000, name = "查询拆单详情", prefix = "limit")
     public FebsResponse getTaskDetail(@NotEmpty(message = "任务ID不可为空") String userTaskId) {
@@ -792,25 +602,35 @@ public class SUserTaskController extends BaseController {
         return response;
     }
 
-
+    /**
+     * 我的任务列表各状态数量
+     * @return
+     */
     @PostMapping("/getTotalTaskCount")
     @Limit(key = "getTotalTaskCount", period = 60, count = 2000, name = "查询拆单总数", prefix = "limit")
     public FebsResponse getTotalTaskCount() {
-        //03  进行中 4结算中 5 完成
+
+        // 03  进行中  4结算中  5 完成
         FebsResponse response = new FebsResponse();
 
         SUser user = FebsUtil.getCurrentUser();
         response.put("code", 0);
-        try{
+
+        try {
+
             List<Map<String,Object>> resultList = this.userTaskService.queryTotalCount(user.getId());
+
             response.data(resultList);
-        }catch (Exception e){
+
+        } catch (Exception e){
             response.put("code",1);
             response.message("查询失败，稍后重试。");
             log.error(e.getMessage(),e);
         }
+
         return response;
     }
+
     /**
      * 任务数量、优惠券检查
      * @return message String
