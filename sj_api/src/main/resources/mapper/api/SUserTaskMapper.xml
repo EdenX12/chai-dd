@@ -233,7 +233,13 @@
         WHERE
             user_id = #{userId}
         AND pay_status = 1
-        GROUP BY
-            status
+        GROUP BY IF(status=3, 0, status)
+        UNION ALL
+
+         SELECT  count(DISTINCT product_id) totalCount,3 as type
+           FROM s_user_follow
+        WHERE status = 1
+          AND follow_type = 0
+          AND user_id = #{userId}
     </select>
 </mapper>

@@ -803,18 +803,6 @@ public class SUserTaskController extends BaseController {
         response.put("code", 0);
         try{
             List<Map<String,Object>> resultList = this.userTaskService.queryTotalCount(user.getId());
-            if(resultList == null){
-                resultList = Lists.newArrayList();
-            }
-
-            IPage<Map> followList = this.userTaskService.findUserTaskFollowList(
-                    new QueryRequest(), user.getId());
-            if(followList != null && followList.getTotal() > 0){
-                Map<String,Object> map = new HashMap<>();
-                map.put("type",3);
-                map.put("totalCount",followList.getTotal() );
-                resultList.add(map);
-            }
             response.data(resultList);
         }catch (Exception e){
             response.put("code",1);
