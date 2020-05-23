@@ -222,7 +222,12 @@
     </update>
     <select id="queryTotalCount" resultType="java.util.Map">
         SELECT
-            count(DISTINCT product_id) totalCount ,status as type
+            count(DISTINCT product_id) totalCount ,
+            case
+            when status = 0 or status =3 then 1
+            when status = 5 then 2
+            when status =1 then 5
+            else 4 end  as type
         FROM
             s_user_task_line
         WHERE

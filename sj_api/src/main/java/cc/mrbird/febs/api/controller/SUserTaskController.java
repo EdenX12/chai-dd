@@ -30,10 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author MrBird
@@ -148,10 +145,10 @@ public class SUserTaskController extends BaseController {
      * 计算总任务金、优惠金额、实付金额等
      */
     private void cluTaskAmt (String productId,
-                              Integer taskNumber,
-                              String userCouponId,
-                              Map<String, Object> resultData,
-                              BigDecimal taskPrice){
+                             Integer taskNumber,
+                             String userCouponId,
+                             Map<String, Object> resultData,
+                             BigDecimal taskPrice){
         // 任务金合计
         BigDecimal totalAmt = new BigDecimal(0);
         // 实付金额
@@ -278,7 +275,7 @@ public class SUserTaskController extends BaseController {
             int i = 0;
             int x = 0;
             while (i < taskNumber) {
-            	
+
                 QueryWrapper<SUserTaskLine> queryWrapper = new QueryWrapper<SUserTaskLine>();
                 String taskLineId = this.taskLineService.queryIdByLineOrder(productId,minLineOrder + x);
                 x++;
@@ -288,7 +285,7 @@ public class SUserTaskController extends BaseController {
                     break;
                 }
 
-            	queryWrapper.eq("user_id", userId);
+                queryWrapper.eq("user_id", userId);
                 queryWrapper.eq("task_line_id", taskLineId);
                 queryWrapper.eq("pay_status",1);
                 // 首先判断登录人是不是在这个任务线中
@@ -296,8 +293,8 @@ public class SUserTaskController extends BaseController {
                 if (count > 0) {
                     continue;
                 }
-            	i++;
-               
+                i++;
+
                 STaskLine taskLine = this.taskLineService.getById(taskLineId);
 
                 if (needPayAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -458,7 +455,7 @@ public class SUserTaskController extends BaseController {
     @PostMapping("/payUserTaskSuccess")
     @Limit(key = "payUserTaskSuccess", period = 60, count = 2000, name = "支付领取任务成功页面接口", prefix = "limit")
     public FebsResponse payUserTaskSuccess(HttpServletRequest request,
-                                    String userTaskId) {
+                                           String userTaskId) {
 
         Map<String, Object> taskSuccessMap = new HashMap();
 
@@ -706,7 +703,7 @@ public class SUserTaskController extends BaseController {
     @PostMapping("/getUserTaskList")
     @Limit(key = "getUserTaskList", period = 60, count = 2000, name = "检索我的任务【转出中】接口", prefix = "limit")
     public FebsResponse getUserTaskList(QueryRequest queryRequest, String type) {
-       // 0 已接任务 1 转让中 2 转让成功 3 任务完结 4 佣金已入账
+
         FebsResponse response = new FebsResponse();
         SUser user = FebsUtil.getCurrentUser();
         Map<String, Object> userTaskPageList = null;
@@ -714,20 +711,26 @@ public class SUserTaskController extends BaseController {
         switch (type)
         {
             //进行中
-            case "0" :
+            case "1" :
                 result = this.userTaskService.findTaskDetailByStatus(
                         queryRequest, user.getId(),0);break;
             //已完成
+            case "2" :
+                result = this.userTaskService.findTaskDetailByStatus(
+                        queryRequest, user.getId(),5);break;
+            //已关注
+            case "3" : result = this.userTaskService.findUserTaskFollowList(
+                    queryRequest, user.getId());break;
+            //结算中
             case "4" :
                 result = this.userTaskService.findTaskDetailByStatus(
                         queryRequest, user.getId(),4);break;
-             //已关注
-            case "5" : result = this.userTaskService.findUserTaskFollowList(
-                    queryRequest, user.getId());break;
-            //结算中
-            case "3" :
-                result = this.userTaskService.findTaskDetailByStatus(
-                    queryRequest, user.getId(),3);break;
+            //转让中
+            case "5" :
+                SUserTask userTask = new SUserTask();
+                userTask.setUserId(user.getId());
+                result = this.userTaskService.findUserTaskOutList(userTask, queryRequest);break;
+
         }
         if (result != null) {
             List<Map> userTaskList = result.getRecords();
@@ -793,24 +796,31 @@ public class SUserTaskController extends BaseController {
     @PostMapping("/getTotalTaskCount")
     @Limit(key = "getTotalTaskCount", period = 60, count = 2000, name = "查询拆单总数", prefix = "limit")
     public FebsResponse getTotalTaskCount() {
+        //03  进行中 4结算中 5 完成
         FebsResponse response = new FebsResponse();
 
         SUser user = FebsUtil.getCurrentUser();
-
-        List<Map<String,Object>>  taskingList = this.userTaskService.queryTotalCount(user.getId());
-        if(taskingList == null){
-            taskingList = Lists.newArrayList();
-        }
-        IPage<Map> followList = this.userTaskService.findUserTaskFollowList(
-                null, user.getId());
-        if(followList != null && followList.getTotal() > 0){
-            Map<String,Object> map = new HashMap<>();
-            map.put("type",5);
-            map.put("totalCount",followList.getTotal());
-                taskingList.add(map);
-        }
-        response.data(taskingList);
         response.put("code", 0);
+        try{
+            List<Map<String,Object>> resultList = this.userTaskService.queryTotalCount(user.getId());
+            if(resultList == null){
+                resultList = Lists.newArrayList();
+            }
+
+            IPage<Map> followList = this.userTaskService.findUserTaskFollowList(
+                    new QueryRequest(), user.getId());
+            if(followList != null && followList.getTotal() > 0){
+                Map<String,Object> map = new HashMap<>();
+                map.put("type",3);
+                map.put("totalCount",followList.getTotal() );
+                resultList.add(map);
+            }
+            response.data(resultList);
+        }catch (Exception e){
+            response.put("code",1);
+            response.message("查询失败，稍后重试。");
+            log.error(e.getMessage(),e);
+        }
         return response;
     }
     /**
@@ -823,26 +833,26 @@ public class SUserTaskController extends BaseController {
                                 String userCouponId) {
 
         // 先判断有没有自己锁定的任务
-    	QueryWrapper<SUserTask> queryWrapper = new QueryWrapper<SUserTask>();
+        QueryWrapper<SUserTask> queryWrapper = new QueryWrapper<SUserTask>();
 
-    	queryWrapper.eq("user_id", user.getId());
-    	queryWrapper.eq("pay_status", 0);
+        queryWrapper.eq("user_id", user.getId());
+        queryWrapper.eq("pay_status", 0);
 
-    	List<SUserTask> userTaskList = this.userTaskService.list(queryWrapper);
+        List<SUserTask> userTaskList = this.userTaskService.list(queryWrapper);
 
-    	for (SUserTask userTask : userTaskList) {
+        for (SUserTask userTask : userTaskList) {
 
-    	    // 抽取s_user_task中 支付状态（锁定） 的（自己的） 数据 修改状态为 3-不支付[取消或超期]
-    		userTask.setPayStatus(3);
-    		this.userTaskService.updateById(userTask);
+            // 抽取s_user_task中 支付状态（锁定） 的（自己的） 数据 修改状态为 3-不支付[取消或超期]
+            userTask.setPayStatus(3);
+            this.userTaskService.updateById(userTask);
 
             // 再根据s_user_task_line中的task_line_id到 表s_task_line 修改 冻结任务数量-1
-    		QueryWrapper<SUserTaskLine> queryWrapper1 = new QueryWrapper<SUserTaskLine>();
-    		queryWrapper1.eq("task_id", userTask.getId());
+            QueryWrapper<SUserTaskLine> queryWrapper1 = new QueryWrapper<SUserTaskLine>();
+            queryWrapper1.eq("task_id", userTask.getId());
 
-    		List<SUserTaskLine> userTaskLineList = this.userTaskLineService.list(queryWrapper1);
+            List<SUserTaskLine> userTaskLineList = this.userTaskLineService.list(queryWrapper1);
 
-    	    for(SUserTaskLine userTaskLine : userTaskLineList) {
+            for(SUserTaskLine userTaskLine : userTaskLineList) {
 
                 // 同时把s_user_task_line中的相关数据也同样修改为 3-不支付[取消或超期]
                 userTaskLine.setPayStatus(3);
@@ -856,8 +866,8 @@ public class SUserTaskController extends BaseController {
 
                 this.taskLineService.update(updateWrapper);
                 log.info("LockTask更新之前数量 "+taskLine.getLockTask() +"|||taskLineId="+userTaskLine.getTaskLineId()+"userTaskLineId="+userTaskLine.getId());
-    	    }
-    	}
+            }
+        }
 
         // 判断任务数量（输入数量必须大于0）
         if(taskNumber == null || taskNumber <= 0){
