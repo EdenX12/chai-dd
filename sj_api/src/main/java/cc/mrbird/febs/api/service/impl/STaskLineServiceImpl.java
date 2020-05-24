@@ -10,6 +10,7 @@ import cc.mrbird.febs.api.service.ISUserBrowserService;
 import cc.mrbird.febs.api.service.ISUserShareService;
 import cc.mrbird.febs.api.service.ISUserTaskLineService;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -96,16 +97,23 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     		queryWrapper2.eq("product_id", productId);
     		queryWrapper2.orderByDesc("create_time");
     		List<SUserBrowser> sslist=sUserBrowserService.list(queryWrapper2);
+    	
+    		
     		if(sslist!=null&&sslist.size()>0&&sslist.get(0).getShareId()!=null) {
+    		
     			//根据parentId 查询上级分享人
     			SUserShare sss=sUserShareService.getById(sslist.get(0).getShareId());
+    			queryWrapper1=new QueryWrapper<SUserTaskLine>();
+    			queryWrapper1.eq("product_id", productId);
+    	    	queryWrapper1.eq("status", 0);
+    	    	queryWrapper1.eq("pay_status", 1);
     			queryWrapper1.eq("user_id", sss.getUserId());
     			List<SUserTaskLine> st2=this.sUserTaskLineService.list(queryWrapper1);
     			if(st2!=null&&st2.size()>0) {
     	    		taskLineId=st2.get(0).getTaskLineId();
     	    	}
     		}
-    		
+    	
     	}
     	if(taskLineId!=null) {
     		STaskLine tl=this.baseMapper.selectById(taskLineId);
