@@ -42,10 +42,11 @@ public interface ISTaskLineService extends IService<STaskLine> {
     /**
      * 按顺序查询待结算的任务线
      * @param productId
+     * @param userId 
      * @param
      * @return
      */
-    STaskLine findTaskLineForSettle(String productId);
+    STaskLine findTaskLineForSettle(String productId, String userId);
 
     /**
      * 批量更新用户任务线

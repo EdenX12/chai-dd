@@ -7,6 +7,9 @@ import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.utils.*;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -323,6 +327,7 @@ public class SUserPayController extends BaseController {
                 List<SOrderDetail> orderDetailPaySuccessList = this.orderDetailService.findOrderDetailList(orderDetail);
 
                 List<String>  settleTaskLineIds = Lists.newArrayList();
+                List<String> plist=new ArrayList<String>();
                 for (SOrderDetail orderDetailPaySuccess : orderDetailPaySuccessList) {
 
                     // 变更订单明细状态 （1:已付款）
@@ -333,16 +338,18 @@ public class SUserPayController extends BaseController {
 
                     // 根据订单明细中的商品 然后从任务线表(s_task_line)中按顺序选中 结算状态未完成 作为结算任务线 修改为 结算中
                     List<SOrderProduct> orderProductList = this.orderProductService.findOrderProductList(orderDetailPaySuccess.getId());
-
+                 
                     int totalProductNumber = 0;
 
                     for (SOrderProduct orderProduct : orderProductList) {
-
+                    	plist.add(orderProduct.getProductId());
                         totalProductNumber = totalProductNumber + orderProduct.getProductNumber();
 
                         for(int i=0; i<orderProduct.getProductNumber(); i++){
+                        	//先判断我有没有购买这个产品的任务线
+                        	//如果没查到 再查上级有没有任务
 
-                            STaskLine taskLine = this.taskLineService.findTaskLineForSettle(orderProduct.getProductId());
+                            STaskLine taskLine = this.taskLineService.findTaskLineForSettle(orderProduct.getProductId(),orderDetailPaySuccess.getUserId());
 
                             // 结算中
                             taskLine.setSettleStatus(1);
@@ -417,6 +424,61 @@ public class SUserPayController extends BaseController {
 
                 // 同时 批量更新 s_user_task_line表中的状态为 3 佣金计算中（条件 taskLineId）
                 this.taskLineService.updateUserTaskLineForSettle(settleTaskLineIds);
+                // 此时若还没有上级，形成正式上下级绑定关系 找到他的上级
+                // 根据user_id、productId 到s_user_browser表中 找到shareId
+                if (user.getParentId() == null) {
+
+					/*
+					 * SUserBrowser userBrowser = new SUserBrowser();
+					 * userBrowser.setUserId(user.getId());
+					 * userBrowser.setProductId(userTask.getProductId()); userBrowser =
+					 * this.userBrowserService.findUserBrowser(userBrowser);
+					 */
+                    QueryWrapper<SUserBrowser> queryWrapper=new QueryWrapper<SUserBrowser>();
+                    queryWrapper.eq("user_id", user.getId());
+                    queryWrapper.in("product_id", plist);
+                    queryWrapper.orderByAsc("create_time");
+                    queryWrapper.last("limit 1");
+					//查询用户购买的产品最早的浏览是通过哪个分享过来的
+                    SUserBrowser userBrowser=userBrowserService.getOne(queryWrapper);
+                    // 根据shareId 到 s_user_share 表中 找到user_id 作为他的上级ID 更新到s_user中的parentId
+                    if(userBrowser != null && userBrowser.getShareId() != null){
+                        SUserShare userShare = this.userShareService.getById(userBrowser.getShareId());
+                        if (userShare != null) {
+                            user.setParentId(userShare.getUserId());
+                            this.userService.updateById(user);
+
+                            SUserRelation userRelation = new SUserRelation();
+                            userRelation.setUnionId(user.getUnionId());
+                            userRelation.setParentId(userShare.getUserId());
+                            SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
+                            // 由预备队修改为禁卫军
+                            userRelationOne.setRelationType(1);
+                            this.userRelationService.updateById(userRelationOne);
+
+                            //赠送豆
+                            String paramsBean = paramsService.queryBykeyForOne("children_bean_cnt");
+                            Integer beanCnt = Integer.parseInt(paramsBean);
+                            if (paramsBean != null && beanCnt > 0) {
+                                SUser parentUser = this.userService.getById(userShare.getUserId());
+                                SUserBeanLog userBeanLog = new SUserBeanLog();
+                                userBeanLog.setUserId(parentUser.getId());
+                                userBeanLog.setChangeType(9);
+                                userBeanLog.setChangeAmount(beanCnt);
+                                userBeanLog.setChangeTime(new Date());
+                                userBeanLog.setRelationId(userRelationOne.getId());
+                                userBeanLog.setRemark("新增禁卫军");
+                                userBeanLog.setOldAmount(parentUser.getRewardBean());
+                                this.userBeanLogService.save(userBeanLog);
+
+                                parentUser.setRewardBean(parentUser.getRewardBean() + beanCnt);
+                                this.userService.updateById(parentUser);
+                            }
+                        }
+                    }
+                }
+
+                
             }
 
 //            if ("P".equals(strPayType)) {
