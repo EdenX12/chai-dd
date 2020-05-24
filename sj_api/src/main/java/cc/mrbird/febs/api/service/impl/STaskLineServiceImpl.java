@@ -1,10 +1,12 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.STaskLine;
+import cc.mrbird.febs.api.entity.SUserBrowser;
 import cc.mrbird.febs.api.entity.SUserShare;
 import cc.mrbird.febs.api.entity.SUserTaskLine;
 import cc.mrbird.febs.api.mapper.STaskLineMapper;
 import cc.mrbird.febs.api.service.ISTaskLineService;
+import cc.mrbird.febs.api.service.ISUserBrowserService;
 import cc.mrbird.febs.api.service.ISUserShareService;
 import cc.mrbird.febs.api.service.ISUserTaskLineService;
 
@@ -27,6 +29,8 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
 	private ISUserTaskLineService sUserTaskLineService;
 	@Autowired
 	private ISUserShareService sUserShareService;
+	@Autowired
+	private ISUserBrowserService sUserBrowserService;
     
 	@Override
     public Integer queryTaskLineCount(String productId,String userId) {
@@ -85,16 +89,16 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     	if(st!=null&&st.size()>0) {
     		taskLineId=st.get(0).getTaskLineId();
     	}else {
-    		QueryWrapper<SUserShare> queryWrapper2=new QueryWrapper<SUserShare>();
+    		QueryWrapper<SUserBrowser> queryWrapper2=new QueryWrapper<SUserBrowser>();
 			//如果没查到 再查上级有没有任务
     		//1 先查询这个用户 这个产品有没有上级分享
     		queryWrapper2.eq("user_id", userId);
     		queryWrapper2.eq("product_id", productId);
     		queryWrapper2.orderByDesc("create_time");
-    		List<SUserShare> sslist=sUserShareService.list(queryWrapper2);
-    		if(sslist!=null&&sslist.size()>0&&sslist.get(0).getParentId()!=null) {
+    		List<SUserBrowser> sslist=sUserBrowserService.list(queryWrapper2);
+    		if(sslist!=null&&sslist.size()>0&&sslist.get(0).getShareId()!=null) {
     			//根据parentId 查询上级分享人
-    			SUserShare sss=sUserShareService.getById(sslist.get(0).getParentId());
+    			SUserShare sss=sUserShareService.getById(sslist.get(0).getShareId());
     			queryWrapper1.eq("user_id", sss.getUserId());
     			List<SUserTaskLine> st2=this.sUserTaskLineService.list(queryWrapper1);
     			if(st2!=null&&st2.size()>0) {
