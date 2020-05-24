@@ -173,7 +173,7 @@
         SELECT count(DISTINCT product_id)
         FROM s_user_task_line
         WHERE user_id =#{userId}
-        AND  (status = 1 or status = 2)
+        AND  (status = 0 or status = 1 or status = 3 or status = 4)
     </select>
 
     <update id="updateTaskForUnLock">

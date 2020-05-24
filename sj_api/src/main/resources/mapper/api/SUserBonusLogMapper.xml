@@ -90,7 +90,9 @@
     </select>-->
 
     <select id="findUserBonus" resultType="cc.mrbird.febs.api.entity.SUserBonusLog">
-        SELECT SUM(bonus_amount) bonusAmount,bonus_type bonusType,status
+        SELECT  bonus_amount bonusAmount,
+                bonus_type bonusType,
+                status
         FROM s_user_bonus_log
         WHERE user_id=#{userId}
         <if test="productId != null and productId != ''">
