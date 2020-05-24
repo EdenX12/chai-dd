@@ -6,6 +6,7 @@ import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.domain.FebsResponse;
 import cc.mrbird.febs.common.utils.HttpUtil;
 import cc.mrbird.febs.common.utils.MD5;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.utility.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.HashMap;
 @RestController
 @RequestMapping("/api/express")
@@ -38,11 +40,30 @@ public class SExpressController {
             response.message("物流单不存在");
             return response;
         }
+
         HashMap param = new HashMap();
         param.put("com",orderDetail.getShippingExpressCode());
         param.put("num",orderDetail.getShippingCode());
         String customer ="38E2F9F4D77D8A3B03C7562B06049549";
         String key = "TRjsfeJT8443";
+
+        //自动发货得单子可能没有物流公司code，需要根据单号请求物流公司code
+        if(StringUtils.isBlank(orderDetail.getShippingExpressCode())){
+            try {
+                String respData = HttpUtil.sendGet("http://www.kuaidi100.com/autonumber/auto?num="+orderDetail.getShippingCode()+"&key="+key);
+                if(StringUtils.isNotBlank(respData)){
+                    JSONArray jarry = JSONArray.parseArray(respData);
+                    if(jarry != null && jarry.size() >0){
+                        String shippingExpressCode = jarry.getJSONObject(0).getString("comCode");
+                        orderDetail.setShippingExpressCode(shippingExpressCode);
+                        orderDetailService.updateById(orderDetail);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         //授权KEY：TRjsfeJT8443
         //customer：38E2F9F4D77D8A3B03C7562B06049549
         //secret：6f733036acd8463b9dc1a5b54f5956f7

@@ -432,10 +432,25 @@ public class SUserController extends BaseController {
         returnMap.put("userRelationTodayCnt", userRelationTodayCnt);
 
         // 战队贡献累计收益 （横向+纵向 躺赢收益）
-        BigDecimal totalBonus = this.userBonusLogService.findUserBonusOrgRewardSum1(user.getId(), null);
-
+        BigDecimal totalBonus =  BigDecimal.ZERO;
+        List<SUserBonusLog> BonusLogList = this.userBonusLogService.findUserBonus(user.getId(),null,null);
+        if(BonusLogList != null || BonusLogList.size() > 0){
+            for(SUserBonusLog usl : BonusLogList){
+                if(usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
+                    totalBonus =  totalBonus.add(usl.getBonusAmount());
+                }
+            }
+        }
         // 战队贡献今日收益
-        BigDecimal todayBonus = this.userBonusLogService.findUserBonusOrgRewardTodaySum(user.getId());
+        BigDecimal todayBonus = BigDecimal.ZERO;
+        List<SUserBonusLog> BonusLogTodayList = this.userBonusLogService.findUserBonus(user.getId(),null,1);
+        if(BonusLogList != null || BonusLogList.size() > 0){
+            for(SUserBonusLog usl : BonusLogList){
+                if(usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
+                    todayBonus =  todayBonus.add(usl.getBonusAmount());
+                }
+            }
+        }
 
         returnMap.put("totalBonus", totalBonus);
         returnMap.put("todayBonus", todayBonus);

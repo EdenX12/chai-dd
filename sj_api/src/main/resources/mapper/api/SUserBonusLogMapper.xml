@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserBonusLogMapper">
 
-    <select id="findUserBonusOrgRewardSum0" resultType="java.math.BigDecimal">
+    <!--<select id="findUserBonusOrgRewardSum0" resultType="java.math.BigDecimal">
         SELECT IFNULL(SUM(bonus_amount),0) bonusAmount
           FROM s_user_bonus_log
          WHERE user_id=#{userId}
@@ -87,5 +87,18 @@
 
         AND bonus_type IN (1)
         AND status IN (1)
+    </select>-->
+
+    <select id="findUserBonus" resultType="cc.mrbird.febs.api.entity.SUserBonusLog">
+        SELECT SUM(bonus_amount) bonusAmount,bonus_type bonusType,status
+        FROM s_user_bonus_log
+        WHERE user_id=#{userId}
+        <if test="productId != null and productId != ''">
+            AND product_id = #{productId}
+        </if>
+        <if test="isToday == 1">
+            AND to_days(create_time) = to_days(now())
+        </if>
+
     </select>
 </mapper>

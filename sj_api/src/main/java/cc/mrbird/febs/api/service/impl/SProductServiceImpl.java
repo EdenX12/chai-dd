@@ -160,29 +160,67 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
                 // 未登录显示未关注
                 returnMap.put("followFlag", false);
             } else {
+                // 任务躺赢（实际）
+                BigDecimal taskTaskRewardAmt0 = BigDecimal.ZERO;
+                // 组织躺赢（纵向+横向 实际）【结算中状态显示】
+                BigDecimal taskOrgRewardAmt0 = BigDecimal.ZERO;
+                // 买家返 （实际）【结算中状态显示】
+                BigDecimal taskBuyerRewardAmt0 = BigDecimal.ZERO;
+                // 任务躺赢（实际）  【已完成 状态显示】 根据userId productId从bonusLog中读取
+                BigDecimal taskTaskRewardAmt1 = BigDecimal.ZERO;
+                // 组织躺赢（纵向+横向 实际）【已完成 状态显示】
+                BigDecimal taskOrgRewardAmt1 = BigDecimal.ZERO;
+                // 买家返 （实际）【已完成 状态显示】
+                BigDecimal taskBuyerRewardAmt1 = BigDecimal.ZERO;
+                List<SUserBonusLog> BonusLogList = this.userBonusLogService.findUserBonus(user.getId(),productId,null);
+                if(BonusLogList != null && BonusLogList.size() > 0){
 
+                    for(SUserBonusLog usl : BonusLogList){
+                        if(usl == null){
+                            continue;
+                        }
+                        if(usl.getStatus() == 0 && usl.getBonusType() == 2){
+                            taskTaskRewardAmt0 =  taskTaskRewardAmt0.add(usl.getBonusAmount());
+                        }
+                        if(usl.getStatus() == 0 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
+                            taskOrgRewardAmt0 =  taskOrgRewardAmt0.add(usl.getBonusAmount());
+                        }
+                        if(usl.getStatus() == 0 && usl.getBonusType() == 1){
+                            taskBuyerRewardAmt0 =  taskBuyerRewardAmt0.add(usl.getBonusAmount());
+                        }
+                        if(usl.getStatus() == 1 && usl.getBonusType() == 2){
+                            taskTaskRewardAmt1 =  taskTaskRewardAmt1.add(usl.getBonusAmount());
+                        }
+                        if(usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
+                            taskOrgRewardAmt1 =  taskOrgRewardAmt1.add(usl.getBonusAmount());
+                        }
+                        if(usl.getStatus() == 1 && usl.getBonusType() == 1){
+                            taskBuyerRewardAmt1 =  taskBuyerRewardAmt1.add(usl.getBonusAmount());
+                        }
+                    }
+                }
                 // 任务躺赢（实际）  【结算中状态显示】 根据userId productId从bonusLog中读取
-                BigDecimal taskTaskRewardAmt0 = this.userBonusLogService.findUserBonusTaskRewardSum0(user.getId(), productId);
+                //taskTaskRewardAmt0 = this.userBonusLogService.findUserBonusTaskRewardSum0(user.getId(), productId);
                 returnMap.put("taskTaskRewardAmt0", taskTaskRewardAmt0);
 
                 // 组织躺赢（纵向+横向 实际）【结算中状态显示】
-                BigDecimal taskOrgRewardAmt0 = this.userBonusLogService.findUserBonusOrgRewardSum0(user.getId(), productId);
+                // taskOrgRewardAmt0 = this.userBonusLogService.findUserBonusOrgRewardSum0(user.getId(), productId);
                 returnMap.put("taskOrgRewardAmt0", taskOrgRewardAmt0);
 
                 // 买家返 （实际）【结算中状态显示】
-                BigDecimal taskBuyerRewardAmt0 = this.userBonusLogService.findUserBonusBuyerRewardSum0(user.getId(), productId);
+                //BigDecimal taskBuyerRewardAmt0 = this.userBonusLogService.findUserBonusBuyerRewardSum0(user.getId(), productId);
                 returnMap.put("taskBuyerRewardAmt0", taskBuyerRewardAmt0);
 
                 // 任务躺赢（实际）  【已完成 状态显示】 根据userId productId从bonusLog中读取
-                BigDecimal taskTaskRewardAmt1 = this.userBonusLogService.findUserBonusTaskRewardSum1(user.getId(), productId);
+                //BigDecimal taskTaskRewardAmt1 = this.userBonusLogService.findUserBonusTaskRewardSum1(user.getId(), productId);
                 returnMap.put("taskTaskRewardAmt1", taskTaskRewardAmt1);
 
                 // 组织躺赢（纵向+横向 实际）【已完成 状态显示】
-                BigDecimal taskOrgRewardAmt1 = this.userBonusLogService.findUserBonusOrgRewardSum1(user.getId(), productId);
+                //BigDecimal taskOrgRewardAmt1 = this.userBonusLogService.findUserBonusOrgRewardSum1(user.getId(), productId);
                 returnMap.put("taskOrgRewardAmt1", taskOrgRewardAmt1);
 
                 // 买家返 （实际）【已完成 状态显示】
-                BigDecimal taskBuyerRewardAmt1 = this.userBonusLogService.findUserBonusBuyerRewardSum1(user.getId(), productId);
+                //BigDecimal taskBuyerRewardAmt1 = this.userBonusLogService.findUserBonusBuyerRewardSum1(user.getId(), productId);
                 returnMap.put("taskBuyerRewardAmt1", taskBuyerRewardAmt1);
 
                 // 是否已关注
