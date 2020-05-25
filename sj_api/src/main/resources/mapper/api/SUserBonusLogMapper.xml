@@ -103,4 +103,11 @@
         </if>
 
     </select>
+
+    <select id="getSettlementAmt" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(bonus_amount),0)
+        FROM s_user_bonus_log
+        WHERE user_id=#{userId}
+        and status = 0
+    </select>
 </mapper>

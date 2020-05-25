@@ -64,4 +64,9 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
         return this.baseMapper.findUserBonus(userId,productId,isToday);
     }
 
+    @Override
+    public BigDecimal getSettlementAmt(String userId) {
+        return this.baseMapper.getSettlementAmt(userId);
+    }
+
 }

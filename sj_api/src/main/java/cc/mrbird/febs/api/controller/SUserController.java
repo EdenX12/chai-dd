@@ -395,8 +395,8 @@ public class SUserController extends BaseController {
         returnMap.put("rewardBean", user.getRewardBean());
         // 可用余额
         returnMap.put("totalAmount", user.getTotalAmount());
-        // 冻结金额
-        returnMap.put("lockAmount", user.getLockAmount());
+        // 结算中金额（冻结）
+        returnMap.put("lockAmount", userBonusLogService.getSettlementAmt(user.getId()));
         // 等级名称
         SUserLevel userLevel = this.userLevelService.findByLevelType(user.getUserLevelType());
         returnMap.put("levelName", userLevel.getLevelName());
@@ -434,9 +434,9 @@ public class SUserController extends BaseController {
         // 战队贡献累计收益 （横向+纵向 躺赢收益）
         BigDecimal totalBonus =  BigDecimal.ZERO;
         List<SUserBonusLog> BonusLogList = this.userBonusLogService.findUserBonus(user.getId(),null,null);
-        if(BonusLogList != null || BonusLogList.size() > 0){
+        if(BonusLogList != null && BonusLogList.size() > 0){
             for(SUserBonusLog usl : BonusLogList){
-                if(usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
+                if(usl != null && usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
                     totalBonus =  totalBonus.add(usl.getBonusAmount());
                 }
             }
@@ -444,9 +444,9 @@ public class SUserController extends BaseController {
         // 战队贡献今日收益
         BigDecimal todayBonus = BigDecimal.ZERO;
         List<SUserBonusLog> BonusLogTodayList = this.userBonusLogService.findUserBonus(user.getId(),null,1);
-        if(BonusLogList != null || BonusLogList.size() > 0){
-            for(SUserBonusLog usl : BonusLogList){
-                if(usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
+        if(BonusLogTodayList != null && BonusLogTodayList.size() > 0){
+            for(SUserBonusLog usl : BonusLogTodayList){
+                if(usl != null && usl.getStatus() == 1 && (usl.getBonusType() == 3 || usl.getBonusType() == 4)){
                     todayBonus =  todayBonus.add(usl.getBonusAmount());
                 }
             }

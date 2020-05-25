@@ -4,6 +4,7 @@ import cc.mrbird.febs.api.entity.SUserBonusLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -28,4 +29,9 @@ public interface SUserBonusLogMapper extends BaseMapper<SUserBonusLog> {
 
     List<SUserBonusLog> findUserBonus(@Param("userId") String userId, @Param("productId") String productId,@Param("isToday")Integer isToday);
 
+    /**
+     * 查询我的账户结算中金额
+     * @return
+     */
+    BigDecimal getSettlementAmt(@Param("userId") String userId);
 }

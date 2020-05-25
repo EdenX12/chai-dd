@@ -21,6 +21,9 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
     List<SUserBonusLog> findUserBonusList(SUserBonusLog userBonusLog);
 
     List<SUserBonusLog> findUserBonus( String userId,  String productId,Integer isToday);
+
+
+    BigDecimal getSettlementAmt(String userId);
 /*
     *//**
      * 战队今日累计收益
