@@ -108,5 +108,16 @@
           AND TIMESTAMPDIFF(MINUTE, payment_time, NOW()) >= 5
     </select>
 
+    <select id="getTotalOrderCount" resultType="java.util.Map">
+        select  order_status as orderStatus,count(1) count  from s_order_detail
+        where order_status not in  (3, 5, - 1, 6)
+        and user_id=#{userId}
+        GROUP BY order_status
+        UNION ALL
+        select  5 as orderStatus ,count(1) count from s_order_detail
+        where
+        user_id=#{userId}
+        and order_status  in  (3, 5, - 1, 6)
+    </select>
 
 </mapper>

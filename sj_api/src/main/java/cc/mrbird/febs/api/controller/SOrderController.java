@@ -1175,4 +1175,23 @@ public class SOrderController extends BaseController {
             }
         }
     }
+    @PostMapping("/getTotalOrderCount")
+    @Limit(key = "getTotalOrderCount", period = 60,count = 2000, name = "查询订单数量", prefix = "limit")
+    public FebsResponse getTotalOrderCount(){
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        try {
+            SUser user = FebsUtil.getCurrentUser();
+         List<Map<String, Object>> list = orderService.getTotalOrderCount(user.getId());
+            response.data(list);
+        } catch (Exception e) {
+            message = "查询订单数量";
+            response.put("code", 1);
+            response.message(message);
+            log.error( e.getMessage(),e);
+        }
+        return response;
+    }
+
 }

@@ -48,4 +48,12 @@ public interface ISOrderService extends IService<SOrder> {
      * @return  List<SOrder>
      */
     List<SOrder> findOrderPaySuccessList();
+
+    /**
+     * 分类查询订单总量
+     * @param userId
+     * @return
+     */
+
+    List<Map<String, Object>> getTotalOrderCount(String userId);
 }

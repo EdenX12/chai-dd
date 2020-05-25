@@ -130,6 +130,11 @@ public class SOrderServiceImpl extends ServiceImpl<SOrderMapper, SOrder> impleme
         return this.baseMapper.queryOrderPaySuccessList();
     }
 
+    @Override
+    public List<Map<String, Object>> getTotalOrderCount(String userId) {
+        return this.baseMapper.getTotalOrderCount(userId);
+    }
+
 
     @Override
     public SOrder updateOrder(SOrder order) {

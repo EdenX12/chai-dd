@@ -42,4 +42,12 @@ public interface SOrderMapper extends BaseMapper<SOrder> {
      */
     List<SOrder> queryOrderPaySuccessList();
 
+    /**
+     * 分类查询订单总量
+     * @param userId
+     * @return
+     */
+
+   List<Map<String, Object>> getTotalOrderCount(@Param("userId")String userId);
+
 }
