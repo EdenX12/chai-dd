@@ -40,8 +40,8 @@ public class ScheduledTask {
     /**
      * 定时任务更新商品上已拆人数和已满人数
      */
-    //@Scheduled(cron="0 0 0 * * ?")
-    @Scheduled(cron="0 * * * * ?")
+    @Scheduled(cron="0 0 0 * * ?")
+    //@Scheduled(cron="0 * * * * ?")
     @Transactional
     public void updateProductCountTask(){
 

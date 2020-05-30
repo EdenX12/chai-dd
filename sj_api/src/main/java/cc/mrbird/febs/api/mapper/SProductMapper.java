@@ -34,4 +34,10 @@ public interface SProductMapper extends BaseMapper<SProduct> {
     void updateForOverBatch(@Param("list")List<Map<String,Object>> list);
 
     void updateForUserCountBatch(@Param("list")List<Map<String,Object>> list);
+
+    List<String> getMyTaskLineIds(@Param("userId")String userId,@Param("productId")String productId);
+
+    Integer getMinOrder(@Param("list")List<String> list);
+
+    Integer myFrontCount(@Param("minLineOrder")Integer  minLineOrder,@Param("productId") String productId);
 }

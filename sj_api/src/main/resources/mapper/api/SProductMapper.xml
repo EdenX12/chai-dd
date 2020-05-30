@@ -286,7 +286,7 @@
         ON SUF.product_id = SP.id
         LEFT JOIN (select product_id, count(*) browserCnt from s_user_browser WHERE product_id = #{productId}) SUB
         ON SUB.product_id = SP.id
-        LEFT JOIN (select sop.product_id, sum(sop.product_number) productNumber from s_order_product sop inner join s_order_detail sod on sod.id = sop.order_detail_id where sod.payment_state in(1,9) group by sop.product_id) SCALE
+        LEFT JOIN (select sop.product_id, sum(sop.product_number) productNumber from s_order_product sop inner join s_order_detail sod on sod.id = sop.order_detail_id where sod.payment_state in(1,9) group by sop.product_id) SALE
         ON SALE.product_id = SP.id
         WHERE 1 = 1
         AND SP.id = #{productId}
@@ -319,4 +319,41 @@
             where id = #{item.productId}
         </foreach>
     </update>
+
+    <select id="getMyTaskLineIds" resultType="java.lang.String">
+        SELECT
+            utl.task_line_id
+        FROM
+            s_user_task_line utl
+        WHERE
+        (
+            utl.`status` = 0
+            OR utl.`status` = 3
+        )
+        <if test="userId != null and userId != ''">
+            AND utl.user_id = #{userId}
+        </if>
+
+        AND utl.product_id = #{productId}
+    </select>
+    <select id="getMinOrder" resultType="java.lang.Integer">
+        select min(line_order) from s_task_line where id in
+        <foreach index="index" item="item" open="("  separator="," close=")"  collection="list">
+            #{item}
+        </foreach>
+    </select>
+    <select id="myFrontCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(DISTINCT task_line_id) from s_user_task_line  where 1=1
+        AND (`status` = 0 OR `status` = 3)
+        AND product_id = #{productId}
+        <if test="minLineOrder != null and minLineOrder != ''">
+            and task_line_id in (
+            select id from s_task_line
+            where line_order <![CDATA[ < ]]>   #{minLineOrder}
+            )
+
+        </if>
+
+    </select>
+
 </mapper>

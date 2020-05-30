@@ -5,6 +5,7 @@ import cc.mrbird.febs.api.mapper.SProductMapper;
 import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.domain.QueryRequest;
 import cc.mrbird.febs.common.utils.SortUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,6 +40,12 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
     @Autowired
     private ISUserBonusLogService userBonusLogService;
+
+    @Autowired
+    private ISUserTaskLineService userTaskLineService;
+
+    @Autowired
+    private ISTaskLineService taskLineService;
 
     @Override
     public IPage<Map> findProductListByProductName(String productName, QueryRequest request) {
@@ -157,16 +164,24 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
             BigDecimal taskReturnAmt = totalReward.multiply(sameGroupRate).divide(taskNumber, 2, BigDecimal.ROUND_HALF_UP);
             returnMap.put("taskReturnAmt", taskReturnAmt);
 
+            Integer frontProductCount = 0;
+            List<String> taskLineList =  this.baseMapper.getMyTaskLineIds(user == null ? null : user.getId(),productId);
+            frontProductCount = this.baseMapper.myFrontCount(null,productId);
+            if(taskLineList != null && user!= null){
+                Integer minLineOrder = this.baseMapper.getMinOrder(taskLineList);
+                if(minLineOrder != null && minLineOrder > 0 ){
+                    frontProductCount = this.baseMapper.myFrontCount(minLineOrder,productId);
+                }
+            }
             if (user == null) {
                 // 未登录显示未关注
                 returnMap.put("followFlag", false);
 
                 // 此单前方商品数量 （已满未结算）
-
-
+                returnMap.put("frontProductCount", frontProductCount );
 
             } else {
-
+                returnMap.put("frontProductCount", frontProductCount);
                 // 此单前方商品数量 （小于我已有未结算任务线 的 已满未结算）
 
 
