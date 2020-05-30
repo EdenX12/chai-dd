@@ -181,10 +181,9 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
                 returnMap.put("frontProductCount", frontProductCount );
 
             } else {
-                returnMap.put("frontProductCount", frontProductCount);
+
                 // 此单前方商品数量 （小于我已有未结算任务线 的 已满未结算）
-
-
+                returnMap.put("frontProductCount", frontProductCount);
 
                 // 任务躺赢（实际）
                 BigDecimal taskTaskRewardAmt0 = BigDecimal.ZERO;
