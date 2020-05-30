@@ -18,7 +18,10 @@
 			ifnull(STL3.total_task, 0)                              totalTaskNumber,    <!-- 当前任务线份额 -->
 			ifnull(STL3.received_task, 0)                           receivedTaskNumber, <!-- 已完成任务份额 -->
 			ifnull(SUT.taskUserCnt, 0)                              taskUserCnt,        <!-- 拆家人数 -->
-			ifnull(SUF.followCnt, 0) + ifnull(SUB.browserCnt, 0)    followCnt           <!-- 关注人数 -->
+			ifnull(SUF.followCnt, 0) + ifnull(SUB.browserCnt, 0)    followCnt,          <!-- 关注人数 -->
+            ifnull(SALE.productNumber, 0)                           saleCnt,            <!-- 已售件数 -->
+            ifnull(reward.rewardCnt, 0)                             rewardCnt           <!-- 躺赢次数 -->
+
         FROM s_product_recommend SPR
         LEFT JOIN s_product SP
         ON SP.id = SPR.product_id
@@ -36,6 +39,10 @@
         ON SUB.product_id = SP.id
         WHERE SPR.recommend_type_id = #{sProductRecommend.recommendTypeId}
         AND SPR.is_on_face = 1
+        LEFT JOIN (select sop.product_id, sum(sop.product_number) productNumber from s_order_product sop inner join s_order_detail sod on sod.id = sop.order_detail_id where sod.payment_state in(1,9) group by sop.product_id) SALE
+        ON SALE.product_id = SP.id
+        LEFT JOIN (select product_id, count(*) rewardCnt from s_user_bonus_log where bonus_type in(2,3,4) group by product_id) reward
+        ON reward.product_id = SP.id
         ORDER BY SPR.s_order ASC, SP.create_time DESC
 
     </select>
