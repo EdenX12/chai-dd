@@ -790,14 +790,14 @@ public class SOrderController extends BaseController {
                 userAmountLog.setChangeType(4);
                 taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
 
-                userAmountLog.setRelationId(userBonusLogOne.getUserTaskLineId());
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
                 userAmountLog.setRemark("关联用户任务ID");
 
             } else if (userBonusLogOne.getBonusType() == 3) {
                 userAmountLog.setChangeType(41);
                 taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
 
-                userAmountLog.setRelationId(userBonusLogOne.getUserTaskLineId());
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
                 userAmountLog.setRemark("关联用户任务ID");
 
             } else if (userBonusLogOne.getBonusType() == 4) {
@@ -810,7 +810,7 @@ public class SOrderController extends BaseController {
             } else if (userBonusLogOne.getBonusType() == 5) {
                 userAmountLog.setChangeType(9);
 
-                userAmountLog.setRelationId(userBonusLogOne.getUserTaskLineId());
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
                 userAmountLog.setRemark("关联用户任务ID");
             }
 
