@@ -167,7 +167,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
             Integer frontProductCount = 0;
             List<String> taskLineList =  this.baseMapper.getMyTaskLineIds(user == null ? null : user.getId(),productId);
             frontProductCount = this.baseMapper.myFrontCount(null,productId);
-            if(taskLineList != null && user!= null){
+            if(taskLineList != null && taskLineList.size() > 0  && user!= null){
                 Integer minLineOrder = this.baseMapper.getMinOrder(taskLineList);
                 if(minLineOrder != null && minLineOrder > 0 ){
                     frontProductCount = this.baseMapper.myFrontCount(minLineOrder,productId);
