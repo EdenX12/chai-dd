@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -246,6 +247,7 @@ public class SUserController extends BaseController {
 			suer.setUserPhone(phone);
 			suer.setUserStatus(0);
 			suer.setUserType(1);
+			suer.setInviteCode(getRundom());
 			userService.save(suer);
 			//更新下微信信息里的手机号
 			suerWechat.setUserPhone(phone);
@@ -263,6 +265,27 @@ public class SUserController extends BaseController {
         Map<String, Object> returnInfo = this.generateUserInfo(jwtToken, suer);
         return new FebsResponse().message("操作成功").data(returnInfo).put("code", 0);
     }
+    public static String getRundom(){
+//      48-57 65-90 97-122
+     StringBuffer id=new StringBuffer();
+     Random random = new Random();
+     for (int i = 0; i < 6; i++) {
+         char s = 0;
+         int j=random.nextInt(2) % 3;
+         switch (j) {
+         case 0:
+             //随机生成数字
+             s = (char) (random.nextInt(57) % (57 - 48 + 1) + 48);
+             break;
+         case 1:
+             //随机生成大写字母
+             s = (char) (random.nextInt(90) % (90 - 65 + 1) + 65);            
+             break;
+         }
+         id.append(s);
+     }
+     return id.toString();
+ }
     /**
      * 用户登录
      * @return SUser
