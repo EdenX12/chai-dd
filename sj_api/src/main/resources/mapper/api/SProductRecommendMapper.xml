@@ -37,12 +37,12 @@
         ON SUF.product_id = SP.id
         LEFT JOIN (select product_id, count(*) browserCnt from s_user_browser group by product_id) SUB
         ON SUB.product_id = SP.id
-        WHERE SPR.recommend_type_id = #{sProductRecommend.recommendTypeId}
-        AND SPR.is_on_face = 1
         LEFT JOIN (select sop.product_id, sum(sop.product_number) productNumber from s_order_product sop inner join s_order_detail sod on sod.id = sop.order_detail_id where sod.payment_state in(1,9) group by sop.product_id) SALE
         ON SALE.product_id = SP.id
         LEFT JOIN (select product_id, count(*) rewardCnt from s_user_bonus_log where bonus_type in(2,3,4) group by product_id) reward
         ON reward.product_id = SP.id
+        WHERE SPR.recommend_type_id = #{sProductRecommend.recommendTypeId}
+        AND SPR.is_on_face = 1
         ORDER BY SPR.s_order ASC, SP.create_time DESC
 
     </select>
