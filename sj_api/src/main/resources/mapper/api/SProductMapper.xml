@@ -293,4 +293,30 @@
         AND SP.delete_flag = 0
     </select>
 
+    <select id="getUserCountForProduct" resultType="java.util.Map">
+        SELECT  IFNULL(count( DISTINCT  user_id),0)  count ,product_id productId FROM s_user_task
+        WHERE pay_status = 1 group by product_id
+    </select>
+    <select id="getOverCount" resultType="java.util.Map">
+        select  IFNULL(count(1),0) count,product_id productId from s_task_line
+        where settle_status =1 or settle_status =2 or line_status=1 GROUP BY product_id
+    </select>
+    <update id="updateForOverBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index"  separator=";">
+            update s_product
+            <set>
+                over_product_number = #{item.count}
+            </set>
+            where id = #{item.productId}
+        </foreach>
+    </update>
+    <update id="updateForUserCountBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index"  separator=";">
+            update s_product
+            <set>
+                user_product_number = #{item.count}
+            </set>
+            where id = #{item.productId}
+        </foreach>
+    </update>
 </mapper>

@@ -6,6 +6,7 @@ import cc.mrbird.febs.common.domain.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,4 +64,12 @@ public interface ISProductService extends IService<SProduct> {
      * @return SProduct
      */
     Map findProductDetail(String  productId, SUser user);
+
+    List<Map<String,Object>> getUserCountForProduct();
+
+    List<Map<String,Object>> getOverCount();
+
+    void updateForOverBatch(List<Map<String,Object>> list);
+
+    void updateForUserCountBatch(List<Map<String,Object>> list);
 }

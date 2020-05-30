@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,4 +27,11 @@ public interface SProductMapper extends BaseMapper<SProduct> {
 
     Map findProductDetail(@Param("productId") String productId);
 
+    List<Map<String,Object>> getUserCountForProduct();
+
+    List<Map<String,Object>> getOverCount();
+
+    void updateForOverBatch(@Param("list")List<Map<String,Object>> list);
+
+    void updateForUserCountBatch(@Param("list")List<Map<String,Object>> list);
 }

@@ -273,4 +273,24 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
         }
     }
 
+    @Override
+    public List<Map<String, Object>> getUserCountForProduct() {
+        return this.baseMapper.getUserCountForProduct();
+    }
+
+    @Override
+    public List<Map<String, Object>> getOverCount() {
+        return this.baseMapper.getOverCount();
+    }
+
+    @Override
+    public void updateForOverBatch(List<Map<String,Object>> list) {
+        this.baseMapper.updateForOverBatch(list);
+    }
+
+    @Override
+    public void updateForUserCountBatch(List<Map<String,Object>> list) {
+        this.baseMapper.updateForUserCountBatch(list);
+    }
+
 }
