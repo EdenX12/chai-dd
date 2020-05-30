@@ -36,7 +36,7 @@
         ON SUB.product_id = SP.id
         WHERE SPR.recommend_type_id = #{sProductRecommend.recommendTypeId}
         AND SPR.is_on_face = 1
-        ORDER BY SPR.s_order ASC
+        ORDER BY SPR.s_order ASC, SP.create_time DESC
 
     </select>
 

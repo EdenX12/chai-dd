@@ -4,6 +4,7 @@ import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.mapper.SProductMapper;
 import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.domain.QueryRequest;
+import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -46,7 +47,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, null, null, false);
 
             return this.baseMapper.findProductDetailByProductName(page, productName);
 
@@ -63,7 +64,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, null, null, false);
 
             return this.baseMapper.findNewProductDetail(page);
 
@@ -80,7 +81,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, null, null, false);
 
             return this.baseMapper.findActivityProductDetail(page, activityId);
 
@@ -97,7 +98,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-           // SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, null, null, false);
 
             return this.baseMapper.findProductDetailByBigTypeId(page, product);
 
@@ -114,7 +115,7 @@ public class SProductServiceImpl extends ServiceImpl<SProductMapper, SProduct> i
 
             Page<SProduct> page = new Page<>();
 
-            //SortUtil.handlePageSort(request, page, "sOrder", FebsConstant.ORDER_ASC, false);
+            SortUtil.handlePageSort(request, page, null, null, false);
 
             return this.baseMapper.findProductDetailBySmallTypeId(page, product);
 

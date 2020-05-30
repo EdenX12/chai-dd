@@ -186,9 +186,10 @@ public class SUserPayController extends BaseController {
             userPay.setPayTime(new Date());
             userPay.setRelationId(relationId);
             userPay.setTransSn(transSn);
-            userPay.setPayType(1);
 
             if ("T".equals(strPayType)) {
+
+                userPay.setPayType(1);
 
                 // 领取任务支付成功
                 SUserTask userTask = this.userTaskService.getById(relationId);
@@ -315,6 +316,8 @@ public class SUserPayController extends BaseController {
             }
 
             if ("O".equals(strPayType)) {
+
+                userPay.setPayType(2);
 
                 // 支付购买订单成功
                 SOrder order = this.orderService.getById(relationId);
