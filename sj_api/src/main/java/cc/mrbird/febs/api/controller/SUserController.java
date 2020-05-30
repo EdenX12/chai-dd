@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import cc.mrbird.febs.api.entity.*;
 import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.controller.BaseController;
+import cc.mrbird.febs.common.domain.QueryRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.codec.binary.Base64;
@@ -106,6 +107,12 @@ public class SUserController extends BaseController {
 
     @Autowired
     private ITokenService tokenService;
+
+    @Autowired
+    private ISParamsService paramsService;
+
+    @Autowired
+    private ISUserTaskService userTaskService;
 
     /**
      * 临时用一下 因为我的前端访问链接里带# 微信处理这种链接会出错
@@ -237,6 +244,7 @@ public class SUserController extends BaseController {
 			suer.setNickName(suerWechat.getNickName());
 			suer.setOpenId(suerWechat.getOpenId());
 			suer.setRewardBean(0);
+            suer.setCanuseBean(0);
 			suer.setTaskCount(0);
 			suer.setTotalAmount(BigDecimal.ZERO);
 			suer.setUnionId(unionid);
@@ -284,7 +292,7 @@ public class SUserController extends BaseController {
 		//JSONObject object = JSONObject.parseObject(jsonStr);
 		//String openId=object.getString("openid");
     	JSONObject object=null;
-    	String openId="o7nUh5Xdj99tdHStvspMVWR-InDg";
+    	String openId="o7nUh5R2MwRIa2eEFimt9xL3UBBU";
 		String password = MD5Util.encrypt(openId, "123456");
         String token = FebsUtil.encryptToken(JWTUtil.sign(openId, password));
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(properties.getShiro().getJwtTimeOut());
@@ -321,6 +329,7 @@ public class SUserController extends BaseController {
                 su.setCanuseBean(0);
                 su.setNickName(nick);
                 su.setRewardBean(0);
+                su.setCanuseBean(0);
                 su.setTaskCount(0);
                 su.setTotalAmount(BigDecimal.ZERO);
                 su.setUserImg(pic);
@@ -459,13 +468,80 @@ public class SUserController extends BaseController {
 
         return response;
     }
+    @PostMapping("/getUserCenter")
+    @Limit(key = "getUserCenter", period = 60, count = 2000, name = "用户会员中心接口", prefix = "limit")
+    public FebsResponse getUserCenter(){
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
 
-    /**
-     * 缓存存储信息
-     * @param token token
-     * @param user  用户信息
-     * @return String
-     */
+        SUser user = FebsUtil.getCurrentUser();
+        Map<String ,Object> returnMap = new HashMap<>();
+
+        //用户等级
+        returnMap.put("userLevelType",user.getUserLevelType());
+
+        //还差X豆升级
+        SUserLevel userLevel = userLevelService.findByLevelType(user.getUserLevelType()+1);
+        if(userLevel != null){
+            returnMap.put("lackBean",userLevel.getMinNumber()-user.getRewardBean());
+        }else{
+            returnMap.put("lackBean",0);
+        }
+
+        //邀请码
+        returnMap.put("inviteCode",user.getInviteCode());
+        //累计拆豆
+        returnMap.put("rewardBean",user.getRewardBean());
+        //可用拆豆
+        returnMap.put("canuseBean",user.getCanuseBean());
+        //系统等级配置
+        List<SUserLevel> allUserLevel = userLevelService.findAll();
+        returnMap.put("allUserLevel",allUserLevel);
+        //获取拆豆，读param 表中得key
+        //完成拆单
+        returnMap.put("orderBeanCnt",paramsService.queryBykeyForOne("order_bean_cnt"));
+        //购买商品
+        returnMap.put("productBeanCnt",paramsService.queryBykeyForOne("product_bean_cnt"));
+        //分享商品
+        returnMap.put("shareBeanCnt",paramsService.queryBykeyForOne("share_bean_cnt"));
+        //关注商品
+        returnMap.put("followBeanCnt",paramsService.queryBykeyForOne("follow_bean_cnt"));
+        //每日签到
+        returnMap.put("signBeanCnt",paramsService.queryBykeyForOne("sign_bean_cnt"));
+        //新增一级禁卫军
+        returnMap.put("childrenBeanCnt",paramsService.queryBykeyForOne("children_bean_cnt"));
+        //新增一名预备军
+        //returnMap.put("signBeanCnt",paramsService.queryBykeyForOne("sign_bean_cnt"));
+
+        //用户会员中心说明  读param表
+        returnMap.put("userCenterContent",paramsService.queryBykeyForOne("user_center_content"));
+
+        response.data(returnMap);
+        return response;
+    }
+
+    @PostMapping("/querySettlementList")
+    @Limit(key = "querySettlementList", period = 60, count = 2000, name = "用户会员中心接口", prefix = "limit")
+    public FebsResponse querySettlementList(QueryRequest queryRequest) {
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+
+        SUser user = FebsUtil.getCurrentUser();
+
+        Map<String, Object> pageList = getDataTable(
+               this.userTaskService.querySettlementList(user.getId(),queryRequest));
+
+        response.put("code", 0);
+        response.data(pageList);
+        return response;
+    }
+
+        /**
+         * 缓存存储信息
+         * @param token token
+         * @param user  用户信息
+         * @return String
+         */
     private String saveTokenToRedis(SUser user, JWTToken token, HttpServletRequest request) throws Exception {
         String ip = IPUtil.getIpAddr(request);
 

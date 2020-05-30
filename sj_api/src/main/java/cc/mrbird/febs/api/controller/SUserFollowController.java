@@ -85,6 +85,10 @@ public class SUserFollowController extends BaseController {
 
             // 每关注一个任务（任务广场，转让中心），（+拆豆1颗）
             user.setRewardBean(user.getRewardBean() + followBeanCnt);
+            if(user.getCanuseBean() == null){
+                user.setCanuseBean(0);
+            }
+            user.setCanuseBean(user.getCanuseBean()+ followBeanCnt);
             this.userService.updateById(user);
 
         } catch (Exception e) {
@@ -136,6 +140,10 @@ public class SUserFollowController extends BaseController {
 
             // 每取消一个任务（任务广场，转让中心），（-1颗）
             user.setRewardBean(user.getRewardBean() - followBeanCnt);
+            if(user.getCanuseBean() == null){
+                user.setCanuseBean(0);
+            }
+            user.setCanuseBean(user.getCanuseBean()-followBeanCnt);
             this.userService.updateById(user);
 
         } catch (Exception e) {

@@ -257,6 +257,10 @@ public class SUserPayController extends BaseController {
                     this.userBeanLogService.save(userBeanLog);
 
                     user.setRewardBean(user.getRewardBean() + orderBeanCnt);
+                    if(user.getCanuseBean() == null){
+                        user.setCanuseBean(0);
+                    }
+                    user.setCanuseBean(user.getCanuseBean()+ orderBeanCnt);
                     this.userService.updateById(user);
                 }
 
@@ -299,6 +303,10 @@ public class SUserPayController extends BaseController {
                                 this.userBeanLogService.save(userBeanLog);
 
                                 parentUser.setRewardBean(parentUser.getRewardBean() + beanCnt);
+                                if(parentUser.getCanuseBean() == null){
+                                    parentUser.setCanuseBean(0);
+                                }
+                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ + beanCnt);
                                 this.userService.updateById(parentUser);
                             }
                         }
@@ -418,6 +426,10 @@ public class SUserPayController extends BaseController {
                         this.userBeanLogService.save(userBeanLog);
 
                         user.setRewardBean(user.getRewardBean() + productBeanCnt);
+                        if(user.getCanuseBean() == null){
+                            user.setCanuseBean(0);
+                        }
+                        user.setCanuseBean(user.getCanuseBean()+productBeanCnt);
                         this.userService.updateById(user);
                     }
                 }
@@ -472,6 +484,10 @@ public class SUserPayController extends BaseController {
                                 this.userBeanLogService.save(userBeanLog);
 
                                 parentUser.setRewardBean(parentUser.getRewardBean() + beanCnt);
+                                if(parentUser.getCanuseBean() == null){
+                                    parentUser.setCanuseBean(0);
+                                }
+                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ beanCnt);
                                 this.userService.updateById(parentUser);
                             }
                         }

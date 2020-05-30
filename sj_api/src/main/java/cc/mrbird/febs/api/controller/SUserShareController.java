@@ -88,6 +88,10 @@ public class SUserShareController extends BaseController {
 
                 // 转发分享商品详情
                 user.setRewardBean(user.getRewardBean() + shareBeanCnt);
+                if(user.getCanuseBean() == null){
+                    user.setCanuseBean(0);
+                }
+                user.setCanuseBean(user.getCanuseBean()+ shareBeanCnt);
                 this.userService.updateById(user);
             }
 

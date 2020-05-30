@@ -37,4 +37,6 @@ public interface SUserTaskMapper extends BaseMapper<SUserTask> {
 
     List<Map<String,Object>> queryTotalCount(@Param("userId") String userId);
 
+    IPage<Map> querySettlementList(Page page, @Param("userId") String userId);
+
 }

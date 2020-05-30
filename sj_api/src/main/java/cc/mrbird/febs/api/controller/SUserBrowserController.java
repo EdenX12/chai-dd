@@ -108,6 +108,10 @@ public class SUserBrowserController extends BaseController {
 
                 // 点击阅读转发内容
                 user.setRewardBean(user.getRewardBean() + browserBeanCnt);
+                if(user.getCanuseBean() == null){
+                    user.setCanuseBean(0);
+                }
+                user.setCanuseBean(user.getCanuseBean()+ + browserBeanCnt);
                 this.userService.updateById(user);
 
                 // 关系追加 (预备队关系)

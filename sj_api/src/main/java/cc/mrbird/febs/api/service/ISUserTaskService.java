@@ -107,4 +107,12 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @return
      */
     List<Map<String,Object>>  queryTotalCount(String userId);
+
+    /**
+     * 我的--结算中列表
+     * @param userId
+     * @param request
+     * @return
+     */
+    IPage<Map> querySettlementList(String userId, QueryRequest request);
 }

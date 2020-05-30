@@ -241,4 +241,24 @@
           AND follow_type = 0
           AND user_id = #{userId}
     </select>
+    <select id="querySettlementList" resultType="java.util.Map">
+        select task.order_sn,
+        sum(case when  bonus.bonus_type=1 then bonus_amount else 0 end)  as buyRewordAmt,
+        sum(case when  bonus.bonus_type=2 then bonus_amount else 0 end)  as bonusAmt,
+        sum(case when  bonus.bonus_type=3 then bonus_amount else 0 end)  as upperHorizontaAmt,
+        sum(case when  bonus.bonus_type=4 then bonus_amount else 0 end)  as upperVerticalAmt,
+        sum(case when  bonus.bonus_type=5 then bonus_amount else 0 end)  as rewardAmt,
+        sum( bonus_amount)  as totalAmt,
+        task.create_time
+        from s_user_task task
+        LEFT JOIN s_user_task_line line on task_id = task.id
+        LEFT JOIN s_user_bonus_log bonus on (bonus.user_task_line_id = line.id and task.user_id = bonus.user_id)
+        where  1=1
+        and task.user_id=#{userId}
+        and line.pay_status=1
+        and line.`status`=4
+        GROUP BY task.id
+        ORDER BY  task.create_time desc
+    </select>
+
 </mapper>

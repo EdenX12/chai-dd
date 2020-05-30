@@ -167,4 +167,20 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
         return this.baseMapper.queryTotalCount(userId);
     }
 
+    @Override
+    public IPage<Map> querySettlementList(String userId, QueryRequest request) {
+        try {
+
+            Page<Map> page = new Page<>();
+            SortUtil.handlePageSort(request, page, null, null, false);
+            IPage<Map> returnPage = this.baseMapper.querySettlementList(page,userId);
+
+            return returnPage;
+        } catch (Exception e) {
+            log.error("我的结算中列表异常", e);
+            return null;
+        }
+
+    }
+
 }
