@@ -1019,6 +1019,7 @@ public class SOrderController extends BaseController {
                         // 根据任务线ID 检索 用户任务线
                         SUserTaskLine userTaskLine = new SUserTaskLine();
                         userTaskLine.setTaskLineId(taskLineOne.getId());
+                        userTaskLine.setPayStatus(1);
                         List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
 
                         // 同组任务线上的拆家（X人）均分
