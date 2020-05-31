@@ -1,15 +1,22 @@
 package cc.mrbird.febs.api.service.impl;
 
 import cc.mrbird.febs.api.entity.SOfferPrice;
+import cc.mrbird.febs.api.entity.SUserAddress;
 import cc.mrbird.febs.api.entity.SUserRelation;
 import cc.mrbird.febs.api.mapper.SUserRelationMapper;
 import cc.mrbird.febs.api.service.ISUserRelationService;
+import cc.mrbird.febs.common.domain.FebsConstant;
+import cc.mrbird.febs.common.domain.QueryRequest;
+import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MrBird
@@ -74,5 +81,59 @@ public class SUserRelationServiceImpl extends ServiceImpl<SUserRelationMapper, S
     public Integer findUserRelationTodayCnt(String userId) {
 
         return this.baseMapper.queryUserRelationTodayCnt(userId);
+    }
+
+    @Override
+    public IPage<Map> getFirstLevel(QueryRequest queryRequest, String userId, String relationType) {
+        try {
+            Page<Map> page = new Page<>();
+
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getFirstLevel(page,userId,relationType);
+        } catch (Exception e) {
+            log.error("查询一级禁卫军/预备队异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public IPage<Map> getSecondLevel(QueryRequest queryRequest, String userId, String relationType) {
+        try {
+            Page<Map> page = new Page<>();
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getSecondLevel(page,userId,relationType);
+        } catch (Exception e) {
+            log.error("查询二级禁卫军/预备队异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public IPage<Map> getThirdLevel(QueryRequest queryRequest, String userId, String relationType) {
+        try {
+            Page<Map> page = new Page<>();
+
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getThirdLevel(page,userId,relationType);
+        } catch (Exception e) {
+            log.error("查询三级禁卫军/预备队异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getMyTeamTotal(String userId, String relationType) {
+        try {
+            return this.baseMapper.getMyTeamTotal(userId,relationType);
+        } catch (Exception e) {
+            log.error("查询禁卫军/预备队异常", e);
+            return null;
+        }
     }
 }

@@ -110,4 +110,36 @@
         WHERE user_id=#{userId}
         and status = 0
     </select>
+
+    <select id="">
+        select *
+         from
+        (
+            select user_id  userId,
+                   null    productId,
+                   null    orderDetailId,
+                   null    taskLineId,
+                   change_type type,
+                   date_format(change_time, '%m.%d %H:%i') detailTime,
+                   change_amount  amount
+            from s_user_amount_log
+            where change_type not in(3, 4, 31, 41, 9)
+              and user_id = 'dc9d8be317ff318ec90748b3eb76f16e'
+
+        union all
+
+            select ubl.user_id    userId,
+                   ubl.product_id   productId,
+                   ubl.order_detail_id orderDetailId,
+                   ubl.task_line_id     taskLineId,
+                   0 type,
+                   max(date_format(ubl.update_time, '%m.%d %H:%i')) detailTime,
+                   sum(ubl.bonus_amount) amount
+              from s_user_bonus_log ubl
+              left join s_product sp on sp.id = ubl.product_id
+             where ubl.user_id = 'dc9d8be317ff318ec90748b3eb76f16e'
+               and ubl.status = 1
+            group by ubl.user_id, ubl.product_id, ubl.order_detail_id, ubl.task_line_id
+        ) A order by detailTime desc
+    </select>
 </mapper>
