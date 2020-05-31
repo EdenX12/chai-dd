@@ -783,23 +783,40 @@ public class SOrderController extends BaseController {
                 buyUserName = userOne.getNickName();
                 buyBonusAmt = buyBonusAmt.add(userBonusLogOne.getBonusAmount());
 
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
+                userAmountLog.setRemark("关联购买订单ID");
+
             } else if (userBonusLogOne.getBonusType() == 2) {
                 userAmountLog.setChangeType(4);
                 taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
+
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
+                userAmountLog.setRemark("关联用户任务ID");
+
             } else if (userBonusLogOne.getBonusType() == 3) {
                 userAmountLog.setChangeType(41);
                 taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
+
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
+                userAmountLog.setRemark("关联用户任务ID");
+
             } else if (userBonusLogOne.getBonusType() == 4) {
                 userAmountLog.setChangeType(31);
                 taskBonusAmt = taskBonusAmt.add(userBonusLogOne.getBonusAmount());
+
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
+                userAmountLog.setRemark("关联购买订单ID");
+
             } else if (userBonusLogOne.getBonusType() == 5) {
                 userAmountLog.setChangeType(9);
+
+                userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
+                userAmountLog.setRemark("关联用户任务ID");
             }
 
             userAmountLog.setChangeAmount(userBonusLogOne.getBonusAmount());
             userAmountLog.setChangeTime(new Date());
-            userAmountLog.setRelationId(userBonusLogOne.getOrderDetailId());
-            userAmountLog.setRemark("关联购买订单ID");
+
             userAmountLog.setOldAmount(userOne.getTotalAmount());
 
             saveUserAmountLogList.add(userAmountLog);

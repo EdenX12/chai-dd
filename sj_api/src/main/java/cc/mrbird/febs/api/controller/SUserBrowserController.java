@@ -70,18 +70,22 @@ public class SUserBrowserController extends BaseController {
 
             userBrowser.setShareId(shareId);
 
+            SUserShare userShare = this.userShareService.getById(shareId);
+
+            // 正常数据不会出现此种情况
+            if (userShare == null) {
+                return response;
+            }
+
+            // 如果是自己 不做处理
+            if (user != null && user.getId().equals(userShare.getUserId())) {
+                return response;
+            }
+
             SUserBrowser userBrowserOne = this.userBrowserService.findUserBrowser(userBrowser);
 
             // 第一次读取 重复查看忽略
             if (userBrowserOne == null) {
-
-                SUserShare userShare = this.userShareService.getById(shareId);
-
-                // 正常数据不会出现此种情况
-                if (userShare == null) {
-                    log.error("shareId:===" + shareId);
-                    return response;
-                }
 
                 // 0-APP,1-微信公众号,2-小程序
                 userBrowser.setChannel(2);
