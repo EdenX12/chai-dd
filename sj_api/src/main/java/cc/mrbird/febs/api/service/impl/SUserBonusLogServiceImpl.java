@@ -3,12 +3,17 @@ package cc.mrbird.febs.api.service.impl;
 import cc.mrbird.febs.api.entity.SUserBonusLog;
 import cc.mrbird.febs.api.mapper.SUserBonusLogMapper;
 import cc.mrbird.febs.api.service.ISUserBonusLogService;
+import cc.mrbird.febs.common.domain.QueryRequest;
+import cc.mrbird.febs.common.utils.SortUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MrBird
@@ -67,6 +72,21 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
     @Override
     public BigDecimal getSettlementAmt(String userId) {
         return this.baseMapper.getSettlementAmt(userId);
+    }
+
+    @Override
+    public IPage<Map> getBonusDetails(QueryRequest request, String userId) {
+        try {
+
+            Page<Map> page = new Page<>();
+            SortUtil.handlePageSort(request, page, null,null, false);
+            IPage<Map> result = this.baseMapper.getBonusDetails(page, userId);
+
+            return result;
+        } catch (Exception e) {
+            log.error("查询我的收益明细异常", e);
+            return null;
+        }
     }
 
 }

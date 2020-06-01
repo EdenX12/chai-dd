@@ -1,11 +1,15 @@
 package cc.mrbird.febs.api.service;
 
 import cc.mrbird.febs.api.entity.SUserBonusLog;
+import cc.mrbird.febs.common.domain.QueryRequest;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MrBird
@@ -24,6 +28,8 @@ public interface ISUserBonusLogService extends IService<SUserBonusLog> {
 
 
     BigDecimal getSettlementAmt(String userId);
+
+    IPage<Map> getBonusDetails(QueryRequest request, @Param("userId") String userId);
 /*
     *//**
      * 战队今日累计收益

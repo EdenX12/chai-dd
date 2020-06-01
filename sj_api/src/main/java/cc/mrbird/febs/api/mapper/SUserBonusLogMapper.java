@@ -2,10 +2,13 @@ package cc.mrbird.febs.api.mapper;
 
 import cc.mrbird.febs.api.entity.SUserBonusLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -34,4 +37,7 @@ public interface SUserBonusLogMapper extends BaseMapper<SUserBonusLog> {
      * @return
      */
     BigDecimal getSettlementAmt(@Param("userId") String userId);
+
+
+    IPage<Map> getBonusDetails(Page page, @Param("userId") String userId);
 }
