@@ -150,6 +150,14 @@ public class SOrderController extends BaseController {
                     return response;
                 }
 
+                SProduct product = productService.getById(productSpec.getProductId());
+                if(product == null || "3".equals(product.getProductStatus()) || "0".equals(product.getProductStatus())){
+                    message = "您选择的商品未发布或下架，不可购买！";
+                    response.put("code", 1);
+                    response.message(message);
+                    return response;
+                }
+
                 // 商品详情
                 Map productDetail = this.productService.findProductDetail(productSpec.getProductId(), user);
 
