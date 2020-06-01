@@ -35,7 +35,8 @@
     <update id="updateUserTaskLineForSettle" parameterType="list">
         UPDATE s_user_task_line
            SET status=3
-         WHERE task_line_id in (
+         WHERE status = 0
+           AND task_line_id in (
         <foreach collection="list" item="item" index="index" open="" close="" separator=",">
             #{item}
         </foreach>

@@ -4,31 +4,35 @@
 
     <select id="findTaskDetailByStatus" resultType="java.util.Map" >
           SELECT
+          SUTL1.status,                       -- 状态（0,3 进行中  4  结算中   -1 5 已完成）
           SUTL1.product_id     productId,     -- 商品ID
           SUTL1.totalTaskLine  taskingCnt,    -- 进行中任务线数量
           SUTL2.totalTaskLine  totalTaskCnt,  -- 总任务线数量
           SUTL1.newestTime      newestTime    -- 该用户最新下单的时间
           FROM
          (SELECT
+                  status,
                   product_id,
                   count(*) totalTaskLine,
                   max(create_time) newestTime
            FROM s_user_task_line
            WHERE user_id = #{userId}
             AND pay_status = 1
-
-            <choose>
-                <when test="status == 0">
-                    AND status IN (0, 3)
-                </when>
-                <otherwise>
-                    AND status = #{status}
-                </otherwise>
-            </choose>
-
-            GROUP BY  product_id) SUTL1
+            GROUP BY  status, product_id) SUTL1
         LEFT JOIN (SELECT  product_id, count(*) totalTaskLine FROM s_user_task_line where  user_id=#{userId} AND pay_status = 1 GROUP BY  product_id) SUTL2
         ON  SUTL2.product_id = SUTL1.product_id
+        WHERE 1 = 1
+        <choose>
+            <when test="status == 0">
+                AND status IN (0, 3)
+            </when>
+            <when test="status == 5">
+                AND status IN (-1, 5)
+            </when>
+            <when test="status == 4">
+                AND status = 4
+            </when>
+        </choose>
     </select>
 
     <select id="findUserTaskFollowDetail" resultType="java.util.Map" >
@@ -226,14 +230,14 @@
             count(DISTINCT product_id) totalCount ,
             case
             when status = 0 or status =3 then 1
-            when status = 5 then 2
+            when status = 5 or status = -1 then 2
             else 4 end  as type
         FROM
             s_user_task_line
         WHERE
             user_id = #{userId}
         AND pay_status = 1
-        GROUP BY IF(status=3, 0, status)
+        GROUP BY (case when status in(0,3) then 1 when status in(-1,5) then 2 else 4 end)
         UNION ALL
          SELECT  count(DISTINCT product_id) totalCount,3 as type
            FROM s_user_follow

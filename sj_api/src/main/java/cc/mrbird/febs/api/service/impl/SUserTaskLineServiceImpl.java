@@ -46,6 +46,11 @@ public class SUserTaskLineServiceImpl extends ServiceImpl<SUserTaskLineMapper, S
             queryWrapper.eq(SUserTaskLine::getPayStatus, userTaskLine.getPayStatus());
         }
 
+        // 状态
+        if (userTaskLine.getStatus() != null) {
+            queryWrapper.eq(SUserTaskLine::getStatus, userTaskLine.getStatus());
+        }
+
         return this.baseMapper.selectList(queryWrapper);
     }
 

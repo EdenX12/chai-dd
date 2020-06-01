@@ -743,6 +743,7 @@ public class SOrderController extends BaseController {
                 SUserTaskLine userTaskLine = new SUserTaskLine();
                 userTaskLine.setTaskLineId(taskLineOne.getId());
                 userTaskLine.setPayStatus(1);
+                userTaskLine.setStatus(4);
                 List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
 
                 for (SUserTaskLine userTaskLineOne : userTaskLineList) {
@@ -1045,6 +1046,7 @@ public class SOrderController extends BaseController {
                         SUserTaskLine userTaskLine = new SUserTaskLine();
                         userTaskLine.setTaskLineId(taskLineOne.getId());
                         userTaskLine.setPayStatus(1);
+                        userTaskLine.setStatus(3);
                         List<SUserTaskLine> userTaskLineList = this.userTaskLineService.findUserTaskLineList(userTaskLine);
 
                         // 同组任务线上的拆家（X人）均分
