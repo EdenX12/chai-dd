@@ -24,7 +24,7 @@
     </select>
     <!--查询一级禁卫军/预备队-->
     <select id = "getFirstLevel" resultType="java.util.Map">
-        select u.user_name userName,sur1.create_time createTime,COUNT(DISTINCT sur2.user_id) subordinateCount
+        select u.nick_name userName,user_img userImg ,user_level_type userLevelType ,sur1.create_time createTime,COUNT(DISTINCT sur2.user_id) subordinateCount
          from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user u on u.id = sur1.user_id
@@ -33,7 +33,7 @@
         order by  sur1.create_time desc
     </select>
     <select id="getSecondLevel" resultType="java.util.Map">
-        select u.user_name userName,sur2.user_id,sur2.create_time createTime,COUNT(DISTINCT sur3.user_id) subordinateCount
+        select  u.nick_name userName,user_img userImg ,user_level_type userLevelType ,sur2.create_time createTime,COUNT(DISTINCT sur3.user_id) subordinateCount
          from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
@@ -43,7 +43,7 @@
         order by  sur2.create_time desc
     </select>
     <select id="getThirdLevel" resultType="java.util.Map">
-        select u.user_name userName,sur3.user_id,sur3.create_time createTime,COUNT(DISTINCT sur4.user_id) subordinateCount
+        select  u.nick_name userName,user_img userImg ,user_level_type userLevelType ,sur3.create_time createTime,COUNT(DISTINCT sur4.user_id) subordinateCount
          from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
