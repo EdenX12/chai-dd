@@ -84,7 +84,7 @@ public class SUserBonusLogServiceImpl extends ServiceImpl<SUserBonusLogMapper, S
 
             return result;
         } catch (Exception e) {
-            log.error("查询我的收益明细异常", e);
+            log.error("查询我的余额明细异常", e);
             return null;
         }
     }

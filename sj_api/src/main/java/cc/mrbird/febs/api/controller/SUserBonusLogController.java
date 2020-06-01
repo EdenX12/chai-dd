@@ -26,7 +26,7 @@ public class SUserBonusLogController extends BaseController {
     ISUserBonusLogService userBonusLogService;
 
     @GetMapping("/getBonusDetails")
-    @Limit(key = "getBonusDetails", period = 60, count = 2000, name = "查询收益明细接口", prefix = "limit")
+    @Limit(key = "getBonusDetails", period = 60, count = 2000, name = "查询余额明细接口", prefix = "limit")
     public FebsResponse  getBonusDetails(QueryRequest request){
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
