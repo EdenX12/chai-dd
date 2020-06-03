@@ -35,4 +35,12 @@ public interface ISUserRelationService extends IService<SUserRelation> {
      *  查询禁卫军/预备队总数
      */
     Map<String,Object> getMyTeamTotal(String userId,String relationType);
+
+    /**
+     * 今日新增
+     * @param queryRequest
+     * @param userId
+     * @return
+     */
+    IPage<Map> getTodayNewAdd(QueryRequest queryRequest,String userId);
 }

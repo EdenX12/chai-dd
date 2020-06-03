@@ -136,4 +136,19 @@ public class SUserRelationServiceImpl extends ServiceImpl<SUserRelationMapper, S
             return null;
         }
     }
+
+    @Override
+    public IPage<Map> getTodayNewAdd(QueryRequest queryRequest, String userId) {
+        try {
+            Page<Map> page = new Page<>();
+
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getTodayNewAdd(page,userId);
+        } catch (Exception e) {
+            log.error("查询今日禁卫军/预备队异常", e);
+            return null;
+        }
+    }
 }

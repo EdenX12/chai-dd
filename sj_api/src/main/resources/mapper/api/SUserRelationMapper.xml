@@ -53,4 +53,70 @@
         and sur1.parent_id = #{userId}
         order by  sur3.create_time desc
     </select>
+
+    <select id="getTodayNewAdd" resultType="java.util.Map">
+        SELECT
+            a.*
+        FROM
+            (
+                SELECT
+                    u.nick_name userName,
+                    u.user_img userImg,
+                    '一级' userLevelType,
+                    sur1.create_time createTime,
+                    sur1.relation_type relationType
+                FROM
+                    s_user_relation sur1
+                LEFT JOIN s_user u ON u.id = sur1.user_id
+                WHERE
+                    sur1.parent_id = '1111'
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                    sur1.create_time,
+                    '%Y-%m-%d'
+                )
+                UNION ALL
+                    SELECT
+                        u.nick_name userName,
+                        user_img userImg,
+                        '二级' userLevelType,
+                        sur2.create_time createTime,
+                        sur2.relation_type relationType
+                    FROM
+                        s_user_relation sur1
+                    LEFT JOIN s_user_relation sur2 ON (
+                        sur2.parent_id = sur1.user_id
+                    )
+                    LEFT JOIN s_user u ON u.id = sur2.user_id
+                    WHERE
+                        sur1.parent_id = '111'
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                        sur2.create_time,
+                        '%Y-%m-%d'
+                    )
+                    UNION ALL
+                        SELECT
+                            u.nick_name userName,
+                            user_img userImg,
+                            '三级' userLevelType,
+                            sur3.create_time createTime,
+                            sur3.relation_type relationType
+                        FROM
+                            s_user_relation sur1
+                        LEFT JOIN s_user_relation sur2 ON (
+                            sur2.parent_id = sur1.user_id
+                        )
+                        LEFT JOIN s_user_relation sur3 ON (
+                            sur3.parent_id = sur2.user_id
+                        )
+                        LEFT JOIN s_user u ON u.id = sur3.user_id
+                        WHERE
+                            sur1.parent_id = '111'
+                        AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                            sur3.create_time,
+                            '%Y-%m-%d'
+                        )
+            ) AS a
+        ORDER BY
+            a.createTime DESC
+    </select>
 </mapper>

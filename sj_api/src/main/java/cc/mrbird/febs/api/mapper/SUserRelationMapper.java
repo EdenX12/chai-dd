@@ -24,4 +24,6 @@ public interface SUserRelationMapper extends BaseMapper<SUserRelation> {
     IPage<Map> getSecondLevel(Page page, @Param("userId") String userId, @Param("relationType")String relationType);
 
     IPage<Map> getThirdLevel(Page page, @Param("userId") String userId, @Param("relationType")String relationType);
+
+    IPage<Map>  getTodayNewAdd (Page page, @Param("userId") String userId);
 }

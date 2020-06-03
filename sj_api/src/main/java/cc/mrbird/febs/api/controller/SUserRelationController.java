@@ -93,4 +93,25 @@ public class SUserRelationController  extends BaseController {
         }
 
     }
+    @GetMapping("/getTodayNewAdd")
+    @Limit(key = "getTodayNewAdd", period = 60, count = 2000, name = " 查询我的预备队和禁卫军今日新增列表", prefix = "limit")
+    public FebsResponse getTodayNewAdd(QueryRequest queryRequest) {
+        FebsResponse response = new FebsResponse();
+        response.put("code", 0);
+        SUser user = FebsUtil.getCurrentUser();
+        String userId = user.getId();
+        IPage<Map> page = null;
+        try{
+            page = userRelationService.getTodayNewAdd(queryRequest,userId);
+            response.data( getDataTable(page));
+            return  response;
+
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            response.message("查询失败");
+            response.put("code", 1);
+            return  response;
+        }
+
+    }
 }
