@@ -185,6 +185,12 @@ public class SUserShopCarController extends BaseController {
             // 关注人数
             newProductDetail.put("followCnt", productDetail.get("followCnt"));
 
+            // 已售件数
+            newProductDetail.put("saleCnt", productDetail.get("saleCnt"));
+
+            // 躺赢次数
+            newProductDetail.put("rewardCnt", productDetail.get("rewardCnt"));
+
             // 快递邮费
             newProductDetail.put("expressFee", productDetail.get("expressFee"));
 
