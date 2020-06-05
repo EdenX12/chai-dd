@@ -151,4 +151,69 @@ public class SUserRelationServiceImpl extends ServiceImpl<SUserRelationMapper, S
             return null;
         }
     }
+
+    @Override
+    public IPage<Map> getFirstLeveForAmt(QueryRequest queryRequest, String userId, String relationType) {
+        try {
+            Page<Map> page = new Page<>();
+
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getFirstLevelForAmt(page,userId,relationType);
+        } catch (Exception e) {
+            log.error("查询一级禁卫军/预备队分佣明细异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public IPage<Map> getSecondLevelForAmt(QueryRequest queryRequest, String userId, String relationType) {
+        try {
+            Page<Map> page = new Page<>();
+
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getSecondLevelForAmt(page,userId,relationType);
+        } catch (Exception e) {
+            log.error("查询二级禁卫军/预备队分佣明细异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public IPage<Map> getThirdLevelForAmt(QueryRequest queryRequest, String userId, String relationType) {
+        try {
+            Page<Map> page = new Page<>();
+
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getThirdLevelForAmt(page,userId,relationType);
+        } catch (Exception e) {
+            log.error("查询三级禁卫军/预备队分佣明细异常", e);
+            return null;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getMyTeamTotalForAmt(String userId, String relationType) {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public IPage<Map> getTodayNewAddForAmt(QueryRequest queryRequest, String userId) {
+        try {
+            Page<Map> page = new Page<>();
+
+            SortUtil.handlePageSort(queryRequest, page, null,null, false);
+
+            return this.baseMapper.getTodayNewAddForAmt(page,userId);
+        } catch (Exception e) {
+            log.error("查询禁卫军/预备队今日新增分佣明细异常", e);
+            return null;
+        }
+    }
 }

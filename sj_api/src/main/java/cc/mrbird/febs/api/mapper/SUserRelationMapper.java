@@ -26,4 +26,12 @@ public interface SUserRelationMapper extends BaseMapper<SUserRelation> {
     IPage<Map> getThirdLevel(Page page, @Param("userId") String userId, @Param("relationType")String relationType);
 
     IPage<Map>  getTodayNewAdd (Page page, @Param("userId") String userId);
+
+    IPage<Map> getFirstLevelForAmt(Page page, @Param("userId") String userId, @Param("relationType")String relationType);
+
+    IPage<Map> getSecondLevelForAmt(Page page, @Param("userId") String userId, @Param("relationType")String relationType);
+
+    IPage<Map> getThirdLevelForAmt(Page page, @Param("userId") String userId, @Param("relationType")String relationType);
+
+    IPage<Map>  getTodayNewAddForAmt (Page page, @Param("userId") String userId);
 }
