@@ -115,6 +115,9 @@ public class SUserController extends BaseController {
     @Autowired
     private ISUserTaskService userTaskService;
 
+    @Autowired
+    private ISUserWithdrawService userWithdrawService;
+
     /**
      * 临时用一下 因为我的前端访问链接里带# 微信处理这种链接会出错
      * @param code
@@ -486,7 +489,9 @@ public class SUserController extends BaseController {
 
         returnMap.put("totalBonus", totalBonus);
         returnMap.put("todayBonus", todayBonus);
-
+        //提现金额相关
+        returnMap.put("withdrawingAmount",userWithdrawService.getWithdrawingAmount(user.getId()));
+        returnMap.put("withdrawSuccessAmount",userWithdrawService.getWithdrawSuccessAmount(user.getId()));
         response.data(returnMap);
 
         return response;
