@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author MrBird
@@ -56,8 +57,8 @@ public class SUserWithdrawController extends BaseController {
     @PostMapping("/addUserWithdraw")
     @Transactional
     @Limit(key = "addUserWithdraw", period = 60, count = 2000, name = " 新增用户提现接口", prefix = "limit")
-    public FebsResponse addUserWithdraw(@NotEmpty(message="用户银行卡ID不可为空") String userBankId,
-                                        @NotEmpty(message="金额不可为空") String amount ) {
+    public FebsResponse addUserWithdraw(@NotEmpty(message = "用户银行卡ID不可为空") String userBankId,
+                                        @NotEmpty(message = "金额不可为空") String amount) {
 
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
@@ -67,14 +68,14 @@ public class SUserWithdrawController extends BaseController {
             SUser user = FebsUtil.getCurrentUser();
 
             SUserBank userBank = userBankService.getById(userBankId);
-            if(userBank == null){
+            if (userBank == null) {
                 message = "用户银行卡不存在！";
                 response.put("code", 1);
                 response.message(message);
                 return response;
             }
 
-            if(!user.getId().equals(userBank.getUserId())){
+            if (!user.getId().equals(userBank.getUserId())) {
                 message = "当前用户不能提现到该卡，请核对后再提交！";
                 response.put("code", 1);
                 response.message(message);
@@ -122,7 +123,7 @@ public class SUserWithdrawController extends BaseController {
             message = "新增用户提现";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
 
         return response;
@@ -143,15 +144,14 @@ public class SUserWithdrawController extends BaseController {
 
             SUser user = FebsUtil.getCurrentUser();
 
-            IPage<SUserWithdraw>  page = this.userWithdrawService.FindForPage(request,user.getId());
+            IPage<SUserWithdraw> page = this.userWithdrawService.FindForPage(request, user.getId());
             response.data(getDataTable(page));
             response.put("code", 0);
-
         } catch (Exception e) {
             message = "新增用户提现";
             response.put("code", 1);
             response.message(message);
-            log.error( e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
 
         return response;

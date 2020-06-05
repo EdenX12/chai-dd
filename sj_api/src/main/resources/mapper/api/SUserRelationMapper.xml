@@ -3,14 +3,30 @@
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserRelationMapper">
 
     <select id="queryUserRelationCnt" resultType="java.lang.Integer">
-        SELECT count(*) FROM s_user_relation WHERE parent_id=#{userId}
+        --SELECT count(*) FROM s_user_relation WHERE parent_id=#{userId}
+        SELECT SUM(cnt) FROM (
+        SELECT DISTINCT COUNT(*)AS cnt FROM s_user_relation WHERE parent_id=#{userId}
+        UNION ALL
+        SELECT DISTINCT COUNT(*) AS cnt FROM s_user_relation WHERE parent_id in(SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1')
+        UNION ALL
+        SELECT DISTINCT COUNT(*) AS cnt FROM s_user_relation WHERE parent_id in ( SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id IN(
+        SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' )AND relation_type = '1' )
+) AS countdata
     </select>
 
     <select id="queryUserRelationTodayCnt" resultType="java.lang.Integer">
-        SELECT count(*)
-          FROM s_user_relation
-         WHERE parent_id=#{userId}
-          AND to_days(create_time) = to_days(now())
+--         SELECT count(*)
+--           FROM s_user_relation
+--          WHERE parent_id=#{userId}
+--           AND to_days(create_time) = to_days(now())
+        SELECT SUM(cnt) FROM (
+        SELECT DISTINCT COUNT(*)AS cnt FROM s_user_relation WHERE parent_id=#{userId}
+        UNION ALL
+        SELECT DISTINCT COUNT(*) AS cnt FROM s_user_relation WHERE parent_id in(SELECT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(create_time) = to_days(now()))
+        UNION ALL
+        SELECT DISTINCT COUNT(*) AS cnt FROM s_user_relation WHERE parent_id in ( SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id IN(
+            SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(create_time) = to_days(now()))AND relation_type = '1'  AND to_days(create_time) = to_days(now()))
+        ) AS countdata
     </select>
 
     <select id="getMyTeamTotal" resultType="java.util.Map">
