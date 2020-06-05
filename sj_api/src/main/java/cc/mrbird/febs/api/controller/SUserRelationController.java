@@ -35,23 +35,34 @@ public class SUserRelationController  extends BaseController {
      * 查询我的预备队和禁卫军列表
      * @param queryRequest
      * @param relationType 团队类型 禁卫军 1 预备队 0
-     * @param level
+     * @param level  级别  一级 二级 三级
+     *  @param flag    flag  =1  列表带分佣金额  flag= 0 不带分佣金额
      * @return
      */
     @GetMapping("/getMyTeamList")
     @Limit(key = "getMyTeamList", period = 60, count = 2000, name = " 查询我的预备队和禁卫军列表", prefix = "limit")
-    public FebsResponse getMyTeamList(QueryRequest queryRequest, @NotEmpty(message = "团队类型") String relationType,@NotNull(message = "级别不可为空") Integer level) {
+    public FebsResponse getMyTeamList(QueryRequest queryRequest, @NotEmpty(message = "团队类型") String relationType,@NotNull(message = "级别不可为空") Integer level,@NotNull(message = "标记不可为空")Integer flag) {
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
         SUser user = FebsUtil.getCurrentUser();
         String userId = user.getId();
         IPage<Map> page = null;
+
         try{
-            switch (level){
-                case 1 : page = userRelationService.getFirstLevel(queryRequest,userId,relationType);break;
-                case 2 : page = userRelationService.getSecondLevel(queryRequest,userId,relationType);break;
-                case 3 : page = userRelationService.getThirdLevel(queryRequest,userId,relationType);break;
+            if(flag == 1){
+                switch (level){
+                    case 1 : page = userRelationService.getFirstLeveForAmt(queryRequest,userId,relationType);break;
+                    case 2 : page = userRelationService.getSecondLevelForAmt(queryRequest,userId,relationType);break;
+                    case 3 : page = userRelationService.getThirdLevelForAmt(queryRequest,userId,relationType);break;
+                }
+            }else{
+                switch (level){
+                    case 1 : page = userRelationService.getFirstLevel(queryRequest,userId,relationType);break;
+                    case 2 : page = userRelationService.getSecondLevel(queryRequest,userId,relationType);break;
+                    case 3 : page = userRelationService.getThirdLevel(queryRequest,userId,relationType);break;
+                }
             }
+
             response.data( getDataTable(page));
             return  response;
 
@@ -93,16 +104,27 @@ public class SUserRelationController  extends BaseController {
         }
 
     }
+
+    /**
+     * 查询我的战队今天新增
+     * @param queryRequest
+     * @param flag    flag  =1  列表带分佣金额  flag= 0 不带分佣金额
+     * @return
+     */
     @GetMapping("/getTodayNewAdd")
     @Limit(key = "getTodayNewAdd", period = 60, count = 2000, name = " 查询我的预备队和禁卫军今日新增列表", prefix = "limit")
-    public FebsResponse getTodayNewAdd(QueryRequest queryRequest) {
+    public FebsResponse getTodayNewAdd(QueryRequest queryRequest,Integer flag) {
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
         SUser user = FebsUtil.getCurrentUser();
         String userId = user.getId();
         IPage<Map> page = null;
         try{
-            page = userRelationService.getTodayNewAdd(queryRequest,userId);
+            if(flag == 1){
+                page = userRelationService.getTodayNewAddForAmt(queryRequest,userId);
+            }else{
+                page = userRelationService.getTodayNewAdd(queryRequest,userId);
+            }
             response.data( getDataTable(page));
             return  response;
 

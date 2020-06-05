@@ -24,33 +24,54 @@
     </select>
     <!--查询一级禁卫军/预备队-->
     <select id = "getFirstLevel" resultType="java.util.Map">
-        select u.nick_name userName,user_img userImg ,user_level_type userLevelType ,sur1.create_time createTime,COUNT(DISTINCT sur2.user_id) subordinateCount
-         from s_user_relation  sur1
+       select u.nick_name userName,
+       u.user_img userImg,
+       u.user_level_type userLevelType,
+       max(sur1.create_time) createTime,
+       COUNT(sur2.user_id) subordinateCount
+       from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user u on u.id = sur1.user_id
         where sur1.relation_type = #{relationType}
         and sur1.parent_id = #{userId}
+        group by u.nick_name,
+                 u.user_img,
+                 u.user_level_type
         order by  sur1.create_time desc
     </select>
     <select id="getSecondLevel" resultType="java.util.Map">
-        select  u.nick_name userName,user_img userImg ,user_level_type userLevelType ,sur2.create_time createTime,COUNT(DISTINCT sur3.user_id) subordinateCount
-         from s_user_relation  sur1
+       select u.nick_name userName,
+       u.user_img userImg,
+       u.user_level_type userLevelType,
+       max(sur2.create_time) createTime,
+       COUNT(sur3.user_id) subordinateCount
+       from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
         LEFT JOIN s_user u on u.id=sur2.user_id
         where sur1.relation_type = #{relationType}
         and sur1.parent_id = #{userId}
+        group by u.nick_name,
+                 u.user_img,
+                 u.user_level_type
         order by  sur2.create_time desc
     </select>
     <select id="getThirdLevel" resultType="java.util.Map">
-        select  u.nick_name userName,user_img userImg ,user_level_type userLevelType ,sur3.create_time createTime,COUNT(DISTINCT sur4.user_id) subordinateCount
-         from s_user_relation  sur1
-        LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
+        select u.nick_name userName,
+       u.user_img userImg,
+       u.user_level_type userLevelType,
+       max(sur3.create_time) createTime,
+       COUNT(sur4.user_id) subordinateCount
+       from s_user_relation  sur1
+         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur4 on (sur4.parent_id=sur3.user_id and sur4.relation_type = #{relationType})
         LEFT JOIN s_user u on u.id=sur3.user_id
         where sur1.relation_type = #{relationType}
         and sur1.parent_id = #{userId}
+        group by u.nick_name,
+                 u.user_img,
+                 u.user_level_type
         order by  sur3.create_time desc
     </select>
 
@@ -116,6 +137,284 @@
                             '%Y-%m-%d'
                         )
             ) AS a
+        ORDER BY
+            a.createTime DESC
+    </select>
+
+    <select id="getFirstLevelForAmt" resultType="java.util.Map">
+        SELECT
+            A.*, B.amt
+        FROM
+            (
+                SELECT
+                    u.id,
+                    u.nick_name userName,
+                    u.user_img userImg,
+                    u.user_level_type userLevelType,
+                    COUNT(DISTINCT sur2.user_id) subordinateCount
+                FROM
+                    s_user_relation sur1
+                LEFT JOIN s_user_relation sur2 ON sur2.parent_id = sur1.user_id
+                AND sur2.relation_type = #{relationType}
+                LEFT JOIN s_user u ON u.id = sur1.user_id
+                WHERE
+                    sur1.relation_type = #{relationType}
+                AND sur1.parent_id = #{userId}
+                GROUP BY
+                    u.id,
+                    u.nick_name,
+                    u.user_img,
+                    u.user_level_type
+            ) A
+        INNER JOIN (
+            SELECT
+                (
+                    CASE
+                    WHEN ubl.bonus_type = 3 THEN
+                        sutl.user_id
+                    ELSE
+                        sod.user_id
+                    END
+                ) userId,
+                sum(ubl.bonus_amount) amt
+            FROM
+                s_user_bonus_log ubl
+            LEFT JOIN s_order_detail sod ON sod.id = ubl.order_detail_id
+            AND ubl.bonus_type = 4
+            LEFT JOIN s_user_task_line sutl ON sutl.id = ubl.user_task_line_id
+            AND ubl.bonus_type = 3
+            WHERE
+                ubl.user_id = #{userId}
+            AND ubl.bonus_type IN (3, 4)
+            GROUP BY
+                (
+                    CASE
+                    WHEN ubl.bonus_type = 3 THEN
+                        sutl.user_id
+                    ELSE
+                        sod.user_id
+                    END
+                )
+        ) B ON A.id = B.userId
+        ORDER BY
+            A.userLevelType DESC
+    </select>
+    <select id="getSecondLevelForAmt" resultType="java.util.Map">
+       SELECT
+            A.*, B.amt
+        FROM
+            (
+                SELECT
+                    u.id,
+                    u.nick_name userName,
+                    u.user_img userImg,
+                    u.user_level_type userLevelType,
+                    COUNT(DISTINCT sur3.user_id) subordinateCount
+                FROM
+                    s_user_relation sur1
+                LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
+								LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
+								LEFT JOIN s_user u on u.id=sur2.user_id
+                WHERE
+                    sur1.relation_type = #{relationType}
+                AND sur1.parent_id = #{userId}
+                GROUP BY
+                    u.id,
+                    u.nick_name,
+                    u.user_img,
+                    u.user_level_type
+            ) A
+        INNER JOIN (
+            SELECT
+                (
+                    CASE
+                    WHEN ubl.bonus_type = 3 THEN
+                        sutl.user_id
+                    ELSE
+                        sod.user_id
+                    END
+                ) userId,
+                sum(ubl.bonus_amount) amt
+            FROM
+                s_user_bonus_log ubl
+            LEFT JOIN s_order_detail sod ON sod.id = ubl.order_detail_id
+            AND ubl.bonus_type = 4
+            LEFT JOIN s_user_task_line sutl ON sutl.id = ubl.user_task_line_id
+            AND ubl.bonus_type = 3
+            WHERE
+                ubl.user_id = #{userId}
+            AND ubl.bonus_type IN (3, 4)
+            GROUP BY
+                (
+                    CASE
+                    WHEN ubl.bonus_type = 3 THEN
+                        sutl.user_id
+                    ELSE
+                        sod.user_id
+                    END
+                )
+        ) B ON A.id = B.userId
+        ORDER BY
+            A.userLevelType DESC
+    </select>
+    <select id="getThirdLevelForAmt" resultType="java.util.Map">
+       SELECT
+            A.*, B.amt
+        FROM
+            (
+                SELECT
+                    u.id,
+                    u.nick_name userName,
+                    u.user_img userImg,
+                    u.user_level_type userLevelType,
+                    COUNT(DISTINCT sur4.user_id) subordinateCount
+                FROM
+                s_user_relation  sur1
+                LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
+                LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
+                LEFT JOIN s_user_relation sur4 on (sur4.parent_id=sur3.user_id and sur4.relation_type = #{relationType})
+                LEFT JOIN s_user u on u.id=sur3.user_id
+                WHERE
+                    sur1.relation_type = #{relationType}
+                AND sur1.parent_id = #{userId}
+                GROUP BY
+                    u.id,
+                    u.nick_name,
+                    u.user_img,
+                    u.user_level_type
+            ) A
+        INNER JOIN (
+            SELECT
+                (
+                    CASE
+                    WHEN ubl.bonus_type = 3 THEN
+                        sutl.user_id
+                    ELSE
+                        sod.user_id
+                    END
+                ) userId,
+                sum(ubl.bonus_amount) amt
+            FROM
+                s_user_bonus_log ubl
+            LEFT JOIN s_order_detail sod ON sod.id = ubl.order_detail_id
+            AND ubl.bonus_type = 4
+            LEFT JOIN s_user_task_line sutl ON sutl.id = ubl.user_task_line_id
+            AND ubl.bonus_type = 3
+            WHERE
+                ubl.user_id = #{userId}
+            AND ubl.bonus_type IN (3, 4)
+            GROUP BY
+                (
+                    CASE
+                    WHEN ubl.bonus_type = 3 THEN
+                        sutl.user_id
+                    ELSE
+                        sod.user_id
+                    END
+                )
+        ) B ON A.id = B.userId
+        ORDER BY
+            A.userLevelType DESC
+    </select>
+
+    <select id="getTodayNewAddForAmt" resultType="java.util.Map">
+        SELECT
+            a.*,b.amt
+        FROM
+            (
+                SELECT
+                    u.id userId,
+                    u.nick_name userName,
+                    u.user_img userImg,
+                    '一级' userLevelType,
+                    sur1.create_time createTime,
+                    sur1.relation_type relationType
+                FROM
+                    s_user_relation sur1
+                LEFT JOIN s_user u ON u.id = sur1.user_id
+                WHERE
+                    sur1.parent_id = #{userId}
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                    sur1.create_time,
+                    '%Y-%m-%d'
+                )
+                UNION ALL
+                    SELECT
+                        u.id userId,
+                        u.nick_name userName,
+                        user_img userImg,
+                        '二级' userLevelType,
+                        sur2.create_time createTime,
+                        sur2.relation_type relationType
+                    FROM
+                        s_user_relation sur1
+                    LEFT JOIN s_user_relation sur2 ON (
+                        sur2.parent_id = sur1.user_id
+                    )
+                    LEFT JOIN s_user u ON u.id = sur2.user_id
+                    WHERE
+                        sur1.parent_id = #{userId}
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                        sur2.create_time,
+                        '%Y-%m-%d'
+                    )
+                    UNION ALL
+                        SELECT
+                            u.id userId,
+                            u.nick_name userName,
+                            user_img userImg,
+                            '三级' userLevelType,
+                            sur3.create_time createTime,
+                            sur3.relation_type relationType
+                        FROM
+                            s_user_relation sur1
+                        LEFT JOIN s_user_relation sur2 ON (
+                            sur2.parent_id = sur1.user_id
+                        )
+                        LEFT JOIN s_user_relation sur3 ON (
+                            sur3.parent_id = sur2.user_id
+                        )
+                        LEFT JOIN s_user u ON u.id = sur3.user_id
+                        WHERE
+                            sur1.parent_id = #{userId}
+                        AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                            sur3.create_time,
+                            '%Y-%m-%d'
+                        )
+            ) AS a
+             INNER JOIN
+                (
+                 SELECT
+                  (
+                   CASE
+                   WHEN ubl.bonus_type = 3 THEN
+                    sutl.user_id
+                   ELSE
+                    sod.user_id
+                   END
+                  ) userId,
+                  sum(ubl.bonus_amount) amt
+                 FROM
+                  s_user_bonus_log ubl
+                 LEFT JOIN s_order_detail sod ON sod.id = ubl.order_detail_id
+                 AND ubl.bonus_type = 4
+                 LEFT JOIN s_user_task_line sutl ON sutl.id = ubl.user_task_line_id
+                 AND ubl.bonus_type = 3
+                 WHERE
+                  ubl.user_id = #{userId}
+                 AND ubl.bonus_type IN (3, 4)
+                 GROUP BY
+                  (
+                   CASE
+                   WHEN ubl.bonus_type = 3 THEN
+                    sutl.user_id
+                   ELSE
+                    sod.user_id
+                   END
+                  )
+                )
+                AS b ON b.user_id = a.userId
+
         ORDER BY
             a.createTime DESC
     </select>
