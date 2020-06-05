@@ -43,4 +43,29 @@ public interface ISUserRelationService extends IService<SUserRelation> {
      * @return
      */
     IPage<Map> getTodayNewAdd(QueryRequest queryRequest,String userId);
+
+    /**
+     *  查询一级禁卫军/预备队--收益
+     */
+    IPage<Map> getFirstLeveForAmt(QueryRequest queryRequest,String userId, String relationType);
+    /**
+     *  查询二级禁卫军/预备队--收益
+     */
+    IPage<Map> getSecondLevelForAmt(QueryRequest queryRequest,String userId, String relationType);
+    /**
+     *  查询三级禁卫军/预备队--收益
+     */
+    IPage<Map> getThirdLevelForAmt(QueryRequest queryRequest,String userId, String relationType);
+    /**
+     *  查询禁卫军/预备队总数--收益
+     */
+    Map<String,Object> getMyTeamTotalForAmt(String userId,String relationType);
+
+    /**
+     * 今日新增--收益
+     * @param queryRequest
+     * @param userId
+     * @return
+     */
+    IPage<Map> getTodayNewAddForAmt(QueryRequest queryRequest,String userId);
 }
