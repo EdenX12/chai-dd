@@ -13,7 +13,7 @@
                               from s_user_task_line
                              where user_id = #{userId}
                                and pay_status = 1
-                               and status in (0,1,3)
+                               and status in (0,1,3,4)
                                and task_line_id = s_task_line.id)
     </select>
 
