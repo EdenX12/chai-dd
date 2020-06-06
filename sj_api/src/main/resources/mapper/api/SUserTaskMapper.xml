@@ -248,9 +248,9 @@
     <select id="querySettlementList" resultType="java.util.Map">
     
 SELECT case when a.buyRewordAmt+a.bonusAmt>0 then '我的任务' else '躺赢任务' end as title,
-	c.productName,
-	d.lineOrder,
-b.createTime,
+c.product_name as productName,
+	d.line_order as lineOrder,
+b.create_time as createTime,
 a.buyRewordAmt,a.bonusAmt,a.upperHorizontaAmt,a.upperVerticalAmt,a.rewardAmt,a.totalAmt
 FROM
 	(
