@@ -30,8 +30,12 @@
     </select>
 
     <select id="getMyTeamTotal" resultType="java.util.Map">
-        select count(DISTINCT sur1.user_id) first,count(DISTINCT sur2.user_id) second, count(DISTINCT sur3.user_id) third ,
-        count(DISTINCT sur1.user_id)+count(DISTINCT sur2.user_id)+ count(DISTINCT sur3.user_id)  total
+        select count(DISTINCT sur1.user_id) first,
+        case when sur1.relation_type =0 then  0 else count(DISTINCT sur2.user_id) end  second,
+        case when sur1.relation_type =0 then  0 else count(DISTINCT sur3.user_id) end  third ,
+        case when sur1.relation_type =0 then  count(DISTINCT sur1.user_id)
+        else count(DISTINCT sur1.user_id)+count(DISTINCT sur2.user_id)+ count(DISTINCT sur3.user_id)  end
+         total
         from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
