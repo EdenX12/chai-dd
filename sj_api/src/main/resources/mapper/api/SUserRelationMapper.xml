@@ -17,11 +17,11 @@
         SELECT SUM(cnt) FROM (
         SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id=#{userId} AND to_days(update_time) = to_days(now())
         UNION ALL
-        SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id in(SELECT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(update_time) = to_days(now()))AND to_days(update_time) = to_days(now()) AND relation_type = '1'
+        SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id in(SELECT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1')AND to_days(update_time) = to_days(now()) AND relation_type = '1'
         UNION ALL
         SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id in (
 						SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id IN(
-                SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(update_time) = to_days(now()))AND relation_type = '1'  AND to_days(update_time) = to_days(now()))AND to_days(update_time) = to_days(now()) AND relation_type = '1'
+                SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1')AND relation_type = '1')AND to_days(update_time) = to_days(now()) AND relation_type = '1'
         ) AS countdata
     </select>
 
