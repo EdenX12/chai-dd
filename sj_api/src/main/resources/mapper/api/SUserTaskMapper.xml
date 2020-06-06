@@ -246,23 +246,36 @@
           AND user_id = #{userId}
     </select>
     <select id="querySettlementList" resultType="java.util.Map">
-        select task.order_sn,
-        sum(case when  bonus.bonus_type=1 then bonus_amount else 0 end)  as buyRewordAmt,
-        sum(case when  bonus.bonus_type=2 then bonus_amount else 0 end)  as bonusAmt,
-        sum(case when  bonus.bonus_type=3 then bonus_amount else 0 end)  as upperHorizontaAmt,
-        sum(case when  bonus.bonus_type=4 then bonus_amount else 0 end)  as upperVerticalAmt,
-        sum(case when  bonus.bonus_type=5 then bonus_amount else 0 end)  as rewardAmt,
-        sum( bonus_amount)  as totalAmt,
-        task.create_time
-        from s_user_task task
-        LEFT JOIN s_user_task_line line on task_id = task.id
-        LEFT JOIN s_user_bonus_log bonus on (bonus.user_task_line_id = line.id and task.user_id = bonus.user_id)
-        where  1=1
-        and task.user_id=#{userId}
-        and line.pay_status=1
-        and line.`status`=4
-        GROUP BY task.id
-        ORDER BY  task.create_time desc
+    
+SELECT case when a.buyRewordAmt+a.bonusAmt>0 then '我的任务' else '躺赢任务' end as title,
+	c.productName,
+	d.lineOrder,
+b.createTime,
+a.buyRewordAmt,a.bonusAmt,a.upperHorizontaAmt,a.upperVerticalAmt,a.rewardAmt,a.totalAmt
+FROM
+	(
+		SELECT
+			 sum(case when  bonus_type=1 then bonus_amount else 0 end)  as buyRewordAmt,
+        sum(case when  bonus_type=2 then bonus_amount else 0 end)  as bonusAmt,
+        sum(case when  bonus_type=3 then bonus_amount else 0 end)  as upperHorizontaAmt,
+        sum(case when  bonus_type=4 then bonus_amount else 0 end)  as upperVerticalAmt,
+        sum(case when  bonus_type=5 then bonus_amount else 0 end)  as rewardAmt,
+        sum( bonus_amount)  as totalAmt ,
+			user_task_line_id
+		FROM
+			s_user_bonus_log
+		WHERE
+			user_id = #{userId}
+		AND STATUS = 0
+		GROUP BY
+			user_task_line_id
+	) a
+LEFT JOIN s_user_task_line b ON a.user_task_line_id = b.id
+LEFT JOIN s_product c ON b.product_id = c.id
+LEFT JOIN s_task_line d ON b.task_line_id = d.id
+where d.id is not null
+ ORDER BY a.bonusAmt+a.buyRewordAmt>0,b.create_time 
+       
     </select>
 
 </mapper>
