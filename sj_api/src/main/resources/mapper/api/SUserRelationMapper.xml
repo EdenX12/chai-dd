@@ -198,10 +198,7 @@ ORDER BY
                     sur1.relation_type = #{relationType}
                 AND sur1.parent_id = #{userId}
                 GROUP BY
-                    u.id,
-                    u.nick_name,
-                    u.user_img,
-                    u.user_level_type
+                    u.id
             ) A
         left JOIN (
             SELECT
@@ -256,10 +253,7 @@ ORDER BY
                     sur1.relation_type = #{relationType}
                 AND sur1.parent_id = #{userId}
                 GROUP BY
-                    u.id,
-                    u.nick_name,
-                    u.user_img,
-                    u.user_level_type
+                    u.id
             ) A
         left JOIN (
             SELECT
@@ -315,10 +309,7 @@ ORDER BY
                     sur1.relation_type = #{relationType}
                 AND sur1.parent_id = #{userId}
                 GROUP BY
-                    u.id,
-                    u.nick_name,
-                    u.user_img,
-                    u.user_level_type
+                    u.id
             ) A
         left JOIN (
             SELECT
@@ -356,7 +347,7 @@ ORDER BY
 
     <select id="getTodayNewAddForAmt" resultType="java.util.Map">
         SELECT
-            a.*,b.amt
+            a.*,ifnull(b.amt,0) as amt
         FROM
             (
                 SELECT
@@ -419,7 +410,7 @@ ORDER BY
                             '%Y-%m-%d'
                         )
             ) AS a
-             INNER JOIN
+             left JOIN
                 (
                  SELECT
                   (
