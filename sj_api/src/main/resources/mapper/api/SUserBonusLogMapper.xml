@@ -95,11 +95,12 @@
                 status
         FROM s_user_bonus_log
         WHERE user_id=#{userId}
+        and status=1
         <if test="productId != null and productId != ''">
             AND product_id = #{productId}
         </if>
         <if test="isToday == 1">
-            AND to_days(create_time) = to_days(now())
+            AND to_days(update_time) = to_days(now())
         </if>
 
     </select>
