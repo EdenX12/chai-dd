@@ -15,13 +15,13 @@
 
     <select id="queryUserRelationTodayCnt" resultType="java.lang.Integer">
         SELECT SUM(cnt) FROM (
-        SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id=#{userId} AND to_days(create_time) = to_days(now())
+        SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id=#{userId} AND to_days(update_time) = to_days(now())
         UNION ALL
-        SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id in(SELECT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(create_time) = to_days(now()))AND to_days(create_time) = to_days(now()) AND relation_type = '1'
+        SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id in(SELECT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(update_time) = to_days(now()))AND to_days(update_time) = to_days(now()) AND relation_type = '1'
         UNION ALL
         SELECT COUNT(DISTINCT user_id) AS cnt FROM s_user_relation WHERE parent_id in (
 						SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id IN(
-                SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(create_time) = to_days(now()))AND relation_type = '1'  AND to_days(create_time) = to_days(now()))AND to_days(create_time) = to_days(now()) AND relation_type = '1'
+                SELECT DISTINCT user_id FROM s_user_relation WHERE parent_id=#{userId} AND relation_type = '1' AND to_days(update_time) = to_days(now()))AND relation_type = '1'  AND to_days(update_time) = to_days(now()))AND to_days(update_time) = to_days(now()) AND relation_type = '1'
         ) AS countdata
     </select>
 
@@ -39,11 +39,11 @@
         and sur1.parent_id = #{userId}
     </select>
     <!--查询一级禁卫军/预备队-->
-    <select id = "getFirstLevel" resultType="java.util.Map">
+    <select id="getFirstLevel" resultType="java.util.Map">
        select u.nick_name userName,
        u.user_img userImg,
        u.user_level_type userLevelType,
-       max(sur1.create_time) createTime,
+       max(sur1.update_time) createTime,
        COUNT(sur2.user_id) subordinateCount
        from s_user_relation  sur1
         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
@@ -53,16 +53,16 @@
         group by u.nick_name,
                  u.user_img,
                  u.user_level_type
-        order by  sur1.create_time desc
+        order by  sur1.update_time desc
     </select>
     <select id="getSecondLevel" resultType="java.util.Map">
        select u.nick_name userName,
        u.user_img userImg,
        u.user_level_type userLevelType,
-       max(sur2.create_time) createTime,
+       max(sur2.update_time) createTime,
        COUNT(sur3.user_id) subordinateCount
        from s_user_relation  sur1
-        LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
+        INNER JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
         LEFT JOIN s_user u on u.id=sur2.user_id
         where sur1.relation_type = #{relationType}
@@ -70,17 +70,17 @@
         group by u.nick_name,
                  u.user_img,
                  u.user_level_type
-        order by  sur2.create_time desc
+        order by  sur2.update_time desc
     </select>
     <select id="getThirdLevel" resultType="java.util.Map">
         select u.nick_name userName,
        u.user_img userImg,
        u.user_level_type userLevelType,
-       max(sur3.create_time) createTime,
+       max(sur3.update_time) createTime,
        COUNT(sur4.user_id) subordinateCount
        from s_user_relation  sur1
-         LEFT JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
-        LEFT JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
+         INNER JOIN s_user_relation sur2 on (sur2.parent_id=sur1.user_id and sur2.relation_type = #{relationType})
+        INNER JOIN s_user_relation sur3 on (sur3.parent_id=sur2.user_id and sur3.relation_type = #{relationType})
         LEFT JOIN s_user_relation sur4 on (sur4.parent_id=sur3.user_id and sur4.relation_type = #{relationType})
         LEFT JOIN s_user u on u.id=sur3.user_id
         where sur1.relation_type = #{relationType}
@@ -88,73 +88,94 @@
         group by u.nick_name,
                  u.user_img,
                  u.user_level_type
-        order by  sur3.create_time desc
+        order by  sur3.update_time desc
     </select>
 
     <select id="getTodayNewAdd" resultType="java.util.Map">
         SELECT
-            a.*
-        FROM
-            (
-                SELECT
-                    u.nick_name userName,
-                    u.user_img userImg,
-                    '一级' userLevelType,
-                    sur1.create_time createTime,
-                    sur1.relation_type relationType
-                FROM
-                    s_user_relation sur1
-                LEFT JOIN s_user u ON u.id = sur1.user_id
-                WHERE
-                    sur1.parent_id = #{userId}
-                AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                    sur1.create_time,
-                    '%Y-%m-%d'
-                )
-                UNION ALL
-                    SELECT
-                        u.nick_name userName,
-                        user_img userImg,
-                        '二级' userLevelType,
-                        sur2.create_time createTime,
-                        sur2.relation_type relationType
-                    FROM
-                        s_user_relation sur1
-                    LEFT JOIN s_user_relation sur2 ON (
-                        sur2.parent_id = sur1.user_id
-                    )
-                    LEFT JOIN s_user u ON u.id = sur2.user_id
-                    WHERE
-                        sur1.parent_id = #{userId}
-                    AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                        sur2.create_time,
-                        '%Y-%m-%d'
-                    )
-                    UNION ALL
-                        SELECT
-                            u.nick_name userName,
-                            user_img userImg,
-                            '三级' userLevelType,
-                            sur3.create_time createTime,
-                            sur3.relation_type relationType
-                        FROM
-                            s_user_relation sur1
-                        LEFT JOIN s_user_relation sur2 ON (
-                            sur2.parent_id = sur1.user_id
-                        )
-                        LEFT JOIN s_user_relation sur3 ON (
-                            sur3.parent_id = sur2.user_id
-                        )
-                        LEFT JOIN s_user u ON u.id = sur3.user_id
-                        WHERE
-                            sur1.parent_id = #{userId}
-                        AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                            sur3.create_time,
-                            '%Y-%m-%d'
-                        )
-            ) AS a
-        ORDER BY
-            a.createTime DESC
+	a.*
+FROM
+	(
+		SELECT
+			u.nick_name userName,
+			u.user_img userImg,
+			'预备队' userLevelType,
+			sur1.update_time createTime,
+			sur1.relation_type relationType
+		FROM
+			s_user_relation sur1
+		LEFT JOIN s_user u ON u.id = sur1.user_id
+		WHERE
+			sur1.parent_id = #{userId}
+		AND sur1.relation_type = 0
+		AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+			sur1.update_time,
+			'%Y-%m-%d'
+		)
+		UNION ALL
+			SELECT
+				u.nick_name userName,
+				u.user_img userImg,
+				'一级' userLevelType,
+				sur1.update_time createTime,
+				sur1.relation_type relationType
+			FROM
+				s_user_relation sur1
+			LEFT JOIN s_user u ON u.id = sur1.user_id
+			WHERE
+				sur1.parent_id = #{userId}
+			AND sur1.relation_type = 1
+			AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+				sur1.update_time,
+				'%Y-%m-%d'
+			)
+			UNION ALL
+				SELECT
+					u.nick_name userName,
+					user_img userImg,
+					'二级' userLevelType,
+					sur2.update_time createTime,
+					sur2.relation_type relationType
+				FROM
+					s_user_relation sur1
+				LEFT JOIN s_user_relation sur2 ON (
+					sur2.parent_id = sur1.user_id
+					AND sur2.relation_type = 1
+				)
+				LEFT JOIN s_user u ON u.id = sur2.user_id
+				WHERE
+					sur1.parent_id = #{userId}
+				AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+					sur2.update_time,
+					'%Y-%m-%d'
+				)
+				UNION ALL
+					SELECT
+						u.nick_name userName,
+						user_img userImg,
+						'三级' userLevelType,
+						sur3.update_time createTime,
+						sur3.relation_type relationType
+					FROM
+						s_user_relation sur1
+					LEFT JOIN s_user_relation sur2 ON (
+						sur2.parent_id = sur1.user_id
+						AND sur2.relation_type = 1
+					)
+					LEFT JOIN s_user_relation sur3 ON (
+						sur3.parent_id = sur2.user_id
+						AND sur3.relation_type = 1
+					)
+					LEFT JOIN s_user u ON u.id = sur3.user_id
+					WHERE
+						sur1.parent_id = #{userId}
+					AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+						sur3.update_time,
+						'%Y-%m-%d'
+					)
+	) AS a
+ORDER BY
+	a.createTime DESC
     </select>
 
     <select id="getFirstLevelForAmt" resultType="java.util.Map">
@@ -343,7 +364,7 @@
                     u.nick_name userName,
                     u.user_img userImg,
                     '一级' userLevelType,
-                    sur1.create_time createTime,
+                    sur1.update_time createTime,
                     sur1.relation_type relationType
                 FROM
                     s_user_relation sur1
@@ -351,7 +372,7 @@
                 WHERE
                     sur1.parent_id = #{userId}
                 AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                    sur1.create_time,
+                    sur1.update_time,
                     '%Y-%m-%d'
                 )
                 UNION ALL
@@ -360,7 +381,7 @@
                         u.nick_name userName,
                         user_img userImg,
                         '二级' userLevelType,
-                        sur2.create_time createTime,
+                        sur2.update_time createTime,
                         sur2.relation_type relationType
                     FROM
                         s_user_relation sur1
@@ -371,7 +392,7 @@
                     WHERE
                         sur1.parent_id = #{userId}
                     AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                        sur2.create_time,
+                        sur2.update_time,
                         '%Y-%m-%d'
                     )
                     UNION ALL
@@ -380,7 +401,7 @@
                             u.nick_name userName,
                             user_img userImg,
                             '三级' userLevelType,
-                            sur3.create_time createTime,
+                            sur3.update_time createTime,
                             sur3.relation_type relationType
                         FROM
                             s_user_relation sur1
@@ -394,7 +415,7 @@
                         WHERE
                             sur1.parent_id = #{userId}
                         AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                            sur3.create_time,
+                            sur3.update_time,
                             '%Y-%m-%d'
                         )
             ) AS a
