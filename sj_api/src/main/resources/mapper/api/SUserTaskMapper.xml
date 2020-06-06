@@ -246,11 +246,10 @@
           AND user_id = #{userId}
     </select>
     <select id="querySettlementList" resultType="java.util.Map">
-    
-SELECT case when a.buyRewordAmt+a.bonusAmt>0 then '我的任务' else '躺赢任务' end as title,
+  SELECT case when a.buyRewordAmt+a.bonusAmt>0 then '我的任务' when b.create_time is null then '我的任务' else '躺赢任务' end as title,
 c.product_name as productName,
 	d.line_order as lineOrder,
-b.create_time as createTime,
+CASE when b.create_time is null then e.payment_time else b.create_time end as createTime,
 a.buyRewordAmt,a.bonusAmt,a.upperHorizontaAmt,a.upperVerticalAmt,a.rewardAmt,a.totalAmt
 FROM
 	(
@@ -261,20 +260,25 @@ FROM
         sum(case when  bonus_type=4 then bonus_amount else 0 end)  as upperVerticalAmt,
         sum(case when  bonus_type=5 then bonus_amount else 0 end)  as rewardAmt,
         sum( bonus_amount)  as totalAmt ,
-			user_task_line_id
+			user_task_line_id,
+			task_line_id,
+order_detail_id
 		FROM
 			s_user_bonus_log
 		WHERE
-			user_id = #{userId}
+			user_id =#{userId}
 		AND STATUS = 0
 		GROUP BY
 			user_task_line_id
 	) a
 LEFT JOIN s_user_task_line b ON a.user_task_line_id = b.id
-LEFT JOIN s_product c ON b.product_id = c.id
-LEFT JOIN s_task_line d ON b.task_line_id = d.id
+
+LEFT JOIN s_task_line d ON a.task_line_id = d.id
+LEFT JOIN s_product c ON d.product_id = c.id
+LEFT JOIN s_order_detail e on a. order_detail_id=e.id
 where d.id is not null
- ORDER BY a.bonusAmt+a.buyRewordAmt>0,b.create_time 
+ ORDER BY title ,createTime   
+
        
     </select>
 
