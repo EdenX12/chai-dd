@@ -220,6 +220,7 @@ ORDER BY
             WHERE
                 ubl.user_id = #{userId}
             AND ubl.bonus_type IN (3, 4)
+              and ubl.status=1
             GROUP BY
                 (
                     CASE
@@ -275,6 +276,7 @@ ORDER BY
             WHERE
                 ubl.user_id = #{userId}
             AND ubl.bonus_type IN (3, 4)
+              and ubl.status=1
             GROUP BY
                 (
                     CASE
@@ -331,6 +333,7 @@ ORDER BY
             WHERE
                 ubl.user_id = #{userId}
             AND ubl.bonus_type IN (3, 4)
+              and ubl.status=1
             GROUP BY
                 (
                     CASE
@@ -362,10 +365,8 @@ ORDER BY
                 LEFT JOIN s_user u ON u.id = sur1.user_id
                 WHERE
                     sur1.parent_id = #{userId}
-                AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                    sur1.update_time,
-                    '%Y-%m-%d'
-                )
+                and sur1.relation_type=1
+              
                 UNION ALL
                     SELECT
                         u.id userId,
@@ -382,10 +383,8 @@ ORDER BY
                     LEFT JOIN s_user u ON u.id = sur2.user_id
                     WHERE
                         sur1.parent_id = #{userId}
-                    AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                        sur2.update_time,
-                        '%Y-%m-%d'
-                    )
+                         and sur1.relation_type=1
+                  
                     UNION ALL
                         SELECT
                             u.id userId,
@@ -405,10 +404,23 @@ ORDER BY
                         LEFT JOIN s_user u ON u.id = sur3.user_id
                         WHERE
                             sur1.parent_id = #{userId}
-                        AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
-                            sur3.update_time,
-                            '%Y-%m-%d'
-                        )
+                             and sur1.relation_type=1
+                      
+                         UNION ALL
+                        SELECT
+                    u.id userId,
+                    u.nick_name userName,
+                    u.user_img userImg,
+                    '预备队' userLevelType,
+                    sur1.update_time createTime,
+                    sur1.relation_type relationType
+                FROM
+                    s_user_relation sur1
+                LEFT JOIN s_user u ON u.id = sur1.user_id
+                WHERE
+                    sur1.parent_id = #{userId}
+                and sur1.relation_type=0
+               
             ) AS a
              left JOIN
                 (
@@ -431,6 +443,11 @@ ORDER BY
                  WHERE
                   ubl.user_id = #{userId}
                  AND ubl.bonus_type IN (3, 4)
+                 and ubl.status=1
+                  AND DATE_FORMAT(NOW(), '%Y-%m-%d') = DATE_FORMAT(
+                    ubl.update_time,
+                    '%Y-%m-%d'
+                )
                  GROUP BY
                   (
                    CASE
@@ -441,7 +458,7 @@ ORDER BY
                    END
                   )
                 )
-                AS b ON b.user_id = a.userId
+                AS b ON b.userId = a.userId
 
         ORDER BY
             a.createTime DESC
