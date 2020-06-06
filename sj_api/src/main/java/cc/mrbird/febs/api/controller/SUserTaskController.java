@@ -401,6 +401,7 @@ public class SUserTaskController extends BaseController {
                             SUserRelation userRelationOne = this.userRelationService.findUserRelation(userRelation);
                             // 由预备队修改为禁卫军
                             userRelationOne.setRelationType(1);
+                            userRelationOne.setUpdateTime(new Date());
                             this.userRelationService.updateById(userRelationOne);
 
                             //赠送豆
