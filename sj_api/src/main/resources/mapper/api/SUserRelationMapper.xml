@@ -422,7 +422,7 @@ ORDER BY
                 and sur1.relation_type=0
                
             ) AS a
-             left JOIN
+             inner JOIN
                 (
                  SELECT
                   (
