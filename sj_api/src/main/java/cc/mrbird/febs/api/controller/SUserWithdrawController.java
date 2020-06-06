@@ -1,13 +1,7 @@
 package cc.mrbird.febs.api.controller;
 
-import cc.mrbird.febs.api.entity.SBank;
-import cc.mrbird.febs.api.entity.SUser;
-import cc.mrbird.febs.api.entity.SUserBank;
-import cc.mrbird.febs.api.entity.SUserWithdraw;
-import cc.mrbird.febs.api.service.ISBankService;
-import cc.mrbird.febs.api.service.ISUserBankService;
-import cc.mrbird.febs.api.service.ISUserService;
-import cc.mrbird.febs.api.service.ISUserWithdrawService;
+import cc.mrbird.febs.api.entity.*;
+import cc.mrbird.febs.api.service.*;
 import cc.mrbird.febs.common.annotation.Limit;
 import cc.mrbird.febs.common.annotation.Log;
 import cc.mrbird.febs.common.controller.BaseController;
@@ -49,6 +43,9 @@ public class SUserWithdrawController extends BaseController {
 
     @Autowired
     private ISBankService bankService;
+
+    @Autowired
+    private ISUserAmountLogService userAmountLogService;
 
     /**
      * 新增用户提现
@@ -114,7 +111,16 @@ public class SUserWithdrawController extends BaseController {
             userWithdraw.setCreateTime(new Date());
             userWithdraw.setDealTime(new Date());
             this.userWithdrawService.save(userWithdraw);
-
+            //余额流水插入
+            SUserAmountLog userAmountLog = new SUserAmountLog();
+            userAmountLog.setUserId(user.getId());
+            userAmountLog.setChangeType(2);
+            userAmountLog.setChangeAmount(userWithdraw.getAmount());
+            userAmountLog.setChangeTime(new Date());
+            userAmountLog.setRelationId(userWithdraw.getId());
+            userAmountLog.setRemark("关联提现ID");
+            userAmountLog.setOldAmount(user.getTotalAmount());
+            this.userAmountLogService.save(userAmountLog);
             // 用户余额减少
             user.setTotalAmount(user.getTotalAmount().subtract(userWithdraw.getAmount()));
             this.userService.updateById(user);
