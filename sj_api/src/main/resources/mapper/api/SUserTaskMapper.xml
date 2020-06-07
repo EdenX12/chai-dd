@@ -246,7 +246,7 @@
           AND user_id = #{userId}
     </select>
     <select id="querySettlementList" resultType="java.util.Map">
-  SELECT case when a.buyRewordAmt+a.bonusAmt>0 then '我的任务' when b.create_time is null then '我的任务' else '躺赢任务' end as title,
+  SELECT case when a.rewardAmt>0 then '我的任务' when a.buyRewordAmt>0  then '我的任务' else '躺赢任务' end as title,
 c.product_name as productName,
 	d.line_order as lineOrder,
 CASE when b.create_time is null then e.payment_time else b.create_time end as createTime,
