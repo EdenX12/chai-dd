@@ -186,11 +186,11 @@ public class SUserTaskController extends BaseController {
         resultData.put("needPayAmt", needPayAmt);
 
         // 赠送拆豆取得
-        Integer orderBeanCnt = 0;
-        String value  = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        Integer orderBeanCnt = needPayAmt.multiply(new BigDecimal(10)).intValue();
+        /*String value  = this.paramsService.queryBykeyForOne("order_bean_cnt");
         if (value != null) {
             orderBeanCnt = Integer.valueOf(value);
-        }
+        }*/
         resultData.put("orderBeanCnt", orderBeanCnt);
     }
 
