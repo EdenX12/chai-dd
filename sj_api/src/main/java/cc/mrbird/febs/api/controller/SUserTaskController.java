@@ -186,11 +186,11 @@ public class SUserTaskController extends BaseController {
         resultData.put("needPayAmt", needPayAmt);
 
         // 赠送拆豆取得
-        Integer orderBeanCnt = 0;
-        String value  = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        Integer orderBeanCnt = needPayAmt.multiply(new BigDecimal(10)).intValue();
+        /*String value  = this.paramsService.queryBykeyForOne("order_bean_cnt");
         if (value != null) {
             orderBeanCnt = Integer.valueOf(value);
-        }
+        }*/
         resultData.put("orderBeanCnt", orderBeanCnt);
     }
 
@@ -423,7 +423,7 @@ public class SUserTaskController extends BaseController {
                                 if(parentUser.getCanuseBean() == null){
                                     parentUser.setCanuseBean(0);
                                 }
-                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ orderBeanCnt);
+                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ beanCnt);
                                 this.userService.updateById(parentUser);
                             }
                         }
@@ -495,7 +495,8 @@ public class SUserTaskController extends BaseController {
         BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 赠送拆豆取得
-        value = this.paramsService.queryBykeyForOne("order_bean_cnt");
+//        value = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        value = String.valueOf(payAmount.multiply(new BigDecimal(10)));
         Integer orderBeanCnt = Integer.valueOf(value);
 
         // 总佣金
