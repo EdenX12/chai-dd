@@ -95,7 +95,7 @@
                 status
         FROM s_user_bonus_log
         WHERE user_id=#{userId}
-        and status=1
+
         <if test="productId != null and productId != ''">
             AND product_id = #{productId}
         </if>
