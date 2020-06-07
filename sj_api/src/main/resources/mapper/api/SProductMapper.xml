@@ -349,6 +349,7 @@
         select count(DISTINCT task_line_id) from s_user_task_line  where 1=1
         AND (`status` = 0 OR `status` = 3)
         AND product_id = #{productId}
+        and task_line_id in (select id from s_task_line where product_id = #{productId} and received_task &gt;= total_task and settle_status=0)
         <if test="minLineOrder != null and minLineOrder != ''">
             and task_line_id in (
             select id from s_task_line
