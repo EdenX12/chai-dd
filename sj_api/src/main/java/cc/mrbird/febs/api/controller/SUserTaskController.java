@@ -496,7 +496,7 @@ public class SUserTaskController extends BaseController {
 
         // 赠送拆豆取得
 //        value = this.paramsService.queryBykeyForOne("order_bean_cnt");
-        value = payAmount.multiply(new BigDecimal(10)).toString();
+        value = String.valueOf(payAmount.multiply(new BigDecimal(10)));
         Integer orderBeanCnt = Integer.valueOf(value);
 
         // 总佣金

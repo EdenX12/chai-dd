@@ -243,7 +243,7 @@ public class SUserPayController extends BaseController {
                 // 拆豆奖励 及 拆豆流水记录追加 SUserBeanLog
                 Integer orderBeanCnt = 0;
 //                String value = this.paramsService.queryBykeyForOne("order_bean_cnt");
-                String value = userTask.getPayAmount().multiply(new BigDecimal(10)).toString();
+                String value = String.valueOf(total.multiply(new BigDecimal(10)));
                 if (value != null) {
                     orderBeanCnt = Integer.valueOf(value);
                 }
