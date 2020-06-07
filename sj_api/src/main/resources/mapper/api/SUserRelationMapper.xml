@@ -99,7 +99,7 @@ FROM
 		SELECT
 			u.nick_name userName,
 			u.user_img userImg,
-			'预备队' userLevelType,
+			'围观豆友' userLevelType,
 			sur1.update_time createTime,
 			sur1.relation_type relationType
 		FROM
@@ -116,7 +116,7 @@ FROM
 			SELECT
 				u.nick_name userName,
 				u.user_img userImg,
-				'一级' userLevelType,
+				'密友' userLevelType,
 				sur1.update_time createTime,
 				sur1.relation_type relationType
 			FROM
@@ -133,7 +133,7 @@ FROM
 				SELECT
 					u.nick_name userName,
 					user_img userImg,
-					'二级' userLevelType,
+					'亲朋' userLevelType,
 					sur2.update_time createTime,
 					sur2.relation_type relationType
 				FROM
@@ -153,7 +153,7 @@ FROM
 					SELECT
 						u.nick_name userName,
 						user_img userImg,
-						'三级' userLevelType,
+						'远亲' userLevelType,
 						sur3.update_time createTime,
 						sur3.relation_type relationType
 					FROM
@@ -357,7 +357,7 @@ ORDER BY
                     u.id userId,
                     u.nick_name userName,
                     u.user_img userImg,
-                    '一级' userLevelType,
+                    '密友' userLevelType,
                     sur1.update_time createTime,
                     sur1.relation_type relationType
                 FROM
@@ -372,7 +372,7 @@ ORDER BY
                         u.id userId,
                         u.nick_name userName,
                         user_img userImg,
-                        '二级' userLevelType,
+                        '亲朋' userLevelType,
                         sur2.update_time createTime,
                         sur2.relation_type relationType
                     FROM
@@ -390,7 +390,7 @@ ORDER BY
                             u.id userId,
                             u.nick_name userName,
                             user_img userImg,
-                            '三级' userLevelType,
+                            '远亲' userLevelType,
                             sur3.update_time createTime,
                             sur3.relation_type relationType
                         FROM
@@ -411,7 +411,7 @@ ORDER BY
                     u.id userId,
                     u.nick_name userName,
                     u.user_img userImg,
-                    '预备队' userLevelType,
+                    '围观豆友' userLevelType,
                     sur1.update_time createTime,
                     sur1.relation_type relationType
                 FROM
