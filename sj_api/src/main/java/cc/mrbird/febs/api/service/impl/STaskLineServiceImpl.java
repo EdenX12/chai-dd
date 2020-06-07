@@ -85,6 +85,7 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     	queryWrapper1.eq("status", 0);
     	
     	queryWrapper1.eq("pay_status", 1);
+    	queryWrapper1.inSql("task_line_id", "select id from s_task_line where product_id='"+productId+"' and  settle_status=0");
 		//先判断我有没有购买这个产品的任务线
     	List<SUserTaskLine> st=this.sUserTaskLineService.list(queryWrapper1);
     	if(st!=null&&st.size()>0) {
@@ -108,6 +109,7 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
     	    	queryWrapper1.eq("status", 0);
     	    	queryWrapper1.eq("pay_status", 1);
     			queryWrapper1.eq("user_id", sss.getUserId());
+    	    	queryWrapper1.inSql("task_line_id", "select id from s_task_line where product_id='"+productId+"' and  settle_status=0");
     			List<SUserTaskLine> st2=this.sUserTaskLineService.list(queryWrapper1);
     			if(st2!=null&&st2.size()>0) {
     	    		taskLineId=st2.get(0).getTaskLineId();
@@ -127,6 +129,7 @@ public class STaskLineServiceImpl extends ServiceImpl<STaskLineMapper, STaskLine
 
         // 结算状态  0：未完成
         queryWrapper.eq(STaskLine::getSettleStatus, 0);
+
         queryWrapper.orderByAsc(STaskLine::getLineOrder);
 
         List<STaskLine> list = this.baseMapper.selectList(queryWrapper);
