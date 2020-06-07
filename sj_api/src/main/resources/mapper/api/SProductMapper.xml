@@ -268,6 +268,7 @@
         ifnull(SUT.taskUserCnt, 0)                              taskUserCnt,        <!-- 拆家人数 -->
         ifnull(SUF.followCnt, 0) + ifnull(SUB.browserCnt, 0)    followCnt,          <!-- 关注人数 -->
         ifnull(SALE.productNumber, 0)                           saleCnt,            <!-- 已售件数 -->
+        ifnull(reward.rewardCnt, 0)                             rewardCnt,          <!-- 躺赢次数 -->
         ifnull(SP.total_number, 0) - ifnull(STL1.notOverCnt, 0) - sp.over_product_number  todayOverTaskLineCnt, <!-- 当天拆满任务线 -->
         ifnull(SUT.taskUserCnt, 0) - sp.user_product_number  todayTaskUserCnt                                   <!-- 当天拆家人数 -->
 
@@ -288,6 +289,8 @@
         ON SUB.product_id = SP.id
         LEFT JOIN (select sop.product_id, sum(sop.product_number) productNumber from s_order_product sop inner join s_order_detail sod on sod.id = sop.order_detail_id where sod.payment_state in(1,9) group by sop.product_id) SALE
         ON SALE.product_id = SP.id
+        LEFT JOIN (select product_id, count(*) rewardCnt from s_user_bonus_log where bonus_type in(2,3,4) group by product_id) reward
+        ON reward.product_id = SP.id
         WHERE 1 = 1
         AND SP.id = #{productId}
         AND SP.delete_flag = 0
