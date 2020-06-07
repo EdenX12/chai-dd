@@ -495,7 +495,8 @@ public class SUserTaskController extends BaseController {
         BigDecimal sameGroupRate = BigDecimal.valueOf(Double.parseDouble(value));
 
         // 赠送拆豆取得
-        value = this.paramsService.queryBykeyForOne("order_bean_cnt");
+//        value = this.paramsService.queryBykeyForOne("order_bean_cnt");
+        value = payAmount.multiply(new BigDecimal(10)).toString();
         Integer orderBeanCnt = Integer.valueOf(value);
 
         // 总佣金
