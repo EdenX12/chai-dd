@@ -423,7 +423,7 @@ public class SUserTaskController extends BaseController {
                                 if(parentUser.getCanuseBean() == null){
                                     parentUser.setCanuseBean(0);
                                 }
-                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ orderBeanCnt);
+                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ beanCnt);
                                 this.userService.updateById(parentUser);
                             }
                         }

@@ -309,7 +309,7 @@ public class SUserPayController extends BaseController {
                                 if(parentUser.getCanuseBean() == null){
                                     parentUser.setCanuseBean(0);
                                 }
-                                parentUser.setCanuseBean(parentUser.getCanuseBean()+ + beanCnt);
+                                parentUser.setCanuseBean(parentUser.getCanuseBean() + beanCnt);
                                 this.userService.updateById(parentUser);
                             }
                         }
