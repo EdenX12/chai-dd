@@ -269,7 +269,7 @@ order_detail_id
 			user_id =#{userId}
 		AND STATUS = 0
 		GROUP BY
-			user_task_line_id
+			user_task_line_id,task_line_id
 	) a
 LEFT JOIN s_user_task_line b ON a.user_task_line_id = b.id
 
