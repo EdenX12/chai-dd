@@ -2,6 +2,7 @@ package cc.mrbird.febs.api.controller;
 
 
 import cc.mrbird.febs.api.service.ISProductService;
+import cc.mrbird.febs.api.service.ISUserAmountLogService;
 import cc.mrbird.febs.api.service.ISUserService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,14 @@ public class ScheduledTask {
 
     @Autowired
     ISProductService productService;
+
+    @Autowired
+    ISUserAmountLogService userAmountLogService;
     /**
      * user 等级更新定时任务
      */
     @Scheduled(cron="0 0 7,14,20,22 * * ?")
+    @Transactional
     public void updateUserLevelType(){
        // 1.  根据SUser表中的 reward_bean 值  看这个值在 s_user_lever中的 min_number 和 max_number 两个值之间 找到对应的level_type
         //2.  把上面找到的这个level_type 设定到 s_user表中的 user_level_type 字段上
@@ -56,5 +61,17 @@ public class ScheduledTask {
             logger.info("定时任务更新product已拆人数："+userCountList.size()+"条！");
         }
 
+    }
+
+    /**
+     * 根据任务线更新用户账户余额
+     */
+    @Scheduled(cron="0 10 0 * * ?")
+    @Transactional
+    public void batchUpdateUserAmtLog(){
+        userAmountLogService.batchInsertLog();
+        userAmountLogService.batchUpdateBalance();
+        userAmountLogService.batchUpdateStatus();
+        logger.info("定时任务更新用户余额、状态");
     }
 }

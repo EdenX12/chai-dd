@@ -12,4 +12,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class SUserAmountLogServiceImpl extends ServiceImpl<SUserAmountLogMapper, SUserAmountLog> implements ISUserAmountLogService {
 
+    @Override
+    public void batchInsertLog() {
+        this.baseMapper.batchInsertLog();
+    }
+
+    @Override
+    public void batchUpdateBalance() {
+        this.baseMapper.batchUpdateBalance();
+    }
+
+    @Override
+    public void batchUpdateStatus() {
+        this.batchUpdateStatus();
+    }
 }

@@ -1,5 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.api.mapper.SUserAmountLogMapper">
-
+    <!--插入流水-->
+    <insert id="batchInsertLog">
+        INSERT s_user_amount_log (
+        id,
+        user_id,
+        change_type,
+        change_amount,
+        change_time,
+        remark,
+        `status`,
+        relation_id,
+        old_amount
+        ) SELECT
+        MD5(a.id),
+        a.user_id,
+        9,
+        a.pay_amount,
+        NOW(),
+        '关联任务线ID',
+        NULL,
+        a.id,
+        b.total_amount
+        FROM
+        s_user_task_line a
+        LEFT JOIN s_user b ON a.user_id = b.id
+        WHERE
+        a.pay_status = 1
+        AND a.`status` = 0
+        AND a.pay_time <![CDATA[ < ]]> DATE_ADD(DATE_SUB(CURDATE(),INTERVAL 7 DAY),INTERVAL 0 HOUR)
+    </insert>
+    <!--变动余额-->
+    <update id="batchUpdateBalance">
+        UPDATE (
+        SELECT
+        user_id,
+        sum(pay_amount) addamount
+        FROM
+        s_user_task_line
+        WHERE
+        pay_status = 1
+        AND `status` = 0
+        AND pay_time <![CDATA[ < ]]>  DATE_ADD(DATE_SUB(CURDATE(),INTERVAL 7 DAY),INTERVAL 0 HOUR)
+        GROUP BY
+        user_id
+        ) a
+        LEFT JOIN s_user b ON a.user_id = b.id
+        SET b.total_amount = b.total_amount + a.addamount
+    </update>
+    <!-- 改变状态-->
+    <update id="batchUpdateStatus">
+        UPDATE s_user_task_line
+        SET `status` =- 1
+        WHERE
+        pay_status = 1
+        AND `status` = 0
+        AND pay_time <![CDATA[ < ]]>   DATE_ADD(DATE_SUB(CURDATE(),INTERVAL 7 DAY),INTERVAL 0 HOUR)
+    </update>
 </mapper>

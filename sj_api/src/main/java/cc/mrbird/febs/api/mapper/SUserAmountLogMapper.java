@@ -9,4 +9,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SUserAmountLogMapper extends BaseMapper<SUserAmountLog> {
 
+    void batchInsertLog();
+
+    void batchUpdateBalance();
+
+    void batchUpdateStatus();
+
 }
