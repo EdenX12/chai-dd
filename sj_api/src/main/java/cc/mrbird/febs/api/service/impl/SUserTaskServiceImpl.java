@@ -168,12 +168,12 @@ public class  SUserTaskServiceImpl extends ServiceImpl<SUserTaskMapper, SUserTas
     }
 
     @Override
-    public IPage<Map> querySettlementList(String userId, QueryRequest request) {
+    public IPage<Map> querySettlementList(String userId, QueryRequest request,Integer type) {
         try {
 
             Page<Map> page = new Page<>();
             SortUtil.handlePageSort(request, page, null, null, false);
-            IPage<Map> returnPage = this.baseMapper.querySettlementList(page,userId);
+            IPage<Map> returnPage = this.baseMapper.querySettlementList(page,userId,type);
 
             return returnPage;
         } catch (Exception e) {

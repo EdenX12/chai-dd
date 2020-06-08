@@ -114,5 +114,5 @@ public interface ISUserTaskService extends IService<SUserTask> {
      * @param request
      * @return
      */
-    IPage<Map> querySettlementList(String userId, QueryRequest request);
+    IPage<Map> querySettlementList(String userId, QueryRequest request,Integer type);
 }

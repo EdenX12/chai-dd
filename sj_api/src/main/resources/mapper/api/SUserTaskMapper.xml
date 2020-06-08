@@ -277,6 +277,16 @@ LEFT JOIN s_task_line d ON a.task_line_id = d.id
 LEFT JOIN s_product c ON d.product_id = c.id
 LEFT JOIN s_order_detail e on a. order_detail_id=e.id
 where d.id is not null
+<if test="type != null">
+    <choose>
+        <when test="type == 1">
+            and (a.rewardAmt>0 or a.buyRewordAmt)
+        </when>
+        <when test="type == 2">
+            and a.rewardAmt=0 and a.buyRewordAmt=0
+        </when>
+    </choose>
+</if>
  ORDER BY title ,createTime   
 
        

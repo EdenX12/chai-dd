@@ -550,14 +550,14 @@ public class SUserController extends BaseController {
 
     @PostMapping("/querySettlementList")
     @Limit(key = "querySettlementList", period = 60, count = 2000, name = "用户会员中心接口", prefix = "limit")
-    public FebsResponse querySettlementList(QueryRequest queryRequest) {
+    public FebsResponse querySettlementList(QueryRequest queryRequest,Integer type) {
         FebsResponse response = new FebsResponse();
         response.put("code", 0);
 
         SUser user = FebsUtil.getCurrentUser();
 
         Map<String, Object> pageList = getDataTable(
-               this.userTaskService.querySettlementList(user.getId(),queryRequest));
+               this.userTaskService.querySettlementList(user.getId(),queryRequest,type));
 
         response.put("code", 0);
         response.data(pageList);
