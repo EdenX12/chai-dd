@@ -24,6 +24,6 @@ public class SUserAmountLogServiceImpl extends ServiceImpl<SUserAmountLogMapper,
 
     @Override
     public void batchUpdateStatus() {
-        this.batchUpdateStatus();
+        this.baseMapper.batchUpdateStatus();
     }
 }
